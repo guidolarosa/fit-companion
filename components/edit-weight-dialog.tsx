@@ -31,7 +31,6 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
   const router = useRouter()
   const [weight, setWeight] = useState("")
   const [date, setDate] = useState("")
-  const [time, setTime] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -39,7 +38,6 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
       setWeight(entry.weight.toString())
       const entryDate = new Date(entry.date)
       setDate(entryDate.toISOString().split("T")[0])
-      setTime(entryDate.toTimeString().slice(0, 5))
     }
   }, [entry])
 
@@ -50,7 +48,8 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
     setIsSubmitting(true)
 
     try {
-      const dateTime = new Date(`${date}T${time}`)
+      // Set to start of day (midnight) for the selected date
+      const dateTime = new Date(`${date}T00:00:00`)
       const response = await fetch("/api/weight", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -100,29 +99,15 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
               required
             />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-date">Date</Label>
-              <Input
-                id="edit-date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-                className="min-w-0"
-              />
-            </div>
-            <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-time">Time</Label>
-              <Input
-                id="edit-time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                required
-                className="min-w-0"
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="edit-date">Date</Label>
+            <Input
+              id="edit-date"
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              required
+            />
           </div>
           <DialogFooter>
             <Button

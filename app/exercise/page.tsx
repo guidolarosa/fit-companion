@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { ExerciseForm } from "@/components/exercise-form"
 import { ExerciseAgent } from "@/components/exercise-agent"
 import { ExerciseEntryList } from "@/components/exercise-entry-list"
+import { FittyButton } from "@/components/fitty-button"
 import { Flame } from "lucide-react"
 import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
@@ -33,7 +34,10 @@ export default async function ExercisePage() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
-          <h1 className="mb-6 sm:mb-8 text-2xl sm:text-3xl font-bold">Exercise & Calorie Burn</h1>
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold">Exercise & Calorie Burn</h1>
+            <FittyButton />
+          </div>
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>

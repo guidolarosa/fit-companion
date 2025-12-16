@@ -78,30 +78,34 @@ export function SettingsForm({ user }: SettingsFormProps) {
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="height">Height (cm)</Label>
-        <Input
-          id="height"
-          type="number"
-          step="0.1"
-          min="0"
-          value={height}
-          onChange={(e) => setHeight(e.target.value)}
-          placeholder="Enter your height in centimeters"
-        />
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2 min-w-0">
+          <Label htmlFor="height">Height (cm)</Label>
+          <Input
+            id="height"
+            type="number"
+            step="0.1"
+            min="0"
+            value={height}
+            onChange={(e) => setHeight(e.target.value)}
+            placeholder="Enter your height in centimeters"
+            className="min-w-0"
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="age">Age</Label>
-        <Input
-          id="age"
-          type="number"
-          min="0"
-          max="150"
-          value={age}
-          onChange={(e) => setAge(e.target.value)}
-          placeholder="Enter your age"
-        />
+        <div className="space-y-2 min-w-0">
+          <Label htmlFor="age">Age</Label>
+          <Input
+            id="age"
+            type="number"
+            min="0"
+            max="150"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            placeholder="Enter your age"
+            className="min-w-0"
+          />
+        </div>
       </div>
 
       <div className="space-y-2">
@@ -118,22 +122,23 @@ export function SettingsForm({ user }: SettingsFormProps) {
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="ifType">Intermittent Fasting Type</Label>
-        <Select
-          id="ifType"
-          value={ifType}
-          onChange={(e) => setIfType(e.target.value)}
-        >
-          <option value="">No IF</option>
-          <option value="16:8">16:8 (16h fast, 8h eating)</option>
-          <option value="18:6">18:6 (18h fast, 6h eating)</option>
-          <option value="20:4">20:4 (20h fast, 4h eating)</option>
-          <option value="OMAD">OMAD (23h fast, 1h eating)</option>
-        </Select>
-      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2 min-w-0">
+          <Label htmlFor="ifType">Intermittent Fasting Type</Label>
+          <Select
+            id="ifType"
+            value={ifType}
+            onChange={(e) => setIfType(e.target.value)}
+            className="min-w-0"
+          >
+            <option value="">No IF</option>
+            <option value="16:8">16:8 (16h fast, 8h eating)</option>
+            <option value="18:6">18:6 (18h fast, 6h eating)</option>
+            <option value="20:4">20:4 (20h fast, 4h eating)</option>
+            <option value="OMAD">OMAD (23h fast, 1h eating)</option>
+          </Select>
+        </div>
 
-      {ifType && (
         <div className="space-y-2 min-w-0">
           <Label htmlFor="ifStartTime">Eating Window Start Time</Label>
           <Input
@@ -142,13 +147,14 @@ export function SettingsForm({ user }: SettingsFormProps) {
             value={ifStartTime}
             onChange={(e) => setIfStartTime(e.target.value)}
             required={!!ifType}
+            disabled={!ifType}
             className="min-w-0"
           />
           <p className="text-xs text-muted-foreground">
             When your eating window starts each day
           </p>
         </div>
-      )}
+      </div>
 
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save Settings"}

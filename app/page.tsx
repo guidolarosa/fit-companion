@@ -28,6 +28,7 @@ import { calculateBMR, calculateTDEE, getWeightForDate } from "@/lib/calories";
 import { getCurrentUser } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 import { WeightChart } from "@/components/weight-chart";
+import { FittyButton } from "@/components/fitty-button";
 
 async function getWeightData(userId: string) {
   const weights = await prisma.weightEntry.findMany({
@@ -199,9 +200,10 @@ export default async function Dashboard() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
-          <h1 className="mb-6 sm:mb-8 text-2xl sm:text-3xl font-bold">
-            Dashboard
-          </h1>
+          <div className="flex items-center justify-between mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+            <FittyButton />
+          </div>
 
           <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             <WeightGaugeCard
@@ -316,12 +318,14 @@ export default async function Dashboard() {
               netCalories={data.dailyData[0]?.netCalories ?? null}
             />
             <Card>
-              <CardHeader>
-                <CardTitle>Weight Progress</CardTitle>
-                <CardDescription>Track your weight over time</CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-1">
+                <CardTitle className="text-sm font-medium">
+                  <span>Weight Progress</span>
+                </CardTitle>
+                <Weight className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <WeightChart weights={weights} chartHeight={200}/>
+                <WeightChart weights={weights} chartHeight={200} />
               </CardContent>
             </Card>
           </div>

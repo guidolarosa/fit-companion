@@ -11,7 +11,6 @@ export function WeightForm() {
   const router = useRouter()
   const [weight, setWeight] = useState("")
   const [date, setDate] = useState(new Date().toISOString().split("T")[0])
-  const [time, setTime] = useState(new Date().toTimeString().slice(0, 5))
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -19,7 +18,8 @@ export function WeightForm() {
     setIsSubmitting(true)
 
     try {
-      const dateTime = new Date(`${date}T${time}`)
+      // Set to start of day (midnight) for the selected date
+      const dateTime = new Date(`${date}T00:00:00`)
       const response = await fetch("/api/weight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -32,7 +32,6 @@ export function WeightForm() {
       if (response.ok) {
         setWeight("")
         setDate(new Date().toISOString().split("T")[0])
-        setTime(new Date().toTimeString().slice(0, 5))
         toast.success("Weight entry created successfully!")
         router.refresh()
       } else {
@@ -62,29 +61,15 @@ export function WeightForm() {
           required
         />
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2 min-w-0">
-          <Label htmlFor="date">Date</Label>
-          <Input
-            id="date"
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-            className="min-w-0"
-          />
-        </div>
-        <div className="space-y-2 min-w-0">
-          <Label htmlFor="time">Time</Label>
-          <Input
-            id="time"
-            type="time"
-            value={time}
-            onChange={(e) => setTime(e.target.value)}
-            required
-            className="min-w-0"
-          />
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="date">Date</Label>
+        <Input
+          id="date"
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          required
+        />
       </div>
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Submitting..." : "Add Weight Entry"}

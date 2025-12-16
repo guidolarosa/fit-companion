@@ -18,7 +18,7 @@ export default async function AgentPage() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-4xl">
-          <h1 className="mb-6 sm:mb-8 text-2xl sm:text-3xl font-bold">AI Weight Loss Agent</h1>
+          <h1 className="mb-6 sm:mb-8 text-2xl sm:text-3xl font-bold">Fitty Assistant</h1>
 
           <Card>
             <CardHeader>
