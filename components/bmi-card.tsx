@@ -67,7 +67,7 @@ export function BMICard({ bmi, currentWeight, idealWeight, height }: BMICardProp
       <CardContent>
         <div className="space-y-4">
           <div>
-            <div className="flex items-baseline gap-2">
+            <div className="flex items-center gap-2">
               <div className="text-3xl font-bold">{bmi.toFixed(1)}</div>
               <span className={`text-sm font-medium px-2 py-1 rounded ${category.color} ${category.bgColor}`}>
                 {category.label}

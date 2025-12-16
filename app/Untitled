@@ -1,0 +1,7 @@
+async function getWeightData(userId: string) {
+  const weights = await prisma.weightEntry.findMany({
+    where: { userId },
+    orderBy: { date: "asc" },
+  })
+  return weights
+}
