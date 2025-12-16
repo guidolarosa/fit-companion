@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -61,11 +62,16 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
       })
 
       if (response.ok) {
+        toast.success("Weight entry updated successfully!")
         onOpenChange(false)
         router.refresh()
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || "Failed to update weight entry")
       }
     } catch (error) {
       console.error("Error updating weight entry:", error)
+      toast.error("An error occurred while updating the weight entry")
     } finally {
       setIsSubmitting(false)
     }

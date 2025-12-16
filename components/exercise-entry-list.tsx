@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { format } from "date-fns"
 import { Trash2, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -34,10 +35,15 @@ export function ExerciseEntryList({ entries }: ExerciseEntryListProps) {
       })
 
       if (response.ok) {
+        toast.success("Exercise entry deleted successfully!")
         router.refresh()
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || "Failed to delete exercise entry")
       }
     } catch (error) {
       console.error("Error deleting exercise:", error)
+      toast.error("An error occurred while deleting the exercise entry")
     }
   }
 

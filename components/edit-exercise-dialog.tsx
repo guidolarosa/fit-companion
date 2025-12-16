@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -69,11 +70,16 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
       })
 
       if (response.ok) {
+        toast.success("Exercise entry updated successfully!")
         onOpenChange(false)
         router.refresh()
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || "Failed to update exercise entry")
       }
     } catch (error) {
       console.error("Error updating exercise entry:", error)
+      toast.error("An error occurred while updating the exercise entry")
     } finally {
       setIsSubmitting(false)
     }

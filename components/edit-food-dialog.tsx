@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -65,11 +66,16 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
       })
 
       if (response.ok) {
+        toast.success("Food entry updated successfully!")
         onOpenChange(false)
         router.refresh()
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || "Failed to update food entry")
       }
     } catch (error) {
       console.error("Error updating food entry:", error)
+      toast.error("An error occurred while updating the food entry")
     } finally {
       setIsSubmitting(false)
     }

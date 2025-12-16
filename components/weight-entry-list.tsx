@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { format } from "date-fns"
 import { Trash2, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -32,10 +33,15 @@ export function WeightEntryList({ entries }: WeightEntryListProps) {
       })
 
       if (response.ok) {
+        toast.success("Weight entry deleted successfully!")
         router.refresh()
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || "Failed to delete weight entry")
       }
     } catch (error) {
       console.error("Error deleting weight entry:", error)
+      toast.error("An error occurred while deleting the weight entry")
     }
   }
 

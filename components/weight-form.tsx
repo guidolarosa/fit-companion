@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,10 +33,15 @@ export function WeightForm() {
         setWeight("")
         setDate(new Date().toISOString().split("T")[0])
         setTime(new Date().toTimeString().slice(0, 5))
+        toast.success("Weight entry created successfully!")
         router.refresh()
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || "Failed to create weight entry")
       }
     } catch (error) {
       console.error("Error submitting weight:", error)
+      toast.error("An error occurred while creating the weight entry")
     } finally {
       setIsSubmitting(false)
     }
