@@ -56,9 +56,11 @@ export function WeightEntryList({ entries }: WeightEntryListProps) {
               key={entry.id}
               className="flex items-center justify-between  border p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b"
             >
-              <div>
-                <p className="font-semibold">{entry.weight} kg</p>
-                <p className="text-sm text-muted-foreground">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold truncate" title={`${entry.weight} kg`}>
+                  {entry.weight} kg
+                </p>
+                <p className="text-sm text-muted-foreground truncate">
                   {format(new Date(entry.date), "MMM d, yyyy")}
                 </p>
               </div>

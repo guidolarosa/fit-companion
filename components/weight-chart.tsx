@@ -41,6 +41,7 @@ export function WeightChart({ weights, chartHeight = 300 }: WeightChartProps) {
           stroke="hsl(var(--muted-foreground))"
           style={{ fontSize: "12px" }}
           label={{ value: "Weight (kg)", angle: -90, position: "insideLeft" }}
+          domain={[55, 80]}
         />
         <Tooltip
           contentStyle={{

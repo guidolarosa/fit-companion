@@ -8,6 +8,7 @@ import { Trash2, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditExerciseDialog } from "@/components/edit-exercise-dialog"
+import { CaloriePill } from "@/components/calorie-pill"
 
 interface ExerciseEntry {
   id: string
@@ -58,18 +59,18 @@ export function ExerciseEntryList({ entries }: ExerciseEntryListProps) {
               key={entry.id}
               className="flex items-center justify-between border p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b flex-wrap sm:flex-nowrap"
             >
-            <div>
-              <p className="font-semibold">{entry.name}</p>
-              <p className="text-sm text-muted-foreground">
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold truncate" title={entry.name}>
+                {entry.name}
+              </p>
+              <p className="text-sm text-muted-foreground truncate">
                 {format(entry.date, "MMM d, yyyy 'at' HH:mm")}
                 {entry.duration && ` • ${entry.duration} minutes`}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="font-semibold text-primary bg-primary/10 rounded-md px-2 py-1">
-                  {Math.round(entry.calories)} kcal
-                </p>
+                <CaloriePill calories={entry.calories} />
               </div>
               <div className="flex items-center gap-1">
                 <Button

@@ -29,6 +29,8 @@ import { getCurrentUser } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 import { WeightChart } from "@/components/weight-chart";
 import { FittyButton } from "@/components/fitty-button";
+import { ExerciseCalendar } from "@/components/exercise-calendar";
+import { FoodCalendar } from "@/components/food-calendar";
 
 async function getWeightData(userId: string) {
   const weights = await prisma.weightEntry.findMany({
@@ -169,6 +171,36 @@ async function getDashboardData(userId: string) {
     return sum + netCalories;
   }, 0);
 
+  // Group exercises by day for calendar
+  const exerciseDaysMap = new Map<string, number>();
+  allExercises.forEach((exercise) => {
+    const dayKey = format(startOfDay(exercise.date), "yyyy-MM-dd");
+    const existing = exerciseDaysMap.get(dayKey);
+    if (existing) {
+      exerciseDaysMap.set(dayKey, existing + exercise.calories);
+    } else {
+      exerciseDaysMap.set(dayKey, exercise.calories);
+    }
+  });
+
+  const exerciseDays = Array.from(exerciseDaysMap.entries()).map(([dateKey, calories]) => {
+    // Parse date string (yyyy-MM-dd) as local date to avoid timezone issues
+    const [year, month, day] = dateKey.split("-").map(Number);
+    return {
+      date: new Date(year, month - 1, day),
+      calories,
+    };
+  });
+
+  // Prepare food days for calendar (all days with food/exercise data)
+  const foodDays = dailyData.map((day) => ({
+    date: day.date,
+    netCalories: day.netCalories,
+    caloriesConsumed: day.caloriesConsumed,
+    caloriesBurnt: day.caloriesBurnt,
+    tdee: day.tdee,
+  }));
+
   return {
     latestWeight,
     user,
@@ -180,6 +212,8 @@ async function getDashboardData(userId: string) {
     recentExercises,
     recentFoods,
     dailyData,
+    exerciseDays,
+    foodDays,
   };
 }
 
@@ -326,6 +360,31 @@ export default async function Dashboard() {
               </CardHeader>
               <CardContent>
                 <WeightChart weights={weights} chartHeight={200} />
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <Card className="md:col-span-2 lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Exercise Calendar
+                </CardTitle>
+                <Activity className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <ExerciseCalendar exerciseDays={data.exerciseDays} />
+              </CardContent>
+            </Card>
+            <Card className="md:col-span-2 lg:col-span-1">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Food Calendar
+                </CardTitle>
+                <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <FoodCalendar foodDays={data.foodDays} />
               </CardContent>
             </Card>
           </div>

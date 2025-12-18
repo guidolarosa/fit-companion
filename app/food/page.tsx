@@ -12,12 +12,17 @@ import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
 
 async function getFoodEntries(userId: string) {
-  const foods = await prisma.foodEntry.findMany({
-    where: { userId },
-    orderBy: { date: "desc" },
-    take: 20,
-  })
-  return foods
+  const [foods, totalCount] = await Promise.all([
+    prisma.foodEntry.findMany({
+      where: { userId },
+      orderBy: { date: "desc" },
+      take: 10,
+    }),
+    prisma.foodEntry.count({
+      where: { userId },
+    }),
+  ])
+  return { foods, totalCount }
 }
 
 export default async function FoodPage() {
@@ -27,7 +32,7 @@ export default async function FoodPage() {
     redirect("/login")
   }
 
-  const foods = await getFoodEntries(user.id)
+  const { foods, totalCount } = await getFoodEntries(user.id)
 
   return (
     <div className="flex h-screen">
@@ -85,7 +90,7 @@ export default async function FoodPage() {
                 {foods.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No food entries yet</p>
                 ) : (
-                  <FoodEntryList entries={foods} />
+                  <FoodEntryList entries={foods} showViewAll={totalCount > 10} />
                 )}
               </CardContent>
             </Card>

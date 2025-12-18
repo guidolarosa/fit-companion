@@ -2,12 +2,14 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { toast } from "sonner"
 import { format } from "date-fns"
 import { Trash2, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditFoodDialog } from "@/components/edit-food-dialog"
+import { CaloriePill } from "@/components/calorie-pill"
 
 interface FoodEntry {
   id: string
@@ -18,9 +20,10 @@ interface FoodEntry {
 
 interface FoodEntryListProps {
   entries: FoodEntry[]
+  showViewAll?: boolean
 }
 
-export function FoodEntryList({ entries }: FoodEntryListProps) {
+export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListProps) {
   const router = useRouter()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [entryToDelete, setEntryToDelete] = useState<FoodEntry | null>(null)
@@ -49,25 +52,22 @@ export function FoodEntryList({ entries }: FoodEntryListProps) {
   return (
     <>
       <div>
-        {entries
-          .slice()
-          .reverse()
-          .map((entry) => (
-            <div
-              key={entry.id}
-              className="flex items-center justify-between border p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b flex-wrap sm:flex-nowrap"
-            >
-            <div>
-              <p className="font-semibold">{entry.name}</p>
-              <p className="text-sm text-muted-foreground">
+        {entries.map((entry) => (
+          <div
+            key={entry.id}
+            className="flex items-center justify-between border p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b flex-wrap sm:flex-nowrap"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold truncate" title={entry.name}>
+                {entry.name}
+              </p>
+              <p className="text-sm text-muted-foreground truncate">
                 {format(entry.date, "MMM d, yyyy 'at' HH:mm")}
               </p>
             </div>
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="font-semibold text-primary">
-                  {Math.round(entry.calories)} kcal
-                </p>
+                <CaloriePill calories={entry.calories} />
               </div>
               <div className="flex items-center gap-1">
                 <Button
@@ -97,6 +97,15 @@ export function FoodEntryList({ entries }: FoodEntryListProps) {
           </div>
         ))}
       </div>
+      {showViewAll && (
+        <div className="mt-4 flex justify-center">
+          <Link href="/food/all">
+            <Button variant="outline" className="w-full">
+              View all
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <EditFoodDialog
         open={editDialogOpen}

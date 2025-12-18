@@ -9,6 +9,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Fit Companion - Weight Loss Tracker",
   description: "Track your weight loss progress with AI assistance",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
