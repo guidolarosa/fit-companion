@@ -28,37 +28,48 @@ export function WeightChart({ weights, chartHeight = 300 }: WeightChartProps) {
     weight: entry.weight,
   }))
 
+  const minWeight = Math.min(...weights.map((w) => w.weight))
+  const maxWeight = Math.max(...weights.map((w) => w.weight))
+  const range = maxWeight - minWeight
+  const padding = range > 0 ? Math.max(1, range * 0.1) : 1
+  const domainMin = Math.max(0, Math.floor(minWeight - padding))
+  const domainMax = Math.ceil(maxWeight + padding)
+
+  console.log(chartData)
+
   return (
-    <ResponsiveContainer width="100%" height={chartHeight}>
-      <LineChart data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-        <XAxis
-          dataKey="date"
-          stroke="hsl(var(--muted-foreground))"
-          style={{ fontSize: "12px" }}
-        />
-        <YAxis
-          stroke="hsl(var(--muted-foreground))"
-          style={{ fontSize: "12px" }}
-          label={{ value: "Weight (kg)", angle: -90, position: "insideLeft" }}
-          domain={[55, 80]}
-        />
-        <Tooltip
-          contentStyle={{
-            backgroundColor: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: "6px",
-          }}
-        />
-        <Line
-          type="monotone"
-          dataKey="weight"
-          stroke="hsl(var(--primary))"
-          strokeWidth={2}
-          dot={{ fill: "hsl(var(--primary))", r: 4 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div style={{ width: "100%", height: `${chartHeight}px` }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+          <XAxis
+            dataKey="date"
+            stroke="hsl(var(--muted-foreground))"
+            style={{ fontSize: "12px" }}
+          />
+          <YAxis
+            stroke="hsl(var(--muted-foreground))"
+            style={{ fontSize: "12px" }}
+            label={{ value: "Weight (kg)", angle: -90, position: "insideLeft" }}
+            domain={[58, 75]}
+          />
+          <Tooltip
+            contentStyle={{
+              backgroundColor: "hsl(var(--card))",
+              border: "1px solid hsl(var(--border))",
+              borderRadius: "6px",
+            }}
+          />
+          <Line
+            type="monotone"
+            dataKey="weight"
+            stroke="hsl(var(--primary))"
+            strokeWidth={2}
+            dot={{ fill: "hsl(var(--primary))", r: 4 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   )
 }
 

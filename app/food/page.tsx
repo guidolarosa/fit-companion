@@ -16,7 +16,7 @@ async function getFoodEntries(userId: string) {
     prisma.foodEntry.findMany({
       where: { userId },
       orderBy: { date: "desc" },
-      take: 10,
+      take: 5,
     }),
     prisma.foodEntry.count({
       where: { userId },
@@ -90,7 +90,7 @@ export default async function FoodPage() {
                 {foods.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No food entries yet</p>
                 ) : (
-                  <FoodEntryList entries={foods} showViewAll={totalCount > 10} />
+                  <FoodEntryList entries={foods} showViewAll={totalCount > 5} />
                 )}
               </CardContent>
             </Card>

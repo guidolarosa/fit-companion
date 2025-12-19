@@ -228,6 +228,8 @@ export default async function Dashboard() {
 
   const weights = await getWeightData(user.id);
 
+  console.log('hello')
+
   return (
     <div className="flex h-screen">
       <Sidebar />

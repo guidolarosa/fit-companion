@@ -11,12 +11,17 @@ import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
 
 async function getExercises(userId: string) {
-  const exercises = await prisma.exercise.findMany({
-    where: { userId },
-    orderBy: { date: "desc" },
-    take: 20,
-  })
-  return exercises
+  const [exercises, totalCount] = await Promise.all([
+    prisma.exercise.findMany({
+      where: { userId },
+      orderBy: { date: "desc" },
+      take: 10,
+    }),
+    prisma.exercise.count({
+      where: { userId },
+    }),
+  ])
+  return { exercises, totalCount }
 }
 
 export default async function ExercisePage() {
@@ -26,7 +31,7 @@ export default async function ExercisePage() {
     redirect("/login")
   }
 
-  const exercises = await getExercises(user.id)
+  const { exercises, totalCount } = await getExercises(user.id)
 
   return (
     <div className="flex h-screen">
@@ -73,7 +78,7 @@ export default async function ExercisePage() {
               {exercises.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No exercises recorded yet</p>
               ) : (
-                <ExerciseEntryList entries={exercises} />
+                <ExerciseEntryList entries={exercises} showViewAll={totalCount > 10} />
               )}
             </CardContent>
           </Card>

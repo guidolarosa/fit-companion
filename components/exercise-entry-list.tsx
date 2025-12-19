@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { toast } from "sonner"
 import { format } from "date-fns"
 import { Trash2, Edit } from "lucide-react"
@@ -20,9 +21,10 @@ interface ExerciseEntry {
 
 interface ExerciseEntryListProps {
   entries: ExerciseEntry[]
+  showViewAll?: boolean
 }
 
-export function ExerciseEntryList({ entries }: ExerciseEntryListProps) {
+export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntryListProps) {
   const router = useRouter()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [entryToDelete, setEntryToDelete] = useState<ExerciseEntry | null>(null)
@@ -51,14 +53,11 @@ export function ExerciseEntryList({ entries }: ExerciseEntryListProps) {
   return (
     <>
       <div>
-        {entries
-          .slice()
-          .reverse()
-          .map((entry) => (
-            <div
-              key={entry.id}
-              className="flex items-center justify-between border p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b flex-wrap sm:flex-nowrap"
-            >
+        {entries.map((entry) => (
+          <div
+            key={entry.id}
+            className="flex items-center justify-between border p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b flex-wrap sm:flex-nowrap"
+          >
             <div className="min-w-0 flex-1">
               <p className="font-semibold truncate" title={entry.name}>
                 {entry.name}
@@ -100,6 +99,16 @@ export function ExerciseEntryList({ entries }: ExerciseEntryListProps) {
           </div>
         ))}
       </div>
+
+      {showViewAll && (
+        <div className="mt-4 flex justify-center">
+          <Link href="/exercise/all">
+            <Button variant="outline" className="w-full">
+              View all
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <EditExerciseDialog
         open={editDialogOpen}
