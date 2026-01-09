@@ -34,12 +34,11 @@ export function FittyButton() {
       <Button
         onClick={() => setOpen(true)}
         variant="outline"
-        className="gap-2"
+        className="gap-2 hidden sm:flex"
         size="sm"
       >
         <Sparkles className="h-4 w-4" />
-        <span className="hidden sm:inline">Talk with Fitty</span>
-        <span className="sm:hidden">Fitty</span>
+        <span>Talk with Fitty</span>
         <kbd className="hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
           {shortcut}
         </kbd>

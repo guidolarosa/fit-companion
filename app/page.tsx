@@ -321,7 +321,7 @@ export default async function Dashboard() {
             <FittyButton />
           </div>
 
-          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <WeightGaugeCard
               currentWeight={data.latestWeight?.weight || null}
               targetWeightMin={data.targetWeightMin}
@@ -335,14 +335,17 @@ export default async function Dashboard() {
               ifStartTime={data.user?.ifStartTime || null}
             />
 
-            <BMICard
-              bmi={data.bmi}
-              currentWeight={data.latestWeight?.weight || null}
-              height={data.user?.height || null}
-              targetWeightMin={data.targetWeightMin}
-              targetWeightMax={data.targetWeightMax}
-              milestoneStep={data.milestoneStep}
-            />
+            {/* BMI Card - Hidden on mobile (per SPEC-V2 de-emphasis) */}
+            <div className="hidden sm:block">
+              <BMICard
+                bmi={data.bmi}
+                currentWeight={data.latestWeight?.weight || null}
+                height={data.user?.height || null}
+                targetWeightMin={data.targetWeightMin}
+                targetWeightMax={data.targetWeightMax}
+                milestoneStep={data.milestoneStep}
+              />
+            </div>
 
             {/* <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -358,7 +361,7 @@ export default async function Dashboard() {
             </Card> */}
           </div>
 
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <Card
               className={
                 data.netCalories < 0
@@ -437,7 +440,8 @@ export default async function Dashboard() {
               dailyTarget={data.dailyData[0]?.tdee ?? null}
               netCalories={data.dailyData[0]?.netCalories ?? null}
             />
-            <Card>
+            {/* Trend Insights - Hidden on mobile */}
+            <Card className="hidden sm:block">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Trend Insights</CardTitle>
                 <TrendingDown className="h-4 w-4 text-muted-foreground" />
@@ -478,7 +482,8 @@ export default async function Dashboard() {
                 )}
               </CardContent>
             </Card>
-            <Card>
+            {/* Weight Progress - Hidden on mobile, full width */}
+            <Card className="hidden sm:block sm:col-span-2 lg:col-span-3">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-1">
                 <CardTitle className="text-sm font-medium">
                   <span>Weight Progress</span>
@@ -491,7 +496,8 @@ export default async function Dashboard() {
             </Card>
           </div>
 
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {/* Calendars and Quality - Hidden on mobile */}
+          <div className="mt-6 hidden sm:grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <Card className="md:col-span-2 lg:col-span-1">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
@@ -548,47 +554,49 @@ export default async function Dashboard() {
             </Card>
           </div>
 
-          <div className="mt-6 sm:mt-8">
+          {/* Daily Register - Hidden on mobile */}
+          <div className="mt-6 sm:mt-8 hidden sm:block">
             <DailyRegister dailyData={data.dailyData} />
           </div>
 
+          {/* Recent entries - Simplified on mobile */}
           <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-2 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
                   Recent Exercises
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="hidden sm:block">
                   Your latest exercise activities
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-hidden">
                 {data.recentExercises.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
                     No exercises recorded yet
                   </p>
                 ) : (
-                  <ExerciseEntryList entries={data.recentExercises} />
+                  <ExerciseEntryList entries={data.recentExercises.slice(0, 3)} />
                 )}
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <UtensilsCrossed className="h-5 w-5" />
+            <Card className="overflow-hidden">
+              <CardHeader className="pb-2 sm:pb-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <UtensilsCrossed className="h-4 w-4 sm:h-5 sm:w-5" />
                   Recent Food Entries
                 </CardTitle>
-                <CardDescription>Your latest food consumption</CardDescription>
+                <CardDescription className="hidden sm:block">Your latest food consumption</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-hidden">
                 {data.recentFoods.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
                     No food entries yet
                   </p>
                 ) : (
-                  <FoodEntryList entries={data.recentFoods} />
+                  <FoodEntryList entries={data.recentFoods.slice(0, 3)} />
                 )}
               </CardContent>
             </Card>

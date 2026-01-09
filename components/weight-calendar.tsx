@@ -154,14 +154,14 @@ export function WeightCalendar({ weightDays }: WeightCalendarProps) {
               >
                 <span
                   className={cn(
-                    "text-xs leading-none",
+                    "text-[10px] sm:text-xs leading-none",
                     hasWeight && colors?.text
                   )}
                 >
                   {format(day, "d")}
                 </span>
                 {hasWeight && (
-                  <span className={cn("text-lg font-bold leading-tight mt-0.5", colors?.text)}>
+                  <span className={cn("text-xs sm:text-lg font-bold leading-tight mt-0.5", colors?.text)}>
                     {dayData.weight.toFixed(1)}
                   </span>
                 )}
