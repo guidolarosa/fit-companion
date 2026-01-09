@@ -57,9 +57,9 @@ export function DailyTargetRingCard({
         <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-row items-center gap-6">
           {/* Progress Ring */}
-          <div className="relative flex items-center justify-center">
+          <div className="relative flex shrink-0 items-center justify-center">
             <svg width={size} height={size}>
               <circle
                 cx={size / 2}
@@ -87,31 +87,36 @@ export function DailyTargetRingCard({
               />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-xs text-muted-foreground">Consumed</div>
-              <div className="text-lg font-semibold">
-                {Math.round(caloriesConsumed)} kcal
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Consumed</div>
+              <div className="text-lg font-bold">
+                {Math.round(caloriesConsumed)}
               </div>
+              <div className="text-[10px] text-muted-foreground">kcal</div>
             </div>
           </div>
 
           {/* Details */}
-          <div className="space-y-1 text-xs text-center">
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">Daily target</span>
-              <span className="font-medium">{Math.round(dailyTarget)} kcal</span>
+          <div className="flex-1 space-y-2 text-xs">
+            <div className="space-y-1">
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground">Daily target</span>
+                <span className="font-semibold">{Math.round(dailyTarget)} kcal</span>
+              </div>
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground">Progress</span>
+                <span className={`font-semibold ${isDeficitOrBalanced ? "text-green-400" : "text-red-400"}`}>
+                  {(ratio * 100).toFixed(0)}%
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between gap-4">
-              <span className="text-muted-foreground">Progress</span>
-              <span className={`font-medium ${isDeficitOrBalanced ? "text-green-400" : "text-red-400"}`}>
-                {(ratio * 100).toFixed(0)}%
-              </span>
-            </div>
-            <div className="mt-1 text-xs text-muted-foreground">
+            
+            <div className="pt-2 border-t text-[11px] leading-relaxed text-muted-foreground">
               {isDeficitOrBalanced
-                ? "You are at or below your daily target based on what you spent."
-                : "You have eaten more than you spent today."}
+                ? "At or below daily target based on activity."
+                : "Above daily target based on activity."}
             </div>
-            <div className="mt-1 text-[11px] text-muted-foreground">
+            
+            <div className="text-[10px] text-muted-foreground/60">
               {format(date, "MMM d, yyyy")}
             </div>
           </div>

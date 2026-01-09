@@ -16,6 +16,10 @@ interface User {
   lifestyle: string | null
   ifType: string | null
   ifStartTime: string | null
+  targetWeightMin: number | null
+  targetWeightMax: number | null
+  milestoneStep: number | null
+  sustainabilityMode: string | null
 }
 
 interface SettingsFormProps {
@@ -30,6 +34,10 @@ export function SettingsForm({ user }: SettingsFormProps) {
   const [lifestyle, setLifestyle] = useState(user.lifestyle || "")
   const [ifType, setIfType] = useState(user.ifType || "")
   const [ifStartTime, setIfStartTime] = useState(user.ifStartTime || "08:00")
+  const [targetWeightMin, setTargetWeightMin] = useState(user.targetWeightMin?.toString() || "")
+  const [targetWeightMax, setTargetWeightMax] = useState(user.targetWeightMax?.toString() || "")
+  const [milestoneStep, setMilestoneStep] = useState(user.milestoneStep?.toString() || "1")
+  const [sustainabilityMode, setSustainabilityMode] = useState(user.sustainabilityMode || "sustainable")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -40,13 +48,17 @@ export function SettingsForm({ user }: SettingsFormProps) {
       const response = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              name: name || null,
+        body: JSON.stringify({
+          name: name || null,
           height: height ? parseFloat(height) : null,
           age: age ? parseInt(age) : null,
           lifestyle: lifestyle || null,
           ifType: ifType || null,
           ifStartTime: ifType ? ifStartTime : null,
+          targetWeightMin: targetWeightMin ? parseFloat(targetWeightMin) : null,
+          targetWeightMax: targetWeightMax ? parseFloat(targetWeightMax) : null,
+          milestoneStep: milestoneStep ? parseFloat(milestoneStep) : null,
+          sustainabilityMode: sustainabilityMode || null,
         }),
       })
 
@@ -120,6 +132,70 @@ export function SettingsForm({ user }: SettingsFormProps) {
           <option value="moderate">Moderate (light exercise 1-3 days/week)</option>
           <option value="active">Active (moderate to intense exercise 3+ days/week)</option>
         </Select>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2 min-w-0">
+          <Label htmlFor="targetWeightMin">Target Weight Min (kg)</Label>
+          <Input
+            id="targetWeightMin"
+            type="number"
+            step="0.1"
+            min="0"
+            value={targetWeightMin}
+            onChange={(e) => setTargetWeightMin(e.target.value)}
+            placeholder="e.g., 62"
+            className="min-w-0"
+          />
+        </div>
+
+        <div className="space-y-2 min-w-0">
+          <Label htmlFor="targetWeightMax">Target Weight Max (kg)</Label>
+          <Input
+            id="targetWeightMax"
+            type="number"
+            step="0.1"
+            min="0"
+            value={targetWeightMax}
+            onChange={(e) => setTargetWeightMax(e.target.value)}
+            placeholder="e.g., 66"
+            className="min-w-0"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2 min-w-0">
+          <Label htmlFor="milestoneStep">Milestone Step (kg)</Label>
+          <Input
+            id="milestoneStep"
+            type="number"
+            step="0.1"
+            min="0"
+            value={milestoneStep}
+            onChange={(e) => setMilestoneStep(e.target.value)}
+            placeholder="e.g., 2"
+            className="min-w-0"
+          />
+          <p className="text-xs text-muted-foreground">
+            Next milestone delta (e.g., lose 3 kg).
+          </p>
+        </div>
+
+        <div className="space-y-2 min-w-0">
+          <Label htmlFor="sustainabilityMode">Sustainability Mode</Label>
+          <Select
+            id="sustainabilityMode"
+            value={sustainabilityMode}
+            onChange={(e) => setSustainabilityMode(e.target.value)}
+          >
+            <option value="strict">Strict</option>
+            <option value="sustainable">Sustainable</option>
+          </Select>
+          <p className="text-xs text-muted-foreground">
+            Strict = minimal warnings. Sustainable = softer caps and nudges.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

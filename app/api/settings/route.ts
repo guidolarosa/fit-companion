@@ -9,7 +9,18 @@ export async function PUT(request: NextRequest) {
     const userId = userResult.id
 
     const body = await request.json()
-    const { name, height, age, lifestyle, ifType, ifStartTime } = body
+    const {
+      name,
+      height,
+      age,
+      lifestyle,
+      ifType,
+      ifStartTime,
+      targetWeightMin,
+      targetWeightMax,
+      milestoneStep,
+      sustainabilityMode,
+    } = body
 
     const user = await prisma.user.update({
       where: { id: userId },
@@ -20,6 +31,10 @@ export async function PUT(request: NextRequest) {
         lifestyle: lifestyle || null,
         ifType: ifType || null,
         ifStartTime: ifType ? ifStartTime : null,
+        targetWeightMin: targetWeightMin ? parseFloat(targetWeightMin) : null,
+        targetWeightMax: targetWeightMax ? parseFloat(targetWeightMax) : null,
+        milestoneStep: milestoneStep ? parseFloat(milestoneStep) : null,
+        sustainabilityMode: sustainabilityMode || null,
       },
     })
 

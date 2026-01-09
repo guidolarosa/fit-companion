@@ -110,7 +110,7 @@ export function FittyDialog({ open, onOpenChange }: FittyDialogProps) {
 
           {response && (
             <div className="space-y-2">
-              <Label>Fitty's response</Label>
+              <Label>Fitty&apos;s response</Label>
               <div className="rounded-lg border p-4 bg-muted/50">
                 <MarkdownContent content={response} />
               </div>

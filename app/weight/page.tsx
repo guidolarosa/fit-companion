@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma"
 import { WeightForm } from "@/components/weight-form"
 import { WeightChart } from "@/components/weight-chart"
 import { WeightEntryList } from "@/components/weight-entry-list"
+import { WeightCalendar } from "@/components/weight-calendar"
 import { FittyButton } from "@/components/fitty-button"
 import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
@@ -26,6 +27,12 @@ export default async function WeightPage() {
 
   const weights = await getWeightData(user.id)
 
+  // Prepare weight days for calendar
+  const weightDays = weights.map((w) => ({
+    date: w.date,
+    weight: w.weight,
+  }))
+
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -37,6 +44,7 @@ export default async function WeightPage() {
             <FittyButton />
           </div>
 
+          {/* Top row: Add Weight Entry + Weight History Calendar */}
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
               <CardHeader>
@@ -50,6 +58,19 @@ export default async function WeightPage() {
 
             <Card>
               <CardHeader>
+                <CardTitle>Weight History</CardTitle>
+                <CardDescription>Days with weight entries</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <WeightCalendar weightDays={weightDays} />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Second row: Weight Progress Chart */}
+          {weights.length > 0 && (
+            <Card className="mt-6">
+              <CardHeader>
                 <CardTitle>Weight Progress</CardTitle>
                 <CardDescription>Track your weight over time</CardDescription>
               </CardHeader>
@@ -57,12 +78,13 @@ export default async function WeightPage() {
                 <WeightChart weights={weights} />
               </CardContent>
             </Card>
-          </div>
+          )}
 
+          {/* Third row: Weight Entry List */}
           {weights.length > 0 && (
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle>Weight History</CardTitle>
+                <CardTitle>All Entries</CardTitle>
                 <CardDescription>All your recorded weight entries</CardDescription>
               </CardHeader>
               <CardContent>

@@ -108,7 +108,9 @@ async function getDashboardData(userId: string) {
     {
       caloriesConsumed: number;
       caloriesBurnt: number;
+      protein: number;
       date: Date;
+      hasExercise: boolean;
     }
   >();
 
@@ -122,22 +124,28 @@ async function getDashboardData(userId: string) {
       dailyDataMap.set(dayKey, {
         caloriesConsumed: 0,
         caloriesBurnt: exercise.calories,
+        protein: 0,
         date: startOfDay(exercise.date),
+        hasExercise: true,
       });
     }
   });
 
   // Aggregate foods by day
   allFoods.forEach((food) => {
+    const protein = (food as any).protein || 0;
     const dayKey = format(startOfDay(food.date), "yyyy-MM-dd");
     const existing = dailyDataMap.get(dayKey);
     if (existing) {
       existing.caloriesConsumed += food.calories;
+      existing.protein += protein;
     } else {
       dailyDataMap.set(dayKey, {
         caloriesConsumed: food.calories,
         caloriesBurnt: 0,
+        protein,
         date: startOfDay(food.date),
+        hasExercise: false,
       });
     }
   });
@@ -154,11 +162,15 @@ async function getDashboardData(userId: string) {
         tdee = calculateTDEE(bmr, user.lifestyle);
       }
 
+      const netCalories = day.caloriesConsumed - (tdee + day.caloriesBurnt);
+      const ratioToTdee = tdee > 0 ? day.caloriesConsumed / tdee : null;
+
       return {
         ...day,
         bmr,
         tdee,
-        netCalories: day.caloriesConsumed - (tdee + day.caloriesBurnt),
+        netCalories,
+        ratioToTdee,
       };
     })
     .sort((a, b) => b.date.getTime() - a.date.getTime()) // Most recent first
@@ -201,11 +213,65 @@ async function getDashboardData(userId: string) {
     tdee: day.tdee,
   }));
 
+  const targetWeightMin = (user as any)?.targetWeightMin ?? (idealWeight ? idealWeight - 2 : null);
+  const targetWeightMax = (user as any)?.targetWeightMax ?? (idealWeight ? idealWeight + 2 : null);
+  const milestoneStep = (user as any)?.milestoneStep ?? 2;
+  const sustainabilityMode = (user as any)?.sustainabilityMode ?? "sustainable";
+  const aggressiveThreshold = sustainabilityMode === "strict" ? 0.5 : 0.6;
+
+  const last7 = dailyData.slice(0, 7);
+  const avgDeficit = last7.length
+    ? last7.reduce((sum, day) => sum + day.netCalories, 0) / last7.length
+    : null;
+  const avgIntake = last7.length
+    ? last7.reduce((sum, day) => sum + day.caloriesConsumed, 0) / last7.length
+    : null;
+  const projectedKgPerWeek = avgDeficit !== null ? (avgDeficit * 7) / 7700 : null;
+
+  // Soft warnings
+  const warnings: string[] = [];
+  const today = dailyData[0];
+  if (today?.ratioToTdee !== null && today.ratioToTdee < aggressiveThreshold) {
+    warnings.push(
+      "Today's intake is very low versus TDEE. Long-term consistency matters more than speed."
+    );
+  }
+
+  // Deficit quality
+  const trainingDays = last7.filter((d) => d.hasExercise);
+  const trainingDeficitCount = trainingDays.filter((d) => d.netCalories < 0).length;
+  const proteinTrackedDays = last7.filter((d) => d.protein > 0).length;
+  const highProteinDays = last7.filter(
+    (d) => d.caloriesConsumed > 0 && d.protein * 4 / d.caloriesConsumed >= 0.25
+  ).length;
+
+  // Assistant patterns
+  let extremeDeficitStreak = 0;
+  for (const day of dailyData) {
+    if (day.ratioToTdee !== null && day.ratioToTdee < aggressiveThreshold) {
+      extremeDeficitStreak += 1;
+    } else {
+      break;
+    }
+  }
+
+  let plateauDetected = false;
+  if (allWeights.length >= 3 && avgDeficit !== null && avgDeficit < -150) {
+    const recentWeights = allWeights.slice(-3).map((w) => w.weight);
+    const maxW = Math.max(...recentWeights);
+    const minW = Math.min(...recentWeights);
+    plateauDetected = maxW - minW < 0.2;
+  }
+
   return {
     latestWeight,
     user,
     bmi,
     idealWeight,
+    targetWeightMin,
+    targetWeightMax,
+    milestoneStep,
+    sustainabilityMode,
     totalCaloriesBurnt: caloriesBurnt,
     totalCaloriesConsumed: caloriesConsumed,
     netCalories: totalNetCalories,
@@ -214,6 +280,22 @@ async function getDashboardData(userId: string) {
     dailyData,
     exerciseDays,
     foodDays,
+    trendInsights: {
+      avgDeficit,
+      avgIntake,
+      projectedKgPerWeek,
+    },
+    warnings,
+    qualityInsights: {
+      trainingDays: trainingDays.length,
+      trainingDeficitDays: trainingDeficitCount,
+      proteinTrackedDays,
+      highProteinDays,
+    },
+    assistantPatterns: {
+      extremeDeficitStreak,
+      plateauDetected,
+    },
   };
 }
 
@@ -227,8 +309,6 @@ export default async function Dashboard() {
   const data = await getDashboardData(user.id);
 
   const weights = await getWeightData(user.id);
-
-  console.log('hello')
 
   return (
     <div className="flex h-screen">
@@ -244,20 +324,24 @@ export default async function Dashboard() {
           <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             <WeightGaugeCard
               currentWeight={data.latestWeight?.weight || null}
-              idealWeight={data.idealWeight}
+              targetWeightMin={data.targetWeightMin}
+              targetWeightMax={data.targetWeightMax}
+              milestoneStep={data.milestoneStep}
               weightDate={data.latestWeight?.date || null}
-            />
-
-            <BMICard
-              bmi={data.bmi}
-              currentWeight={data.latestWeight?.weight || null}
-              idealWeight={data.idealWeight}
-              height={data.user?.height || null}
             />
 
             <IFCard
               ifType={data.user?.ifType || null}
               ifStartTime={data.user?.ifStartTime || null}
+            />
+
+            <BMICard
+              bmi={data.bmi}
+              currentWeight={data.latestWeight?.weight || null}
+              height={data.user?.height || null}
+              targetWeightMin={data.targetWeightMin}
+              targetWeightMax={data.targetWeightMax}
+              milestoneStep={data.milestoneStep}
             />
 
             {/* <Card>
@@ -354,6 +438,47 @@ export default async function Dashboard() {
               netCalories={data.dailyData[0]?.netCalories ?? null}
             />
             <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Trend Insights</CardTitle>
+                <TrendingDown className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Avg deficit (7d)</span>
+                  <span className="font-semibold">
+                    {data.trendInsights.avgDeficit !== null
+                      ? `${Math.round(data.trendInsights.avgDeficit)} kcal/day`
+                      : "—"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Avg intake (7d)</span>
+                  <span className="font-semibold">
+                    {data.trendInsights.avgIntake !== null
+                      ? `${Math.round(data.trendInsights.avgIntake)} kcal/day`
+                      : "—"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Projected pace</span>
+                  <span className="font-semibold">
+                    {data.trendInsights.projectedKgPerWeek === null
+                      ? "—"
+                      : data.trendInsights.projectedKgPerWeek < 0
+                      ? `${Math.abs(data.trendInsights.projectedKgPerWeek).toFixed(2)} kg/week loss`
+                      : `${data.trendInsights.projectedKgPerWeek.toFixed(2)} kg/week gain`}
+                  </span>
+                </div>
+                {data.warnings.length > 0 && (
+                  <div className="mt-2 rounded-md bg-amber-500/10 border border-amber-500/40 p-2 text-xs text-amber-500">
+                    {data.warnings.map((w, idx) => (
+                      <p key={idx}>• {w}</p>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+            <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-1">
                 <CardTitle className="text-sm font-medium">
                   <span>Weight Progress</span>
@@ -387,6 +512,38 @@ export default async function Dashboard() {
               </CardHeader>
               <CardContent>
                 <FoodCalendar foodDays={data.foodDays} />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Deficit Quality</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Training days (7d)</span>
+                  <span className="font-semibold">{data.qualityInsights.trainingDays}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Deficit on training days</span>
+                  <span className="font-semibold">
+                    {data.qualityInsights.trainingDeficitDays}/{data.qualityInsights.trainingDays}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Protein tracked days</span>
+                  <span className="font-semibold">
+                    {data.qualityInsights.proteinTrackedDays}/7
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">High-protein days ({">="}25%)</span>
+                  <span className="font-semibold">
+                    {data.qualityInsights.highProteinDays}/7
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Balanced fueling on training days supports sustainable progress.
+                </p>
               </CardContent>
             </Card>
           </div>

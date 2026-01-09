@@ -223,3 +223,5 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
   )
 }
 
+
+

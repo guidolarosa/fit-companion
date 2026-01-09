@@ -1,20 +1,140 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Sparkles } from "lucide-react"
+
+const INTENSITY_OPTIONS = [
+  { value: "light", emoji: "🚶", label: "Light" },
+  { value: "moderate", emoji: "🏃", label: "Moderate" },
+  { value: "high", emoji: "🔥", label: "High" },
+  { value: "extreme", emoji: "💀", label: "Extreme" },
+] as const
+
+type Intensity = typeof INTENSITY_OPTIONS[number]["value"] | ""
+
+interface ExerciseSuggestion {
+  name: string
+  calories: number
+  duration: number | null
+}
 
 export function ExerciseForm() {
   const router = useRouter()
   const [name, setName] = useState("")
   const [calories, setCalories] = useState("")
   const [duration, setDuration] = useState("")
+  const [intensity, setIntensity] = useState<Intensity>("")
   const [date, setDate] = useState(new Date().toISOString().split("T")[0])
   const [time, setTime] = useState(new Date().toTimeString().slice(0, 5))
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isEstimating, setIsEstimating] = useState(false)
+  const [suggestions, setSuggestions] = useState<ExerciseSuggestion[]>([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const suggestionsRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Fetch suggestions when name changes
+  useEffect(() => {
+    const controller = new AbortController()
+
+    async function fetchSuggestions() {
+      if (name.trim().length < 2) {
+        setSuggestions([])
+        return
+      }
+
+      try {
+        const response = await fetch(
+          `/api/exercise/search?q=${encodeURIComponent(name)}`,
+          { signal: controller.signal }
+        )
+        if (response.ok) {
+          const data = await response.json()
+          setSuggestions(data.suggestions || [])
+        }
+      } catch (error) {
+        if ((error as Error).name !== "AbortError") {
+          console.error("Error fetching suggestions:", error)
+        }
+      }
+    }
+
+    const timeoutId = setTimeout(fetchSuggestions, 200)
+    return () => {
+      clearTimeout(timeoutId)
+      controller.abort()
+    }
+  }, [name])
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  function handleSelectSuggestion(suggestion: ExerciseSuggestion) {
+    setName(suggestion.name)
+    setCalories(suggestion.calories.toString())
+    if (suggestion.duration) {
+      setDuration(suggestion.duration.toString())
+    }
+    setSuggestions([])
+    setShowSuggestions(false)
+  }
+
+  async function handleEstimateCalories() {
+    if (!name.trim()) {
+      toast.error("Enter an exercise name first")
+      return
+    }
+
+    setIsEstimating(true)
+    try {
+      const response = await fetch("/api/estimate-exercise-calories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          exerciseName: name,
+          duration: duration ? parseInt(duration) : null,
+          intensity: intensity || null,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (data.calories > 0) {
+          setCalories(data.calories.toString())
+          toast.success(`Estimated ${data.calories} kcal`)
+        } else {
+          toast.error("Could not estimate calories for this exercise")
+        }
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || "Failed to estimate calories")
+      }
+    } catch (error) {
+      console.error("Error estimating calories:", error)
+      toast.error("An error occurred while estimating calories")
+    } finally {
+      setIsEstimating(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -37,6 +157,7 @@ export function ExerciseForm() {
         setName("")
         setCalories("")
         setDuration("")
+        setIntensity("")
         setDate(new Date().toISOString().split("T")[0])
         setTime(new Date().toTimeString().slice(0, 5))
         toast.success("Exercise entry created successfully!")
@@ -53,31 +174,97 @@ export function ExerciseForm() {
     }
   }
 
-  return (
+    return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="name">Exercise Name</Label>
-        <Input
-          id="name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g., Running, Cycling, Swimming"
-          required
-        />
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <Input
+              ref={inputRef}
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onFocus={() => setShowSuggestions(true)}
+              placeholder="e.g., Running, Cycling, Swimming"
+              required
+              autoComplete="off"
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <div
+                ref={suggestionsRef}
+                className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-48 overflow-y-auto"
+              >
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex justify-between items-center"
+                    onClick={() => handleSelectSuggestion(suggestion)}
+                  >
+                    <span className="truncate">{suggestion.name}</span>
+                    <span className="text-muted-foreground ml-2 shrink-0">
+                      {Math.round(suggestion.calories)} kcal
+                      {suggestion.duration && ` · ${suggestion.duration}m`}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="flex gap-1">
+            {INTENSITY_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setIntensity(intensity === opt.value ? "" : opt.value)}
+                className={`w-9 h-9 rounded-md text-lg transition-all ${
+                  intensity === opt.value
+                    ? "bg-primary/20 ring-2 ring-primary scale-110"
+                    : "bg-muted hover:bg-muted/80"
+                }`}
+                title={opt.label}
+              >
+                {opt.emoji}
+              </button>
+            ))}
+          </div>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {intensity
+            ? `Intensity: ${INTENSITY_OPTIONS.find((o) => o.value === intensity)?.label}`
+            : "Select intensity (optional)"}
+        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="calories">Calories Burnt</Label>
-        <Input
-          id="calories"
-          type="number"
-          step="0.1"
-          min="0"
-          value={calories}
-          onChange={(e) => setCalories(e.target.value)}
-          placeholder="Enter calories burnt"
-          required
-        />
+        <div className="flex gap-2">
+          <Input
+            id="calories"
+            type="number"
+            step="0.1"
+            min="0"
+            value={calories}
+            onChange={(e) => setCalories(e.target.value)}
+            placeholder="Enter calories burnt"
+            required
+            className="flex-1"
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={handleEstimateCalories}
+            disabled={isEstimating || !name.trim()}
+            title="Estimate calories with AI"
+          >
+            <Sparkles className={`h-4 w-4 ${isEstimating ? "animate-pulse" : ""}`} />
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Enter manually or click the AI button to estimate
+        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="duration">Duration (minutes, optional)</Label>

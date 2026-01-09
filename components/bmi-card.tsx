@@ -6,8 +6,10 @@ import { TrendingUp } from "lucide-react"
 interface BMICardProps {
   bmi: number | null
   currentWeight: number | null
-  idealWeight: number | null
   height: number | null
+  targetWeightMin: number | null
+  targetWeightMax: number | null
+  milestoneStep: number | null
 }
 
 function getBMICategory(bmi: number): { label: string; color: string; bgColor: string } {
@@ -36,12 +38,19 @@ function getBMIProgress(bmi: number): number {
   }
 }
 
-export function BMICard({ bmi, currentWeight, idealWeight, height }: BMICardProps) {
+export function BMICard({
+  bmi,
+  currentWeight,
+  height,
+  targetWeightMin,
+  targetWeightMax,
+  milestoneStep,
+}: BMICardProps) {
   if (!bmi || !height || !currentWeight) {
     return (
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">BMI</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">BMI <span className="text-[10px] text-muted-foreground">(reference only)</span></CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
@@ -56,23 +65,25 @@ export function BMICard({ bmi, currentWeight, idealWeight, height }: BMICardProp
 
   const category = getBMICategory(bmi)
   const progress = getBMIProgress(bmi)
-  const weightDifference = idealWeight ? currentWeight - idealWeight : null
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">BMI</CardTitle>
+        <CardTitle className="text-sm font-medium">
+          BMI <span className="text-[10px] text-muted-foreground">(reference only)</span>
+        </CardTitle>
         <TrendingUp className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div>
-            <div className="flex items-center gap-2">
-              <div className="text-3xl font-bold">{bmi.toFixed(1)}</div>
-              <span className={`text-sm font-medium px-2 py-1 rounded ${category.color} ${category.bgColor}`}>
-                {category.label}
-              </span>
-            </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="text-2xl font-semibold">{bmi.toFixed(1)}</div>
+            <span className={`text-xs font-medium px-2 py-1 rounded ${category.color} ${category.bgColor}`}>
+              {category.label}
+            </span>
+            <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+              Reference only
+            </span>
           </div>
 
           {/* BMI Progress Bar */}
@@ -106,25 +117,29 @@ export function BMICard({ bmi, currentWeight, idealWeight, height }: BMICardProp
             </div>
           </div>
 
-          {/* Weight to ideal */}
-          {weightDifference !== null && idealWeight && (
+          {/* Target range context */}
+          {targetWeightMin && targetWeightMax && (
             <div className="pt-2 border-t">
-              <div className="text-sm text-muted-foreground">Ideal Weight</div>
+              <div className="text-xs text-muted-foreground">Target range</div>
               <div className="flex items-baseline gap-2 mt-1">
-                <div className="text-xl font-semibold">{idealWeight.toFixed(1)} kg</div>
-                {Math.abs(weightDifference) > 0.1 && (
-                  <span
-                    className={`text-sm font-medium ${
-                      weightDifference > 0
-                        ? "text-yellow-400"
-                        : "text-blue-400"
-                    }`}
-                  >
-                    {weightDifference > 0 ? "+" : ""}
-                    {weightDifference.toFixed(1)} kg to reach
+                <div className="text-sm font-semibold">
+                  {targetWeightMin.toFixed(1)}–{targetWeightMax.toFixed(1)} kg
+                </div>
+                {currentWeight && (
+                  <span className="text-xs text-muted-foreground">
+                    {(currentWeight - targetWeightMax > 0
+                      ? currentWeight - targetWeightMax
+                      : targetWeightMin - currentWeight
+                    ).toFixed(1)}
+                    kg to enter range
                   </span>
                 )}
               </div>
+              {milestoneStep && (
+                <div className="text-[11px] text-muted-foreground mt-1">
+                  Next milestone: ±{milestoneStep.toFixed(1)} kg steps
+                </div>
+              )}
             </div>
           )}
         </div>

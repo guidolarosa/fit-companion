@@ -6,12 +6,20 @@ import { format } from "date-fns"
 
 interface WeightGaugeCardProps {
   currentWeight: number | null
-  idealWeight: number | null
+  targetWeightMin: number | null
+  targetWeightMax: number | null
+  milestoneStep: number | null
   weightDate: Date | string | null
 }
 
-export function WeightGaugeCard({ currentWeight, idealWeight, weightDate }: WeightGaugeCardProps) {
-  if (!currentWeight || !idealWeight) {
+export function WeightGaugeCard({
+  currentWeight,
+  targetWeightMin,
+  targetWeightMax,
+  milestoneStep,
+  weightDate,
+}: WeightGaugeCardProps) {
+  if (!currentWeight || !targetWeightMin || !targetWeightMax) {
     return (
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -28,23 +36,19 @@ export function WeightGaugeCard({ currentWeight, idealWeight, weightDate }: Weig
     )
   }
 
-  const difference = currentWeight - idealWeight
-  const absDifference = Math.abs(difference)
-  
-  // Calculate progress percentage (0-100%)
-  // If at ideal weight: 100%
-  // If overweight: progress decreases as weight increases
-  // If underweight: progress decreases as weight decreases
-  let progress = 0
-  if (Math.abs(difference) < 0.1) {
-    progress = 100 // At ideal weight
-  } else if (difference > 0) {
-    // Overweight: progress = (idealWeight / currentWeight) * 100
-    progress = Math.max(0, Math.min(100, (idealWeight / currentWeight) * 100))
-  } else {
-    // Underweight: progress = (currentWeight / idealWeight) * 100
-    progress = Math.max(0, Math.min(100, (currentWeight / idealWeight) * 100))
-  }
+  const rangeSpan = Math.max(0.1, targetWeightMax - targetWeightMin)
+  const inRange = currentWeight >= targetWeightMin && currentWeight <= targetWeightMax
+  const distance =
+    currentWeight > targetWeightMax
+      ? currentWeight - targetWeightMax
+      : currentWeight < targetWeightMin
+      ? targetWeightMin - currentWeight
+      : 0
+
+  // Progress tapers the farther from the range
+  const progress = inRange
+    ? 100
+    : Math.max(0, Math.min(100, (rangeSpan / (rangeSpan + distance)) * 100))
 
   // Determine color based on progress
   const getColor = () => {
@@ -56,8 +60,11 @@ export function WeightGaugeCard({ currentWeight, idealWeight, weightDate }: Weig
   }
 
   const color = getColor()
-  const isOverweight = difference > 0.1
-  const isUnderweight = difference < -0.1
+  const isOver = currentWeight > targetWeightMax + 0.1
+  const isUnder = currentWeight < targetWeightMin - 0.1
+  const nextMilestone = milestoneStep
+    ? (isOver ? currentWeight - milestoneStep : currentWeight + milestoneStep)
+    : null
 
   // SVG semicircle gauge
   const radius = 60
@@ -78,9 +85,9 @@ export function WeightGaugeCard({ currentWeight, idealWeight, weightDate }: Weig
         <Weight className="h-4 w-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="flex flex-row items-center gap-6">
           {/* Gauge */}
-          <div className="flex justify-center items-center relative" style={{ height: "100px" }}>
+          <div className="relative flex shrink-0 justify-center items-center" style={{ height: "100px", width: "160px" }}>
             <svg width="160" height="100" viewBox="0 0 160 100" className="overflow-visible">
               {/* Background arc (full semicircle) */}
               <path
@@ -108,39 +115,57 @@ export function WeightGaugeCard({ currentWeight, idealWeight, weightDate }: Weig
             {/* Center text */}
             <div className="absolute inset-0 flex flex-col items-center justify-center pt-4">
               <div className="text-2xl font-bold">{currentWeight.toFixed(1)}</div>
-              <div className="text-xs text-muted-foreground">kg</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">kg</div>
             </div>
           </div>
 
           {/* Progress info */}
-          <div className="space-y-2 text-center">
-            <div className="flex items-center justify-center gap-2">
-              <div className="text-sm text-muted-foreground">Ideal Weight:</div>
-              <div className="text-sm font-semibold">{idealWeight.toFixed(1)} kg</div>
+          <div className="flex-1 space-y-2 text-xs">
+            <div className="space-y-1">
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-muted-foreground">Target</span>
+                <span className="font-semibold text-foreground">
+                  {targetWeightMin.toFixed(1)}–{targetWeightMax.toFixed(1)} kg
+                </span>
+              </div>
+              
+              {!inRange && (
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-muted-foreground">To reach</span>
+                  {isOver ? (
+                    <span className="text-yellow-400 font-medium">
+                      { (currentWeight - targetWeightMax).toFixed(1)} kg loss
+                    </span>
+                  ) : (
+                    <span className="text-blue-400 font-medium">
+                      { (targetWeightMin - currentWeight).toFixed(1)} kg gain
+                    </span>
+                  )}
+                </div>
+              )}
+              
+              {inRange && (
+                <div className="flex justify-between items-center gap-2">
+                  <span className="text-muted-foreground">Status</span>
+                  <span className="text-green-400 font-medium">✓ In range</span>
+                </div>
+              )}
             </div>
-            {absDifference > 0.1 && (
-              <div className="text-xs">
-                {isOverweight ? (
-                  <span className="text-yellow-400">
-                    {absDifference.toFixed(1)} kg to lose
-                  </span>
-                ) : (
-                  <span className="text-blue-400">
-                    {absDifference.toFixed(1)} kg to gain
-                  </span>
-                )}
-              </div>
-            )}
-            {absDifference <= 0.1 && (
-              <div className="text-xs text-green-400 font-medium">
-                ✓ At ideal weight!
-              </div>
-            )}
-            {weightDate && (
-              <p className="text-xs text-muted-foreground mt-2">
-                {format(new Date(weightDate), "MMM d, yyyy")}
-              </p>
-            )}
+
+            <div className="pt-2 border-t space-y-1">
+              {nextMilestone && (
+                <div className="text-[11px] leading-tight text-muted-foreground">
+                  <span className="font-medium text-foreground/80">Next milestone:</span> {isOver ? "-" : "+"}
+                  {milestoneStep?.toFixed(1)} kg ({nextMilestone.toFixed(1)} kg)
+                </div>
+              )}
+              
+              {weightDate && (
+                <div className="text-[10px] text-muted-foreground/60 pt-1">
+                  {format(new Date(weightDate), "MMM d, yyyy")}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>

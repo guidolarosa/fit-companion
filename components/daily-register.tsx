@@ -75,6 +75,12 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
               {dailyData.map((day, index) => {
                 const totalBurnt = day.tdee + day.caloriesBurnt;
                 const netCalories = day.caloriesConsumed - totalBurnt;
+                const netBadgeClass =
+                  netCalories < 0
+                    ? "text-green-400 bg-green-400/10"
+                    : netCalories > 0
+                    ? "text-red-400 bg-red-400/10"
+                    : "text-yellow-400 bg-yellow-400/10";
                 return (
                   <tr key={index} className="border-b hover:bg-muted/50">
                     <td className="p-2 sm:p-3 font-medium whitespace-nowrap">
@@ -102,21 +108,7 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
                       }`}
                     >
                       {netCalories > 0 ? "+" : ""}
-                      <span
-                        className={`${
-                          netCalories < 0
-                            ? "text-green-400"
-                            : netCalories > 0
-                            ? "text-red-400"
-                            : ""
-                        } bg-${
-                          netCalories < 0
-                            ? "green"
-                            : netCalories > 0
-                            ? "red"
-                            : "yellow"
-                        }-400/10 rounded-md px-2 py-1`}
-                      >
+                      <span className={`${netBadgeClass} rounded-md px-2 py-1`}>
                         {Math.round(netCalories)}
                       </span>
                     </td>
