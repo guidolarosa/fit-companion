@@ -2,6 +2,7 @@ import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { SettingsForm } from "@/components/settings-form"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { PageHeader } from "@/components/page-header"
 import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
@@ -27,7 +28,7 @@ export default async function SettingsPage() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-2xl">
-          <h1 className="mb-6 sm:mb-8 text-2xl sm:text-3xl font-bold">Settings</h1>
+          <PageHeader title="Settings" showFittyButton={false} />
 
           <Card>
             <CardHeader>
@@ -37,7 +38,13 @@ export default async function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SettingsForm user={user} />
+              <SettingsForm user={{
+                ...user,
+                targetWeightMin: (user as any).targetWeightMin ?? null,
+                targetWeightMax: (user as any).targetWeightMax ?? null,
+                milestoneStep: (user as any).milestoneStep ?? null,
+                sustainabilityMode: (user as any).sustainabilityMode ?? null,
+              }} />
             </CardContent>
           </Card>
         </div>

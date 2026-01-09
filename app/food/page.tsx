@@ -6,7 +6,7 @@ import { FoodForm } from "@/components/food-form"
 import { FoodAgent } from "@/components/food-agent"
 import { HealthyProductsList } from "@/components/healthy-products-list"
 import { FoodEntryList } from "@/components/food-entry-list"
-import { FittyButton } from "@/components/fitty-button"
+import { PageHeader } from "@/components/page-header"
 import { UtensilsCrossed } from "lucide-react"
 import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
@@ -40,10 +40,7 @@ export default async function FoodPage() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold">Food & Nutrition</h1>
-            <FittyButton />
-          </div>
+          <PageHeader title="Food & Nutrition" />
 
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>

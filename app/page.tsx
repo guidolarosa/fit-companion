@@ -24,6 +24,7 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
+import { MobileQuickActions } from "@/components/mobile-quick-actions";
 import { calculateBMR, calculateTDEE, getWeightForDate } from "@/lib/calories";
 import { getCurrentUser } from "@/lib/get-session";
 import { redirect } from "next/navigation";
@@ -320,6 +321,9 @@ export default async function Dashboard() {
             <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
             <FittyButton />
           </div>
+
+          {/* Mobile Quick Actions */}
+          <MobileQuickActions />
 
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             <WeightGaugeCard

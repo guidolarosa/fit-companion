@@ -6,7 +6,7 @@ import { WeightForm } from "@/components/weight-form"
 import { WeightChart } from "@/components/weight-chart"
 import { WeightEntryList } from "@/components/weight-entry-list"
 import { WeightCalendar } from "@/components/weight-calendar"
-import { FittyButton } from "@/components/fitty-button"
+import { PageHeader } from "@/components/page-header"
 import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
 
@@ -39,10 +39,7 @@ export default async function WeightPage() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
-          <div className="flex items-center justify-between mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold">Weight Tracking</h1>
-            <FittyButton />
-          </div>
+          <PageHeader title="Weight Tracking" />
 
           {/* Top row: Add Weight Entry + Weight History Calendar */}
           <div className="grid gap-6 lg:grid-cols-2">
