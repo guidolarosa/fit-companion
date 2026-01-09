@@ -84,15 +84,15 @@ export function HealthyProductsList() {
         </Button>
       </div>
 
-      <div className="">
+      <div className="w-full overflow-hidden">
         {products.map((product, index) => (
           <div
             key={index}
-            className="flex items-center gap-3 first:rounded-t-lg last:rounded-b-lg border p-3 border-b-0 last:border-b text-sm"
+            className="flex items-center gap-3 first:rounded-t-lg last:rounded-b-lg border p-3 border-b-0 last:border-b text-sm w-full overflow-hidden"
           >
             <button
               onClick={() => toggleProduct(index)}
-              className={`flex h-5 w-5 items-center justify-center rounded border-2 transition-colors ${
+              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition-colors ${
                 product.checked
                   ? "border-primary bg-primary"
                   : "border-muted-foreground"
@@ -101,13 +101,13 @@ export function HealthyProductsList() {
               {product.checked && <Check className="h-3 w-3 text-primary-foreground" />}
             </button>
             <span
-              className={`flex-1 ${product.checked ? "line-through text-muted-foreground" : ""}`}
+              className={`flex-1 min-w-0 truncate ${product.checked ? "line-through text-muted-foreground" : ""}`}
             >
               {product.name}
             </span>
             <button
               onClick={() => removeProduct(index)}
-              className="text-destructive hover:text-destructive/80"
+              className="text-destructive hover:text-destructive/80 shrink-0"
             >
               <X className="h-4 w-4" />
             </button>

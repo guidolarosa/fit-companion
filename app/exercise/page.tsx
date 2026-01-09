@@ -42,7 +42,7 @@ export default async function ExercisePage() {
           <PageHeader title="Exercise & Calorie Burn" />
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle>Add Exercise</CardTitle>
                 <CardDescription>Record your exercise and calories burnt</CardDescription>
@@ -52,18 +52,18 @@ export default async function ExercisePage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle>Exercise Suggestions</CardTitle>
                 <CardDescription>Ask AI for exercise recommendations</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-hidden">
                 <ExerciseAgent />
               </CardContent>
             </Card>
           </div>
 
-          <Card className="mt-6">
+          <Card className="mt-6 overflow-hidden">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Flame className="h-5 w-5" />
@@ -71,7 +71,7 @@ export default async function ExercisePage() {
               </CardTitle>
               <CardDescription>Your recorded exercises and calories burnt</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="overflow-hidden">
               {exercises.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No exercises recorded yet</p>
               ) : (

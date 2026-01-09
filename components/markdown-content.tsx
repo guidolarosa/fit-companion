@@ -8,7 +8,7 @@ interface MarkdownContentProps {
 
 export function MarkdownContent({ content }: MarkdownContentProps) {
   return (
-    <div className="prose prose-invert max-w-none prose-sm">
+    <div className="prose prose-invert max-w-none prose-sm overflow-hidden break-words">
       <ReactMarkdown
         components={{
           // Customize heading styles

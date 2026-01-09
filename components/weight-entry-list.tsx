@@ -47,14 +47,14 @@ export function WeightEntryList({ entries }: WeightEntryListProps) {
 
   return (
     <>
-      <div>
+      <div className="w-full overflow-hidden">
         {entries
           .slice()
           .reverse()
           .map((entry) => (
             <div
               key={entry.id}
-              className="flex items-center justify-between  border p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b"
+              className="flex items-center justify-between border p-2 sm:p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b w-full overflow-hidden"
             >
               <div className="min-w-0 flex-1">
                 <p className="font-semibold truncate" title={`${entry.weight} kg`}>

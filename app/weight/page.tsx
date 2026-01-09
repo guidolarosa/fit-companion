@@ -43,7 +43,7 @@ export default async function WeightPage() {
 
           {/* Top row: Add Weight Entry + Weight History Calendar */}
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle>Add Weight Entry</CardTitle>
                 <CardDescription>Record your current weight in kilograms</CardDescription>
@@ -53,7 +53,7 @@ export default async function WeightPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle>Weight History</CardTitle>
                 <CardDescription>Days with weight entries</CardDescription>
@@ -66,7 +66,7 @@ export default async function WeightPage() {
 
           {/* Second row: Weight Progress Chart */}
           {weights.length > 0 && (
-            <Card className="mt-6">
+            <Card className="mt-6 overflow-hidden">
               <CardHeader>
                 <CardTitle>Weight Progress</CardTitle>
                 <CardDescription>Track your weight over time</CardDescription>
@@ -79,12 +79,12 @@ export default async function WeightPage() {
 
           {/* Third row: Weight Entry List */}
           {weights.length > 0 && (
-            <Card className="mt-6">
+            <Card className="mt-6 overflow-hidden">
               <CardHeader>
                 <CardTitle>All Entries</CardTitle>
                 <CardDescription>All your recorded weight entries</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-hidden">
                 <WeightEntryList entries={weights} />
               </CardContent>
             </Card>

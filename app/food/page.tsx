@@ -43,7 +43,7 @@ export default async function FoodPage() {
           <PageHeader title="Food & Nutrition" />
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle>Add Food Entry</CardTitle>
                 <CardDescription>Record your food consumption and calories</CardDescription>
@@ -53,19 +53,19 @@ export default async function FoodPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle>Food Suggestions</CardTitle>
                 <CardDescription>Ask AI about healthy food options</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-hidden">
                 <FoodAgent />
               </CardContent>
             </Card>
           </div>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle>Healthy Products List</CardTitle>
                 <CardDescription>Create and export your shopping list</CardDescription>
@@ -75,7 +75,7 @@ export default async function FoodPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="overflow-hidden">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <UtensilsCrossed className="h-5 w-5" />
@@ -83,7 +83,7 @@ export default async function FoodPage() {
                 </CardTitle>
                 <CardDescription>Your recorded food entries and calories consumed</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="overflow-hidden">
                 {foods.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No food entries yet</p>
                 ) : (

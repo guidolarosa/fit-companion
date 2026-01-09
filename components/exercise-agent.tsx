@@ -53,8 +53,8 @@ export function ExerciseAgent() {
       </form>
 
       {response && (
-        <Card>
-          <CardContent className="pt-6">
+        <Card className="overflow-hidden">
+          <CardContent className="pt-6 overflow-hidden">
             <MarkdownContent content={response} />
           </CardContent>
         </Card>
