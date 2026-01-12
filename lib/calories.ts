@@ -33,15 +33,15 @@ export function getWeightForDate(
   date: Date,
   weightEntries: Array<{ weight: number; date: Date | string }>
 ): number | null {
-  const targetDate = new Date(date)
-  targetDate.setHours(0, 0, 0, 0)
+  // Extract YYYY-MM-DD from the UTC date to match "Pinned UTC"
+  const targetDateStr = date.toISOString().split('T')[0]
 
   // Find the latest weight entry on or before the target date
   const relevantWeights = weightEntries
     .filter((entry) => {
       const entryDate = new Date(entry.date)
-      entryDate.setHours(0, 0, 0, 0)
-      return entryDate <= targetDate
+      const entryDateStr = entryDate.toISOString().split('T')[0]
+      return entryDateStr <= targetDateStr
     })
     .sort((a, b) => {
       const dateA = new Date(a.date).getTime()

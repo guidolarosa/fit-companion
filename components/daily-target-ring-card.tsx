@@ -117,7 +117,7 @@ export function DailyTargetRingCard({
             </div>
             
             <div className="text-[10px] text-muted-foreground/60">
-              {format(date, "MMM d, yyyy")}
+              {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
             </div>
           </div>
         </div>

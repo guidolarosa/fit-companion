@@ -117,16 +117,17 @@ async function getDashboardData(userId: string) {
 
   // Aggregate exercises by day
   allExercises.forEach((exercise) => {
-    const dayKey = format(startOfDay(exercise.date), "yyyy-MM-dd");
+    const dayKey = exercise.date.toISOString().split("T")[0];
     const existing = dailyDataMap.get(dayKey);
     if (existing) {
       existing.caloriesBurnt += exercise.calories;
     } else {
+      const [y, m, d] = dayKey.split("-").map(Number);
       dailyDataMap.set(dayKey, {
         caloriesConsumed: 0,
         caloriesBurnt: exercise.calories,
         protein: 0,
-        date: startOfDay(exercise.date),
+        date: new Date(Date.UTC(y, m - 1, d)),
         hasExercise: true,
       });
     }
@@ -135,17 +136,18 @@ async function getDashboardData(userId: string) {
   // Aggregate foods by day
   allFoods.forEach((food) => {
     const protein = (food as any).protein || 0;
-    const dayKey = format(startOfDay(food.date), "yyyy-MM-dd");
+    const dayKey = food.date.toISOString().split("T")[0];
     const existing = dailyDataMap.get(dayKey);
     if (existing) {
       existing.caloriesConsumed += food.calories;
       existing.protein += protein;
     } else {
+      const [y, m, d] = dayKey.split("-").map(Number);
       dailyDataMap.set(dayKey, {
         caloriesConsumed: food.calories,
         caloriesBurnt: 0,
         protein,
-        date: startOfDay(food.date),
+        date: new Date(Date.UTC(y, m - 1, d)),
         hasExercise: false,
       });
     }
@@ -187,7 +189,7 @@ async function getDashboardData(userId: string) {
   // Group exercises by day for calendar
   const exerciseDaysMap = new Map<string, number>();
   allExercises.forEach((exercise) => {
-    const dayKey = format(startOfDay(exercise.date), "yyyy-MM-dd");
+    const dayKey = exercise.date.toISOString().split("T")[0];
     const existing = exerciseDaysMap.get(dayKey);
     if (existing) {
       exerciseDaysMap.set(dayKey, existing + exercise.calories);
@@ -197,10 +199,10 @@ async function getDashboardData(userId: string) {
   });
 
   const exerciseDays = Array.from(exerciseDaysMap.entries()).map(([dateKey, calories]) => {
-    // Parse date string (yyyy-MM-dd) as local date to avoid timezone issues
+    // Parse date string (yyyy-MM-dd) as UTC date to match "Pinned UTC"
     const [year, month, day] = dateKey.split("-").map(Number);
     return {
-      date: new Date(year, month - 1, day),
+      date: new Date(Date.UTC(year, month - 1, day)),
       calories,
     };
   });

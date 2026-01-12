@@ -44,8 +44,15 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
       setCalories(entry.calories.toString())
       setDuration(entry.duration?.toString() || "")
       const entryDate = new Date(entry.date)
-      setDate(entryDate.toISOString().split("T")[0])
-      setTime(entryDate.toTimeString().slice(0, 5))
+      // Extract components from UTC to respect "Pinned UTC"
+      const y = entryDate.getUTCFullYear()
+      const m = String(entryDate.getUTCMonth() + 1).padStart(2, '0')
+      const d = String(entryDate.getUTCDate()).padStart(2, '0')
+      const hh = String(entryDate.getUTCHours()).padStart(2, '0')
+      const mm = String(entryDate.getUTCMinutes()).padStart(2, '0')
+      
+      setDate(`${y}-${m}-${d}`)
+      setTime(`${hh}:${mm}`)
     }
   }, [entry])
 
@@ -56,7 +63,8 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
     setIsSubmitting(true)
 
     try {
-      const dateTime = new Date(`${date}T${time}`)
+      // Use "Pinned UTC" strategy: store local date/time as UTC to avoid timezone shifts
+      const dateTimeStr = `${date}T${time}:00.000Z`
       const response = await fetch("/api/exercise", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -65,7 +73,7 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
           name,
           calories: parseFloat(calories),
           duration: duration ? parseInt(duration) : null,
-          date: dateTime.toISOString(),
+          date: dateTimeStr,
         }),
       })
 

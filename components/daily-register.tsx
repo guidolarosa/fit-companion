@@ -81,10 +81,19 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
                     : netCalories > 0
                     ? "text-red-400 bg-red-400/10"
                     : "text-yellow-400 bg-yellow-400/10";
-                return (
+                
+                // Format in UTC to respect "Pinned UTC"
+                const dateStr = day.date.toLocaleDateString('en-US', { 
+                  month: 'short', 
+                  day: 'numeric', 
+                  year: 'numeric', 
+                  timeZone: 'UTC' 
+                });
+
+                return index < 7 && (
                   <tr key={index} className="border-b hover:bg-muted/50">
                     <td className="p-2 sm:p-3 font-medium whitespace-nowrap">
-                      {format(day.date, "MMM d, yyyy")}
+                      {dateStr}
                     </td>
                     <td className="p-2 sm:p-3 text-right text-muted-foreground whitespace-nowrap">
                       {day.bmr > 0 ? `${Math.round(day.bmr)}` : "-"}

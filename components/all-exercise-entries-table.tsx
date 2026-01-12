@@ -118,8 +118,12 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
                 </p>
               </div>
               <div className="col-span-3 sm:col-span-3">
-                <p className="text-sm text-muted-foreground">{format(entry.date, "MMM d, yyyy")}</p>
-                <p className="text-xs text-muted-foreground sm:hidden">{format(entry.date, "HH:mm")}</p>
+                <p className="text-sm text-muted-foreground">
+                  {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
+                </p>
+                <p className="text-xs text-muted-foreground sm:hidden">
+                  {new Date(entry.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })}
+                </p>
               </div>
               <div className="col-span-3 sm:col-span-2 text-right">
                 <CaloriePill calories={entry.calories} />

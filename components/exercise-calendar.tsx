@@ -27,8 +27,7 @@ export function ExerciseCalendar({ exerciseDays }: ExerciseCalendarProps) {
   // Create a map for quick lookup of exercise days
   const exerciseMap = new Map<string, number>()
   exerciseDays.forEach((day) => {
-    const normalizedDate = startOfDay(day.date)
-    const key = format(normalizedDate, "yyyy-MM-dd")
+    const key = day.date.toISOString().split('T')[0]
     exerciseMap.set(key, day.calories)
   })
 
@@ -43,8 +42,11 @@ export function ExerciseCalendar({ exerciseDays }: ExerciseCalendarProps) {
   }
 
   function getDayCalories(date: Date): number | null {
-    const normalizedDate = startOfDay(date)
-    const key = format(normalizedDate, "yyyy-MM-dd")
+    // Match calendar day (local) to "Pinned UTC" key
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    const key = `${y}-${m}-${d}`
     return exerciseMap.get(key) ?? null
   }
 

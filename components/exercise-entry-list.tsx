@@ -62,7 +62,7 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
                 {entry.name}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                {format(entry.date, "MMM d")}
+                {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}
                 {entry.duration && ` • ${entry.duration}m`}
               </p>
             </div>

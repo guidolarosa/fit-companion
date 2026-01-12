@@ -81,33 +81,35 @@ export async function getUserContext(userId: string) {
   >()
 
   allExercises.forEach((exercise) => {
-    const key = format(startOfDay(exercise.date), "yyyy-MM-dd")
+    const key = exercise.date.toISOString().split("T")[0]
     const existing = dailyDataMap.get(key)
     if (existing) {
       existing.caloriesBurnt += exercise.calories
     } else {
+      const [y, m, d] = key.split("-").map(Number)
       dailyDataMap.set(key, {
         caloriesBurnt: exercise.calories,
         caloriesConsumed: 0,
         protein: 0,
-        date: startOfDay(exercise.date),
+        date: new Date(Date.UTC(y, m - 1, d)),
       })
     }
   })
 
   allFoods.forEach((food) => {
     const protein = (food as any).protein || 0
-    const key = format(startOfDay(food.date), "yyyy-MM-dd")
+    const key = food.date.toISOString().split("T")[0]
     const existing = dailyDataMap.get(key)
     if (existing) {
       existing.caloriesConsumed += food.calories
       existing.protein += protein
     } else {
+      const [y, m, d] = key.split("-").map(Number)
       dailyDataMap.set(key, {
         caloriesBurnt: 0,
         caloriesConsumed: food.calories,
         protein,
-        date: startOfDay(food.date),
+        date: new Date(Date.UTC(y, m - 1, d)),
       })
     }
   })
@@ -178,7 +180,8 @@ export async function getUserContext(userId: string) {
   // Weight information
   context += "WEIGHT TRACKING:\n"
   if (latestWeight) {
-    context += `- Current Weight: ${latestWeight.weight} kg (recorded on ${format(latestWeight.date, "MMM d, yyyy")})\n`
+    const latestWeightDateStr = latestWeight.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+    context += `- Current Weight: ${latestWeight.weight} kg (recorded on ${latestWeightDateStr})\n`
     if (weightChange !== null && weightEntries.length > 1) {
       const changeText = weightChange > 0 ? `+${weightChange.toFixed(1)}` : weightChange.toFixed(1)
       context += `- Weight Change: ${changeText} kg (over ${weightEntries.length} entries)\n`
@@ -202,9 +205,10 @@ export async function getUserContext(userId: string) {
     context += `- Total Calories Burnt (all time): ${Math.round(totalCaloriesBurntValue)} kcal\n`
     context += `- Recent Exercises (last 10):\n`
     recentExercises.slice(0, 5).forEach((ex) => {
+      const exDateStr = ex.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
       context += `  • ${ex.name}: ${Math.round(ex.calories)} kcal`
       if (ex.duration) context += ` (${ex.duration} min)`
-      context += ` - ${format(ex.date, "MMM d")}\n`
+      context += ` - ${exDateStr}\n`
     })
   } else {
     context += "- No exercises recorded yet\n"
@@ -217,7 +221,8 @@ export async function getUserContext(userId: string) {
     context += `- Total Calories Consumed (all time): ${Math.round(totalCaloriesConsumedValue)} kcal\n`
     context += `- Recent Food Entries (last 10):\n`
     recentFoods.slice(0, 5).forEach((food) => {
-      context += `  • ${food.name}: ${Math.round(food.calories)} kcal - ${format(food.date, "MMM d")}\n`
+      const foodDateStr = food.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
+      context += `  • ${food.name}: ${Math.round(food.calories)} kcal - ${foodDateStr}\n`
     })
   } else {
     context += "- No food entries recorded yet\n"

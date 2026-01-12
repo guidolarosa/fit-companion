@@ -191,14 +191,6 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
               <span>12 PM</span>
               <span>12 AM</span>
             </div>
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span className={cycleData[0].isEating ? "text-green-400" : "text-yellow-400"}>
-                Fasting
-              </span>
-              <span className={cycleData[12].isEating ? "text-green-400" : "text-yellow-400"}>
-                Eating
-              </span>
-            </div>
           </div>
         </div>
       </CardContent>

@@ -61,7 +61,7 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
                 {entry.name}
               </p>
               <p className="text-xs sm:text-sm text-muted-foreground">
-                {format(entry.date, "MMM d")}
+                {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}
               </p>
             </div>
             <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto">

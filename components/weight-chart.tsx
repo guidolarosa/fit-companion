@@ -24,7 +24,7 @@ export function WeightChart({ weights, chartHeight = 300 }: WeightChartProps) {
   }
 
   const chartData = weights.map((entry) => ({
-    date: format(new Date(entry.date), "MMM d"),
+    date: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }),
     weight: entry.weight,
   }))
 

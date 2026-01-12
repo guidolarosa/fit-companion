@@ -34,8 +34,8 @@ export function WeightCalendar({ weightDays }: WeightCalendarProps) {
   // Create a map for quick lookup of weight days and their change status
   const weightMap = new Map<string, { weight: number; change: WeightChange }>()
   sortedWeightDays.forEach((day, index) => {
-    const normalizedDate = startOfDay(new Date(day.date))
-    const key = format(normalizedDate, "yyyy-MM-dd")
+    const entryDate = new Date(day.date)
+    const key = entryDate.toISOString().split('T')[0]
     
     let change: WeightChange = "first"
     if (index > 0) {
@@ -63,8 +63,11 @@ export function WeightCalendar({ weightDays }: WeightCalendarProps) {
   }
 
   function getDayData(date: Date): { weight: number; change: WeightChange } | null {
-    const normalizedDate = startOfDay(date)
-    const key = format(normalizedDate, "yyyy-MM-dd")
+    // For calendar days (which are local), we use the date parts to match "Pinned UTC"
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    const key = `${y}-${m}-${d}`
     return weightMap.get(key) ?? null
   }
 

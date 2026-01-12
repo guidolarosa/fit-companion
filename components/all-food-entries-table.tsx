@@ -117,10 +117,10 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
               </div>
               <div className="col-span-3 sm:col-span-2">
                 <p className="text-sm text-muted-foreground">
-                  {format(entry.date, "MMM d, yyyy")}
+                  {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                 </p>
                 <p className="text-xs text-muted-foreground sm:hidden">
-                  {format(entry.date, "HH:mm")}
+                  {new Date(entry.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })}
                 </p>
               </div>
               <div className="col-span-3 sm:col-span-2 text-right">

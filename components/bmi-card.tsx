@@ -118,30 +118,6 @@ export function BMICard({
           </div>
 
           {/* Target range context */}
-          {targetWeightMin && targetWeightMax && (
-            <div className="pt-2 border-t">
-              <div className="text-xs text-muted-foreground">Target range</div>
-              <div className="flex items-baseline gap-2 mt-1">
-                <div className="text-sm font-semibold">
-                  {targetWeightMin.toFixed(1)}–{targetWeightMax.toFixed(1)} kg
-                </div>
-                {currentWeight && (
-                  <span className="text-xs text-muted-foreground">
-                    {(currentWeight - targetWeightMax > 0
-                      ? currentWeight - targetWeightMax
-                      : targetWeightMin - currentWeight
-                    ).toFixed(1)}
-                    kg to enter range
-                  </span>
-                )}
-              </div>
-              {milestoneStep && (
-                <div className="text-[11px] text-muted-foreground mt-1">
-                  Next milestone: ±{milestoneStep.toFixed(1)} kg steps
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

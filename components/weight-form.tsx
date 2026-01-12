@@ -9,8 +9,16 @@ import { Label } from "@/components/ui/label"
 
 export function WeightForm() {
   const router = useRouter()
+  const getLocalDateString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const [weight, setWeight] = useState("")
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0])
+  const [date, setDate] = useState(getLocalDateString())
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -18,20 +26,21 @@ export function WeightForm() {
     setIsSubmitting(true)
 
     try {
-      // Set to start of day (midnight) for the selected date
-      const dateTime = new Date(`${date}T00:00:00`)
+      // Use "Pinned UTC" strategy: store local date/time as UTC to avoid timezone shifts
+      // For weight, we use midnight of the selected date
+      const dateTimeStr = `${date}T00:00:00.000Z`
       const response = await fetch("/api/weight", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           weight: parseFloat(weight),
-          date: dateTime.toISOString(),
+          date: dateTimeStr,
         }),
       })
 
       if (response.ok) {
         setWeight("")
-        setDate(new Date().toISOString().split("T")[0])
+        setDate(getLocalDateString())
         toast.success("Weight entry created successfully!")
         router.refresh()
       } else {

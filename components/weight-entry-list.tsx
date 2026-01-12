@@ -61,7 +61,7 @@ export function WeightEntryList({ entries }: WeightEntryListProps) {
                   {entry.weight} kg
                 </p>
                 <p className="text-sm text-muted-foreground truncate">
-                  {format(new Date(entry.date), "MMM d, yyyy")}
+                  {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                 </p>
               </div>
               <div className="flex items-center gap-1">

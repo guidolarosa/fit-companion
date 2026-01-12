@@ -25,12 +25,27 @@ interface ExerciseSuggestion {
 
 export function ExerciseForm() {
   const router = useRouter()
+  const getLocalDateString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const getLocalTimeString = () => {
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  };
+
   const [name, setName] = useState("")
   const [calories, setCalories] = useState("")
   const [duration, setDuration] = useState("")
   const [intensity, setIntensity] = useState<Intensity>("")
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0])
-  const [time, setTime] = useState(new Date().toTimeString().slice(0, 5))
+  const [date, setDate] = useState(getLocalDateString())
+  const [time, setTime] = useState(getLocalTimeString())
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isEstimating, setIsEstimating] = useState(false)
   const [suggestions, setSuggestions] = useState<ExerciseSuggestion[]>([])
@@ -141,7 +156,8 @@ export function ExerciseForm() {
     setIsSubmitting(true)
 
     try {
-      const dateTime = new Date(`${date}T${time}`)
+      // Use "Pinned UTC" strategy: store local date/time as UTC to avoid timezone shifts
+      const dateTimeStr = `${date}T${time}:00.000Z`
       const response = await fetch("/api/exercise", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -149,7 +165,7 @@ export function ExerciseForm() {
           name,
           calories: parseFloat(calories),
           duration: duration ? parseInt(duration) : null,
-          date: dateTime.toISOString(),
+          date: dateTimeStr,
         }),
       })
 
@@ -158,8 +174,8 @@ export function ExerciseForm() {
         setCalories("")
         setDuration("")
         setIntensity("")
-        setDate(new Date().toISOString().split("T")[0])
-        setTime(new Date().toTimeString().slice(0, 5))
+        setDate(getLocalDateString())
+        setTime(getLocalTimeString())
         toast.success("Exercise entry created successfully!")
         router.refresh()
       } else {

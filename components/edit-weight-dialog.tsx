@@ -37,7 +37,11 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
     if (entry) {
       setWeight(entry.weight.toString())
       const entryDate = new Date(entry.date)
-      setDate(entryDate.toISOString().split("T")[0])
+      // Extract components from UTC to respect "Pinned UTC"
+      const y = entryDate.getUTCFullYear()
+      const m = String(entryDate.getUTCMonth() + 1).padStart(2, '0')
+      const d = String(entryDate.getUTCDate()).padStart(2, '0')
+      setDate(`${y}-${m}-${d}`)
     }
   }, [entry])
 
@@ -48,15 +52,15 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
     setIsSubmitting(true)
 
     try {
-      // Set to start of day (midnight) for the selected date
-      const dateTime = new Date(`${date}T00:00:00`)
+      // Use "Pinned UTC" strategy: store local date/time as UTC to avoid timezone shifts
+      const dateTimeStr = `${date}T00:00:00.000Z`
       const response = await fetch("/api/weight", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: entry.id,
           weight: parseFloat(weight),
-          date: dateTime.toISOString(),
+          date: dateTimeStr,
         }),
       })
 

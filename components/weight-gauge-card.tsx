@@ -162,7 +162,7 @@ export function WeightGaugeCard({
               
               {weightDate && (
                 <div className="text-[10px] text-muted-foreground/60 pt-1">
-                  {format(new Date(weightDate), "MMM d, yyyy")}
+                  {new Date(weightDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
                 </div>
               )}
             </div>
