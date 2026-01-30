@@ -10,6 +10,9 @@ import {
 import { format } from "date-fns";
 import { Calendar } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+
 interface DailyData {
   date: Date;
   caloriesConsumed: number;
@@ -47,14 +50,21 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
-          Daily Register
-        </CardTitle>
-        <CardDescription>
-          Daily calorie tracking with BMR and TDEE
-        </CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <Calendar className="h-5 w-5" />
+            Daily Register
+          </CardTitle>
+          <CardDescription>
+            Daily calorie tracking with BMR and TDEE
+          </CardDescription>
+        </div>
+        <Link href="/register/all">
+          <Button variant="outline" size="sm">
+            See all
+          </Button>
+        </Link>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">

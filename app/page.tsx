@@ -25,7 +25,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { MobileQuickActions } from "@/components/mobile-quick-actions";
-import { calculateBMR, calculateTDEE, getWeightForDate } from "@/lib/calories";
+import { aggregateDailyData } from "@/lib/daily-data";
 import { getCurrentUser } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 import { WeightChart } from "@/components/weight-chart";
@@ -104,83 +104,11 @@ async function getDashboardData(userId: string) {
   const caloriesConsumed = totalCaloriesConsumed._sum.calories || 0;
 
   // Calculate daily register data
-  const dailyDataMap = new Map<
-    string,
-    {
-      caloriesConsumed: number;
-      caloriesBurnt: number;
-      protein: number;
-      date: Date;
-      hasExercise: boolean;
-    }
-  >();
-
-  // Aggregate exercises by day
-  allExercises.forEach((exercise) => {
-    const dayKey = exercise.date.toISOString().split("T")[0];
-    const existing = dailyDataMap.get(dayKey);
-    if (existing) {
-      existing.caloriesBurnt += exercise.calories;
-    } else {
-      const [y, m, d] = dayKey.split("-").map(Number);
-      dailyDataMap.set(dayKey, {
-        caloriesConsumed: 0,
-        caloriesBurnt: exercise.calories,
-        protein: 0,
-        date: new Date(Date.UTC(y, m - 1, d)),
-        hasExercise: true,
-      });
-    }
-  });
-
-  // Aggregate foods by day
-  allFoods.forEach((food) => {
-    const protein = (food as any).protein || 0;
-    const dayKey = food.date.toISOString().split("T")[0];
-    const existing = dailyDataMap.get(dayKey);
-    if (existing) {
-      existing.caloriesConsumed += food.calories;
-      existing.protein += protein;
-    } else {
-      const [y, m, d] = dayKey.split("-").map(Number);
-      dailyDataMap.set(dayKey, {
-        caloriesConsumed: food.calories,
-        caloriesBurnt: 0,
-        protein,
-        date: new Date(Date.UTC(y, m - 1, d)),
-        hasExercise: false,
-      });
-    }
-  });
-
-  // Convert to array and calculate BMR/TDEE for each day
-  const dailyData = Array.from(dailyDataMap.values())
-    .map((day) => {
-      const weight = getWeightForDate(day.date, allWeights);
-      let bmr = 0;
-      let tdee = 0;
-
-      if (weight && user?.height && user?.age) {
-        bmr = calculateBMR(weight, user.height, user.age);
-        tdee = calculateTDEE(bmr, user.lifestyle);
-      }
-
-      const netCalories = day.caloriesConsumed - (tdee + day.caloriesBurnt);
-      const ratioToTdee = tdee > 0 ? day.caloriesConsumed / tdee : null;
-
-      return {
-        ...day,
-        bmr,
-        tdee,
-        netCalories,
-        ratioToTdee,
-      };
-    })
-    .sort((a, b) => b.date.getTime() - a.date.getTime()) // Most recent first
-    .slice(0, 30); // Last 30 days
+  const allDailyData = aggregateDailyData(user, allExercises, allFoods, allWeights);
+  const dailyData = allDailyData.slice(0, 30); // Last 30 days for dashboard logic
 
   // Calculate total net calories from all registered days
-  const totalNetCalories = dailyData.reduce((sum, day) => {
+  const totalNetCalories = allDailyData.reduce((sum, day) => {
     const totalBurnt = day.tdee + day.caloriesBurnt;
     const netCalories = day.caloriesConsumed - totalBurnt;
     return sum + netCalories;
@@ -321,13 +249,13 @@ export default async function Dashboard() {
         <div className="mx-auto max-w-7xl">
           <div className="flex items-center justify-between mb-6 sm:mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
-            <FittyButton />
+            {/* <FittyButton /> */}
           </div>
 
           {/* Mobile Quick Actions */}
           <MobileQuickActions />
 
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
             <WeightGaugeCard
               currentWeight={data.latestWeight?.weight || null}
               targetWeightMin={data.targetWeightMin}
