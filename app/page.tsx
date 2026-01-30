@@ -15,10 +15,8 @@ import { DailyRegister } from "@/components/daily-register";
 import { ExerciseEntryList } from "@/components/exercise-entry-list";
 import { FoodEntryList } from "@/components/food-entry-list";
 import { prisma } from "@/lib/prisma";
-import { format, startOfDay } from "date-fns";
 import {
   Weight,
-  Flame,
   Activity,
   UtensilsCrossed,
   TrendingDown,
@@ -29,7 +27,6 @@ import { aggregateDailyData } from "@/lib/daily-data";
 import { getCurrentUser } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 import { WeightChart } from "@/components/weight-chart";
-import { FittyButton } from "@/components/fitty-button";
 import { ExerciseCalendar } from "@/components/exercise-calendar";
 import { FoodCalendar } from "@/components/food-calendar";
 

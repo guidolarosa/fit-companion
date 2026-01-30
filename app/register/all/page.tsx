@@ -61,7 +61,7 @@ export default async function AllDailyRegisterPage({
           <PageHeader
             title="Full Daily Register"
             description="Complete history of your calorie tracking, BMR, and TDEE."
-            showBackButton
+            showBackOnMobile={true}
           />
 
           <Card className="mt-8">

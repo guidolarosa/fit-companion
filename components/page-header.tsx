@@ -7,11 +7,12 @@ import { FittyButton } from "@/components/fitty-button"
 
 interface PageHeaderProps {
   title: string
+  description?: string
   showBackOnMobile?: boolean
   showFittyButton?: boolean
 }
 
-export function PageHeader({ title, showBackOnMobile = true, showFittyButton = true }: PageHeaderProps) {
+export function PageHeader({ title, description, showBackOnMobile = true, showFittyButton = true }: PageHeaderProps) {
   const router = useRouter()
 
   return (
@@ -27,7 +28,10 @@ export function PageHeader({ title, showBackOnMobile = true, showFittyButton = t
             <ChevronLeft className="h-5 w-5" />
           </Button>
         )}
-        <h1 className="text-2xl sm:text-3xl font-bold">{title}</h1>
+        <div className="flex flex-col">
+          <h1 className="text-2xl sm:text-3xl font-bold">{title}</h1>
+          <p className="text-sm text-muted-foreground">{description}</p>
+        </div>
       </div>
       {showFittyButton && <FittyButton />}
     </div>
