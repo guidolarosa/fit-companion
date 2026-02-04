@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
+    --background: 217 28% 17%; /* Slate-800 */
+    --foreground: 210 40% 98%; /* Slate-50 */
+    --card: 217 28% 17%;
     --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
+    --popover: 217 28% 17%;
     --popover-foreground: 210 40% 98%;
-    --primary: 142.1 76.2% 36.3%;
-    --primary-foreground: 355.7 100% 97.3%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --primary: 25 95% 53%; /* Orange-500 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 142 70% 45%; /* Green-500 (Success/CTA) */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 215 28% 25%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 25 95% 53%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 142.1 76.2% 36.3%;
-    --radius: 0.5rem;
+    --border: 215 28% 25%;
+    --input: 215 28% 25%;
+    --ring: 25 95% 53%;
+    --radius: 0.75rem;
   }
 }
 
@@ -32,8 +32,18 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading uppercase tracking-wide;
   }
 }
 
+.glass-card {
+  @apply bg-white/5 backdrop-blur-md border border-white/10 shadow-xl;
+}
+
+.btn-hover {
+  @apply transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] cursor-pointer;
+}

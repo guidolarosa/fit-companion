@@ -1,7 +1,8 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { TrendingUp } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Activity } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface BMICardProps {
   bmi: number | null
@@ -12,29 +13,15 @@ interface BMICardProps {
   milestoneStep: number | null
 }
 
-function getBMICategory(bmi: number): { label: string; color: string; bgColor: string } {
+function getBMICategory(bmi: number): { label: string; color: string; bgColor: string; progress: number } {
   if (bmi < 18.5) {
-    return { label: "Underweight", color: "text-blue-400", bgColor: "bg-blue-400/20" }
+    return { label: "Bajo peso", color: "text-blue-400", bgColor: "bg-blue-400/20", progress: (bmi / 18.5) * 30 }
   } else if (bmi < 25) {
-    return { label: "Normal", color: "text-green-400", bgColor: "bg-green-400/20" }
+    return { label: "Normal", color: "text-secondary", bgColor: "bg-secondary/20", progress: 30 + ((bmi - 18.5) / (25 - 18.5)) * 40 }
   } else if (bmi < 30) {
-    return { label: "Overweight", color: "text-yellow-400", bgColor: "bg-yellow-400/20" }
+    return { label: "Sobrepeso", color: "text-yellow-400", bgColor: "bg-yellow-400/20", progress: 70 + ((bmi - 25) / (30 - 25)) * 20 }
   } else {
-    return { label: "Obese", color: "text-red-400", bgColor: "bg-red-400/20" }
-  }
-}
-
-function getBMIProgress(bmi: number): number {
-  // Normalize BMI to 0-100% for visualization
-  // Healthy range is 18.5-24.9, so we'll map that to the progress bar
-  if (bmi < 18.5) {
-    return (bmi / 18.5) * 30 // Map underweight to 0-30%
-  } else if (bmi < 25) {
-    return 30 + ((bmi - 18.5) / (25 - 18.5)) * 40 // Map normal to 30-70%
-  } else if (bmi < 30) {
-    return 70 + ((bmi - 25) / (30 - 25)) * 20 // Map overweight to 70-90%
-  } else {
-    return 90 + Math.min(((bmi - 30) / 10) * 10, 10) // Map obese to 90-100%
+    return { label: "Obesidad", color: "text-primary", bgColor: "bg-primary/20", progress: 90 + Math.min(((bmi - 30) / 10) * 10, 10) }
   }
 }
 
@@ -42,21 +29,18 @@ export function BMICard({
   bmi,
   currentWeight,
   height,
-  targetWeightMin,
-  targetWeightMax,
-  milestoneStep,
 }: BMICardProps) {
   if (!bmi || !height || !currentWeight) {
     return (
-      <Card>
+      <Card className="glass-card">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">BMI <span className="text-[10px] text-muted-foreground">(reference only)</span></CardTitle>
-          <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">IMC</CardTitle>
+          <Activity className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-muted-foreground">No data</div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Add your height in settings and weight entry to see your BMI
+          <div className="text-2xl font-bold text-slate-500 italic">Sin datos</div>
+          <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            Agrega tu altura en Ajustes y registra tu peso para ver el IMC.
           </p>
         </CardContent>
       </Card>
@@ -64,63 +48,48 @@ export function BMICard({
   }
 
   const category = getBMICategory(bmi)
-  const progress = getBMIProgress(bmi)
 
   return (
-    <Card>
+    <Card className="glass-card border-none overflow-hidden group">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary opacity-50" />
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">
-          BMI <span className="text-[10px] text-muted-foreground">(reference only)</span>
+        <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">
+          IMC <span className="text-[10px] text-slate-600 normal-case">(referencia)</span>
         </CardTitle>
-        <TrendingUp className="h-4 w-4 text-muted-foreground" />
+        <Activity className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <div className="text-2xl font-semibold">{bmi.toFixed(1)}</div>
-            <span className={`text-xs font-medium px-2 py-1 rounded ${category.color} ${category.bgColor}`}>
+        <div className="space-y-4">
+          <div className="flex items-end gap-3">
+            <div className="text-3xl font-heading font-bold text-slate-50">{bmi.toFixed(1)}</div>
+            <div className={cn(
+              "text-[10px] font-heading font-bold uppercase tracking-widest px-2 py-1 rounded-md mb-1",
+              category.color,
+              category.bgColor
+            )}>
               {category.label}
-            </span>
-            <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
-              Reference only
-            </span>
-          </div>
-
-          {/* BMI Progress Bar */}
-          <div className="space-y-2">
-            <div className="relative h-3 w-full rounded-full bg-muted overflow-hidden">
-              {/* Healthy range indicator */}
-              <div
-                className="absolute h-full bg-green-400/30"
-                style={{
-                  left: "30%",
-                  width: "40%",
-                }}
-              />
-              {/* Current BMI indicator */}
-              <div
-                className={`absolute h-full ${category.bgColor} border-2`}
-                style={{
-                  left: `${Math.max(0, Math.min(100, progress - 1))}%`,
-                  width: "2%",
-                  borderColor: category.color.includes("blue") ? "rgb(96 165 250)" : 
-                               category.color.includes("green") ? "rgb(74 222 128)" :
-                               category.color.includes("yellow") ? "rgb(250 204 21)" :
-                               "rgb(248 113 113)",
-                }}
-              />
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>18.5</span>
-              <span className="text-green-400">Healthy</span>
-              <span>24.9</span>
             </div>
           </div>
 
-          {/* Target range context */}
+          <div className="space-y-3 pt-2">
+            <div className="relative h-2.5 w-full rounded-full bg-white/5 border border-white/5 overflow-hidden">
+              <div
+                className="absolute h-full bg-secondary/40 rounded-full"
+                style={{ left: "30%", width: "40%" }}
+              />
+              <div
+                className={cn("absolute h-full border-r-2 border-white shadow-[0_0_8px_rgba(255,255,255,0.5)] transition-all duration-1000 ease-out", category.bgColor)}
+                style={{ left: `${Math.max(0, Math.min(100, category.progress - 0.5))}%`, width: "1%" }}
+              />
+            </div>
+            <div className="flex justify-between text-[9px] font-heading font-bold text-slate-600 tracking-wider uppercase">
+              <span>Bajo</span>
+              <span className="text-secondary/60">Saludable</span>
+              <span>Alto</span>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
   )
 }
-

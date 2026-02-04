@@ -1,8 +1,9 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, Utensils, Coffee } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Clock, Utensils, Coffee, Info } from "lucide-react"
 import { useEffect, useState } from "react"
+import { cn } from "@/lib/utils"
 
 interface IFCardProps {
   ifType: string | null
@@ -41,17 +42,14 @@ function getCurrentStatus(ifType: string | null, ifStartTime: string | null) {
   const { hours: startHours, minutes: startMinutes } = parseTime(ifStartTime)
   const startTotalMinutes = startHours * 60 + startMinutes
 
-  // Calculate time since start of eating window (in minutes)
   let minutesSinceStart = currentTotalMinutes - startTotalMinutes
   if (minutesSinceStart < 0) {
-    minutesSinceStart += 24 * 60 // Add a full day if negative
+    minutesSinceStart += 24 * 60
   }
 
-  // Calculate where we are in the 24-hour cycle
   const cycleMinutes = minutesSinceStart % (24 * 60)
   const isEating = cycleMinutes < config.eatHours * 60
 
-  // Calculate remaining time
   let remainingMinutes = 0
   let statusText = ""
   let statusIcon = null
@@ -60,19 +58,18 @@ function getCurrentStatus(ifType: string | null, ifStartTime: string | null) {
     remainingMinutes = config.eatHours * 60 - cycleMinutes
     const hours = Math.floor(remainingMinutes / 60)
     const mins = remainingMinutes % 60
-    statusText = `Eating window - ${hours}h ${mins}m remaining`
-    statusIcon = <Utensils className="h-4 w-4 text-green-400" />
+    statusText = `Ventana de alimentación - ${hours}h ${mins}m restantes`
+    statusIcon = <Utensils className="h-4 w-4 text-secondary" />
   } else {
     const fastStart = config.eatHours * 60
     const fastProgress = cycleMinutes - fastStart
     remainingMinutes = config.fastHours * 60 - fastProgress
     const hours = Math.floor(remainingMinutes / 60)
     const mins = remainingMinutes % 60
-    statusText = `Fasting - ${hours}h ${mins}m remaining`
-    statusIcon = <Coffee className="h-4 w-4 text-yellow-400" />
+    statusText = `Ayuno - ${hours}h ${mins}m restantes`
+    statusIcon = <Coffee className="h-4 w-4 text-primary" />
   }
 
-  // Calculate progress percentage for the 24-hour cycle
   const cycleProgress = (cycleMinutes / (24 * 60)) * 100
 
   return {
@@ -93,21 +90,21 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
     const interval = setInterval(() => {
       setCurrentTime(new Date())
       setStatus(getCurrentStatus(ifType, ifStartTime))
-    }, 60000) // Update every minute
+    }, 60000)
 
     return () => clearInterval(interval)
   }, [ifType, ifStartTime])
 
   if (!ifType || !ifStartTime || !IF_TYPES[ifType]) {
     return (
-      <Card>
+      <Card className="glass-card">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Intermittent Fasting</CardTitle>
-          <Clock className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">Ayuno Intermitente</CardTitle>
+          <Clock className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-sm text-muted-foreground">
-            Configure your IF schedule in Settings
+          <div className="text-sm text-slate-500">
+            Configura tu horario de ayuno en Ajustes
           </div>
         </CardContent>
       </Card>
@@ -115,25 +112,13 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
   }
 
   const config = IF_TYPES[ifType]
-
-  // Create data for the 24-hour cycle visualization
   const { hours: startHours, minutes: startMinutes } = parseTime(ifStartTime)
   const startTotalMinutes = startHours * 60 + startMinutes
   const eatingWindowEnd = config.eatHours * 60
 
   const cycleData = Array.from({ length: 24 }, (_, hour) => {
-    // Calculate the start minute of this hour (0-1439)
     const hourStartMinutes = hour * 60
-    // Calculate where this hour falls in the IF cycle (relative to start time)
     const cycleStart = (hourStartMinutes - startTotalMinutes + 24 * 60) % (24 * 60)
-    const cycleEnd = cycleStart + 60 // One hour later
-
-    // Check if this hour overlaps with the eating window
-    // Eating window is from 0 to eatingWindowEnd minutes in the cycle
-    const isInEatingWindow = (cycleStart < eatingWindowEnd) || 
-                            (cycleEnd > 0 && cycleStart < eatingWindowEnd) ||
-                            (cycleStart >= 24 * 60 - 60 && cycleEnd <= eatingWindowEnd)
-
     return {
       hour,
       isEating: cycleStart < eatingWindowEnd,
@@ -143,53 +128,78 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
   const currentHour = currentTime.getHours()
 
   return (
-    <Card>
+    <Card className="glass-card border-none group overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary opacity-50" />
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">Intermittent Fasting</CardTitle>
-        <Clock className="h-4 w-4 text-muted-foreground" />
+        <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">Ayuno Intermitente</CardTitle>
+        <Clock className="h-4 w-4 text-primary group-hover:rotate-12 transition-transform" />
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div>
+          <div className="p-3 rounded-xl bg-white/5 border border-white/5">
             <div className="flex items-center gap-2 mb-2">
-              {status?.statusIcon}
-              <span className="text-sm font-medium">{status?.statusText}</span>
+              <div className={cn(
+                "p-1.5 rounded-lg",
+                status?.isEating ? "bg-secondary/10" : "bg-primary/10"
+              )}>
+                {status?.statusIcon}
+              </div>
+              <span className="text-sm font-heading font-bold text-slate-100">{status?.statusText}</span>
             </div>
-            <div className="text-xs text-muted-foreground">
-              {ifType} - Eating window: {config.eatHours}h, Fasting: {config.fastHours}h
+            <div className="text-[10px] font-heading text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <span className="text-primary font-bold">{ifType}</span> 
+              <span className="h-1 w-1 rounded-full bg-slate-700" />
+              Alimentación: {config.eatHours}h 
+              <span className="h-1 w-1 rounded-full bg-slate-700" />
+              Ayuno: {config.fastHours}h
             </div>
           </div>
 
-          {/* 24-hour cycle visualization */}
-          <div className="space-y-2">
-            <div className="text-xs text-muted-foreground mb-1">24-Hour Cycle</div>
-            <div className="relative h-8 w-full rounded-lg overflow-hidden border">
-              {cycleData.map((data, index) => (
-                <div
-                  key={index}
-                  className={`absolute h-full ${
-                    data.isEating ? "bg-green-500/30" : "bg-yellow-500/30"
-                  }`}
-                  style={{
-                    left: `${(index / 24) * 100}%`,
-                    width: `${(1 / 24) * 100}%`,
-                  }}
-                />
-              ))}
-              {/* Current time indicator */}
-              <div
-                className="absolute top-0 bottom-0 w-0.5 bg-primary z-10"
-                style={{
-                  left: `${(currentHour / 24) * 100}%`,
-                }}
-              >
-                <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-primary" />
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-heading font-bold uppercase tracking-tighter text-slate-500">Ciclo 24 Horas</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <div className="h-2 w-2 rounded-full bg-secondary/40" />
+                  <span className="text-[9px] text-slate-600">COMER</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="h-2 w-2 rounded-full bg-primary/40" />
+                  <span className="text-[9px] text-slate-600">AYUNAR</span>
+                </div>
               </div>
             </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>12 AM</span>
-              <span>12 PM</span>
-              <span>12 AM</span>
+            
+            <div className="relative h-10 w-full rounded-xl overflow-hidden bg-white/5 border border-white/10 p-1">
+              <div className="relative w-full h-full flex gap-0.5">
+                {cycleData.map((data, index) => (
+                  <div
+                    key={index}
+                    className={cn(
+                      "flex-1 h-full rounded-sm transition-all duration-500",
+                      data.isEating ? "bg-secondary/30" : "bg-primary/30",
+                      currentHour === index && "ring-2 ring-white/20 ring-inset"
+                    )}
+                  />
+                ))}
+                
+                <div
+                  className="absolute top-0 bottom-0 w-0.5 bg-white z-10 transition-all duration-1000 ease-in-out"
+                  style={{
+                    left: `${((currentHour + currentTime.getMinutes() / 60) / 24) * 100}%`,
+                  }}
+                >
+                  <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white shadow-lg shadow-white/50" />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-between text-[9px] font-heading font-bold text-slate-600 tracking-tighter uppercase">
+              <span>00:00</span>
+              <span>06:00</span>
+              <span>12:00</span>
+              <span>18:00</span>
+              <span>23:59</span>
             </div>
           </div>
         </div>
@@ -197,4 +207,3 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
     </Card>
   )
 }
-

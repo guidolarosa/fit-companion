@@ -23,27 +23,14 @@ export default async function AllDailyRegisterPage({
   const currentPage = parseInt(searchParams.page || "1");
   const pageSize = 15;
 
-  const dbUser = await prisma.user.findUnique({
-    where: { id: user.id },
-  });
-
-  const allExercises = await prisma.exercise.findMany({
-    where: { userId: user.id },
-    orderBy: { date: "desc" },
-  });
-
-  const allFoods = await prisma.foodEntry.findMany({
-    where: { userId: user.id },
-    orderBy: { date: "desc" },
-  });
-
-  const allWeights = await prisma.weightEntry.findMany({
-    where: { userId: user.id },
-    orderBy: { date: "asc" },
-  });
+  const [dbUser, allExercises, allFoods, allWeights] = await Promise.all([
+    prisma.user.findUnique({ where: { id: user.id } }),
+    prisma.exercise.findMany({ where: { userId: user.id }, orderBy: { date: "desc" } }),
+    prisma.foodEntry.findMany({ where: { userId: user.id }, orderBy: { date: "desc" } }),
+    prisma.weightEntry.findMany({ where: { userId: user.id }, orderBy: { date: "asc" } }),
+  ]);
 
   const allDailyData = aggregateDailyData(dbUser, allExercises, allFoods, allWeights);
-  
   const totalEntries = allDailyData.length;
   const totalPages = Math.ceil(totalEntries / pageSize);
   
@@ -59,19 +46,20 @@ export default async function AllDailyRegisterPage({
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
           <PageHeader
-            title="Full Daily Register"
-            description="Complete history of your calorie tracking, BMR, and TDEE."
-            showBackOnMobile={true}
+            title="Registro Completo"
+            description="Historial detallado de consumo, gasto energético y metabolismo."
+            showBackButton
           />
 
-          <Card className="mt-8">
+          <Card className="mt-8 glass-card border-none overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary opacity-50" />
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Daily Register History
+              <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wider text-slate-400">
+                <Calendar className="h-5 w-5 text-primary" />
+                Historial de Actividad
               </CardTitle>
-              <CardDescription>
-                Viewing {paginatedData.length} entries of {totalEntries} total
+              <CardDescription className="text-slate-500">
+                Mostrando {paginatedData.length} registros de {totalEntries} en total
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -81,16 +69,10 @@ export default async function AllDailyRegisterPage({
                 totalPages={totalPages}
               />
               
-              <div className="mt-8 text-sm text-muted-foreground space-y-2 border-t pt-4">
-                <p>
-                  <strong>BMR:</strong> Basal Metabolic Rate (calories burned at rest)
-                </p>
-                <p>
-                  <strong>TDEE:</strong> Total Daily Energy Expenditure (BMR × activity factor)
-                </p>
-                <p>
-                  <strong>Net:</strong> Consumed - (TDEE + Exercise calories)
-                </p>
+              <div className="mt-8 flex flex-wrap gap-6 text-[10px] font-heading font-bold uppercase tracking-widest text-slate-500 border-t border-white/5 pt-6">
+                <p><strong className="text-slate-400">BMR:</strong> Metabolismo Basal (en reposo)</p>
+                <p><strong className="text-slate-400">TDEE:</strong> Gasto Total (BMR × actividad)</p>
+                <p><strong className="text-slate-400">NETO:</strong> Consumo - (TDEE + Ejercicio)</p>
               </div>
             </CardContent>
           </Card>

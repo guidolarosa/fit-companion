@@ -7,11 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { format } from "date-fns";
-import { Calendar } from "lucide-react";
-
+import { Calendar, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 interface DailyData {
   date: Date;
@@ -29,19 +28,19 @@ interface DailyRegisterProps {
 export function DailyRegister({ dailyData }: DailyRegisterProps) {
   if (dailyData.length === 0) {
     return (
-      <Card>
+      <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Daily Register
+          <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wider text-slate-400">
+            <Calendar className="h-5 w-5 text-primary" />
+            Registro Diario
           </CardTitle>
-          <CardDescription>
-            Daily calorie tracking with BMR and TDEE
+          <CardDescription className="text-slate-500">
+            Seguimiento de calorías, BMR y TDEE
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
-            No data available yet. Start tracking your food and exercise!
+          <p className="text-sm text-slate-500 italic">
+            No hay datos disponibles. ¡Empieza a registrar tu comida y ejercicio!
           </p>
         </CardContent>
       </Card>
@@ -49,51 +48,43 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
   }
 
   return (
-    <Card>
+    <Card className="glass-card border-none overflow-hidden">
       <CardHeader className="flex flex-row items-center justify-between">
         <div>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Daily Register
+          <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wider text-slate-400">
+            <Calendar className="h-5 w-5 text-primary" />
+            Registro Diario
           </CardTitle>
-          <CardDescription>
-            Daily calorie tracking with BMR and TDEE
+          <CardDescription className="text-slate-500">
+            Últimos 7 días de actividad
           </CardDescription>
         </div>
         <Link href="/register/all">
-          <Button variant="outline" size="sm">
-            See all
+          <Button variant="outline" size="sm" className="btn-hover rounded-xl border-white/10 text-slate-300">
+            Ver Todo <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
         </Link>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto -mx-6 px-6">
           <table className="w-full text-sm min-w-[600px]">
             <thead>
-              <tr className="border-b">
-                <th className="text-left p-2 sm:p-3 font-semibold">Date</th>
-                <th className="text-right p-2 sm:p-3 font-semibold">BMR</th>
-                <th className="text-right p-2 sm:p-3 font-semibold">TDEE</th>
-                <th className="text-right p-2 sm:p-3 font-semibold">
-                  Consumed
-                </th>
-                <th className="text-right p-2 sm:p-3 font-semibold">Burnt</th>
-                <th className="text-right p-2 sm:p-3 font-semibold">Net</th>
+              <tr className="border-b border-white/5">
+                <th className="text-left py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">Fecha</th>
+                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">BMR</th>
+                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">TDEE</th>
+                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">Consumo</th>
+                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">Gasto</th>
+                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">Neto</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-white/5">
               {dailyData.map((day, index) => {
                 const totalBurnt = day.tdee + day.caloriesBurnt;
                 const netCalories = day.caloriesConsumed - totalBurnt;
-                const netBadgeClass =
-                  netCalories < 0
-                    ? "text-green-400 bg-green-400/10"
-                    : netCalories > 0
-                    ? "text-red-400 bg-red-400/10"
-                    : "text-yellow-400 bg-yellow-400/10";
+                const isDeficit = netCalories < 0;
                 
-                // Format in UTC to respect "Pinned UTC"
-                const dateStr = day.date.toLocaleDateString('en-US', { 
+                const dateStr = day.date.toLocaleDateString('es-ES', { 
                   month: 'short', 
                   day: 'numeric', 
                   year: 'numeric', 
@@ -101,35 +92,29 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
                 });
 
                 return index < 7 && (
-                  <tr key={index} className="border-b hover:bg-muted/50">
-                    <td className="p-2 sm:p-3 font-medium whitespace-nowrap">
+                  <tr key={index} className="group hover:bg-white/[0.02] transition-colors">
+                    <td className="py-4 px-2 font-bold text-slate-200 whitespace-nowrap">
                       {dateStr}
                     </td>
-                    <td className="p-2 sm:p-3 text-right text-muted-foreground whitespace-nowrap">
+                    <td className="py-4 px-2 text-right text-slate-500 whitespace-nowrap font-heading">
                       {day.bmr > 0 ? `${Math.round(day.bmr)}` : "-"}
                     </td>
-                    <td className="p-2 sm:p-3 text-right text-muted-foreground whitespace-nowrap">
+                    <td className="py-4 px-2 text-right text-slate-500 whitespace-nowrap font-heading">
                       {day.tdee > 0 ? `${Math.round(day.tdee)}` : "-"}
                     </td>
-                    <td className="p-2 sm:p-3 text-right whitespace-nowrap">
+                    <td className="py-4 px-2 text-right text-slate-200 whitespace-nowrap font-heading">
                       {Math.round(day.caloriesConsumed)}
                     </td>
-                    <td className="p-2 sm:p-3 text-right whitespace-nowrap">
+                    <td className="py-4 px-2 text-right text-slate-200 whitespace-nowrap font-heading">
                       {Math.round(day.caloriesBurnt)}
                     </td>
-                    <td
-                      className={`p-2 sm:p-3 text-right font-semibold whitespace-nowrap ${
-                        netCalories < 0
-                          ? "text-green-400"
-                          : netCalories > 0
-                          ? "text-red-400"
-                          : ""
-                      }`}
-                    >
-                      {netCalories > 0 ? "+" : ""}
-                      <span className={`${netBadgeClass} rounded-md px-2 py-1`}>
-                        {Math.round(netCalories)}
-                      </span>
+                    <td className="py-4 px-2 text-right whitespace-nowrap">
+                      <div className={cn(
+                        "inline-flex items-center px-2 py-1 rounded-lg font-heading font-bold text-xs",
+                        isDeficit ? "bg-secondary/10 text-secondary" : netCalories > 0 ? "bg-primary/10 text-primary" : "bg-white/5 text-slate-400"
+                      )}>
+                        {netCalories > 0 ? "+" : ""}{Math.round(netCalories)}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -137,17 +122,10 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
             </tbody>
           </table>
         </div>
-        <div className="mt-4 text-xs text-muted-foreground space-y-1">
-          <p>
-            <strong>BMR:</strong> Basal Metabolic Rate (calories burned at rest)
-          </p>
-          <p>
-            <strong>TDEE:</strong> Total Daily Energy Expenditure (BMR ×
-            activity factor)
-          </p>
-          <p>
-            <strong>Net:</strong> Consumed - (TDEE + Exercise calories)
-          </p>
+        <div className="mt-6 flex flex-wrap gap-4 text-[10px] text-slate-500 font-heading uppercase tracking-widest border-t border-white/5 pt-4">
+          <p><strong className="text-slate-400">BMR:</strong> Metabolismo Basal</p>
+          <p><strong className="text-slate-400">TDEE:</strong> Gasto Energético Total (BMR × actividad)</p>
+          <p><strong className="text-slate-400">NETO:</strong> Consumo - (TDEE + Ejercicio)</p>
         </div>
       </CardContent>
     </Card>

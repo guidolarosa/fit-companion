@@ -41,22 +41,21 @@ export default async function WeightPage() {
         <div className="mx-auto max-w-7xl">
           <PageHeader title="Weight Tracking" />
 
-          {/* Top row: Add Weight Entry + Weight History Calendar */}
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="overflow-hidden">
+            <Card className="glass-card border-none overflow-hidden">
               <CardHeader>
-                <CardTitle>Add Weight Entry</CardTitle>
-                <CardDescription>Record your current weight in kilograms</CardDescription>
+                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Registrar Peso</CardTitle>
+                <CardDescription className="text-slate-500">Registra tu peso actual en kilogramos</CardDescription>
               </CardHeader>
               <CardContent>
                 <WeightForm />
               </CardContent>
             </Card>
 
-            <Card className="overflow-hidden">
+            <Card className="glass-card border-none overflow-hidden">
               <CardHeader>
-                <CardTitle>Weight History</CardTitle>
-                <CardDescription>Days with weight entries</CardDescription>
+                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Historial de Peso</CardTitle>
+                <CardDescription className="text-slate-500">Días con registros de peso</CardDescription>
               </CardHeader>
               <CardContent>
                 <WeightCalendar weightDays={weightDays} />
@@ -66,10 +65,10 @@ export default async function WeightPage() {
 
           {/* Second row: Weight Progress Chart */}
           {weights.length > 0 && (
-            <Card className="mt-6 overflow-hidden">
+            <Card className="mt-6 glass-card border-none overflow-hidden">
               <CardHeader>
-                <CardTitle>Weight Progress</CardTitle>
-                <CardDescription>Track your weight over time</CardDescription>
+                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Progreso de Peso</CardTitle>
+                <CardDescription className="text-slate-500">Seguimiento de tu peso a lo largo del tiempo</CardDescription>
               </CardHeader>
               <CardContent>
                 <WeightChart weights={weights} />
@@ -79,10 +78,10 @@ export default async function WeightPage() {
 
           {/* Third row: Weight Entry List */}
           {weights.length > 0 && (
-            <Card className="mt-6 overflow-hidden">
+            <Card className="mt-6 glass-card border-none overflow-hidden">
               <CardHeader>
-                <CardTitle>All Entries</CardTitle>
-                <CardDescription>All your recorded weight entries</CardDescription>
+                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Todos los Registros</CardTitle>
+                <CardDescription className="text-slate-500">Lista completa de tus registros de peso</CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
                 <WeightEntryList entries={weights} />
