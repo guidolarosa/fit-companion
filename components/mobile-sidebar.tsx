@@ -81,8 +81,8 @@ export function MobileSidebar() {
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-16 items-center px-6 border-b border-white/[0.05]">
-          <h1 className="text-xl font-heading font-bold tracking-tight text-white">
+        <div className="flex h-28 items-center px-6 border-b border-white/[0.05]">
+          <h1 className="text-3xl font-heading font-bold tracking-tight text-white">
             Fit<span className="text-primary">Companion</span>
           </h1>
         </div>
@@ -96,7 +96,7 @@ export function MobileSidebar() {
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-md px-3 py-2.5 text-xl font-medium transition-colors",
                   isActive
                     ? "bg-white/[0.05] text-primary"
                     : "text-zinc-500 hover:text-zinc-200"
@@ -113,7 +113,7 @@ export function MobileSidebar() {
         <div className="p-4 border-t border-white/[0.05]">
           <Button
             variant="ghost"
-            className="w-full justify-start text-zinc-500 hover:text-zinc-200 h-10 text-xs"
+            className="w-full justify-start text-zinc-500 hover:text-zinc-200 h-10 text-xl"
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4 mr-2" />
