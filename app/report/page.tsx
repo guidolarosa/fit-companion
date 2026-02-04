@@ -583,7 +583,7 @@ export default function ReportPage() {
                 <FileText className="h-12 w-12 text-muted-foreground mb-4 opacity-20" />
                 <h3 className="text-lg font-medium text-muted-foreground">Sin datos para mostrar</h3>
                 <p className="text-sm text-muted-foreground max-w-sm mt-1">
-                  Selecciona un período y haz clic en "Analizar Datos" para ver tus tendencias e insights.
+                  Selecciona un período y haz clic en &quot;Analizar Datos&quot; para ver tus tendencias e insights.
                 </p>
               </CardContent>
             </Card>
