@@ -4,26 +4,56 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%; /* Rich black-gray */
-    --foreground: 0 0% 98%;
-    --card: 240 10% 3.9%;
+    /* Core UI Colors */
+    --background: 240 10% 4%; /* #09090B - Primary background */
+    --foreground: 0 0% 98%; /* #FAFAFA - Text primary */
+    --card: 240 6% 10%; /* #18181B - Surface/Cards */
     --card-foreground: 0 0% 98%;
-    --popover: 240 10% 3.9%;
+    --popover: 240 6% 10%;
     --popover-foreground: 0 0% 98%;
-    --primary: 25 95% 53%; /* Minimal orange accent */
+    --primary: 25 95% 53%; /* #F97316 - Orange accent (surplus/attention) */
     --primary-foreground: 0 0% 100%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted-foreground: 240 5% 65%; /* #A1A1AA - Text secondary */
     --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 84% 60%; /* #EF4444 - Danger/Errors */
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 25 95% 53%;
-    --radius: 0.25rem; /* Reduced rounding for minimal look */
+    --radius: 0.75rem; /* 12px - Modern rounded corners */
+    
+    /* Semantic Caloric States */
+    --color-deficit: 142 71% 45%; /* #22C55E - Caloric deficit/success */
+    --color-surplus: 25 95% 53%; /* #F97316 - Caloric surplus/warning */
+    --color-maintenance: 217 91% 60%; /* #3B82F6 - Near TDEE */
+    --color-extreme: 0 84% 60%; /* #EF4444 - Dangerous states */
+    
+    /* Weight Trend States */
+    --color-losing: 142 71% 45%; /* Green - Weight decreasing */
+    --color-gaining: 25 95% 53%; /* Orange - Weight increasing */
+    --color-stable: 217 91% 60%; /* Blue - Weight stable */
+    
+    /* Achievement States */
+    --color-bronze: 30 60% 50%;
+    --color-silver: 0 0% 75%;
+    --color-gold: 51 100% 50%;
+    --color-platinum: 0 0% 90%;
+    
+    /* Surface Elevation (semi-transparent whites) */
+    --surface-1: rgba(255, 255, 255, 0.02);
+    --surface-2: rgba(255, 255, 255, 0.04);
+    --surface-3: rgba(255, 255, 255, 0.06);
+    
+    /* Heatmap intensity scale */
+    --heatmap-0: rgba(255, 255, 255, 0.02);
+    --heatmap-1: rgba(34, 197, 94, 0.2);
+    --heatmap-2: rgba(34, 197, 94, 0.4);
+    --heatmap-3: rgba(34, 197, 94, 0.6);
+    --heatmap-4: rgba(34, 197, 94, 0.8);
   }
 }
 
@@ -34,18 +64,213 @@
   body {
     @apply bg-background text-foreground font-body antialiased selection:bg-primary/30;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Subtle background with gradient orb */
+    background: 
+      radial-gradient(
+        ellipse 80% 50% at 50% -20%,
+        rgba(249, 115, 22, 0.08) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 100% 0%,
+        rgba(249, 115, 22, 0.05) 0%,
+        transparent 40%
+      ),
+      hsl(var(--background));
+    background-attachment: fixed;
+    min-height: 100vh;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading tracking-tight; /* Removed uppercase for a cleaner look */
+    @apply font-heading tracking-tight;
+  }
+  
+  /* Focus visible states for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary ring-offset-2 ring-offset-background;
   }
 }
 
-.glass-card {
-  @apply bg-white/[0.02] border border-white/[0.05] shadow-none;
+/* Background orb decoration layer */
+.bg-orb-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
 }
 
-.btn-hover {
-  @apply transition-all duration-200 hover:bg-white/[0.05] active:opacity-80;
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.6;
+}
+
+.bg-orb-primary {
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(
+    circle,
+    rgba(249, 115, 22, 0.15) 0%,
+    rgba(249, 115, 22, 0.05) 40%,
+    transparent 70%
+  );
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.bg-orb-secondary {
+  width: 400px;
+  height: 300px;
+  background: radial-gradient(
+    circle,
+    rgba(249, 115, 22, 0.08) 0%,
+    transparent 60%
+  );
+  top: 30%;
+  right: -100px;
+}
+
+/* Glass Card Pattern - Following guidelines */
+.glass-card {
+  background: var(--surface-1);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  transition: all 200ms ease;
+}
+
+/* Elevated variant for interactive cards */
+.glass-card-elevated {
+  background: var(--surface-2);
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Hover state for clickable glass cards */
+.glass-card-interactive:hover {
+  background: var(--surface-2);
+  border-color: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Button States - Per Guidelines */
+.btn-primary {
+  @apply transition-all duration-150 ease-out;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:disabled {
+  @apply opacity-50 cursor-not-allowed;
+  transform: none;
+}
+
+/* Loading spinner for buttons */
+.btn-loading {
+  color: transparent;
+  pointer-events: none;
+  position: relative;
+}
+
+.btn-loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid white;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Progress Ring Animation */
+.progress-ring-circle {
+  transition: stroke-dashoffset 1s ease-out;
+}
+
+.progress-ring-circle.animate-on-mount {
+  animation: progress-fill 1s ease-out forwards;
+  animation-delay: 0.3s;
+}
+
+/* Pulse glow for completed goals */
+.progress-complete {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Card expansion animation */
+.expandable-card {
+  display: grid;
+  grid-template-rows: auto 0fr;
+  transition: grid-template-rows 300ms ease;
+}
+
+.expandable-card.expanded {
+  grid-template-rows: auto 1fr;
+}
+
+.expandable-card-content {
+  overflow: hidden;
+}
+
+/* Touch target guidelines */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.touch-target-comfortable {
+  min-width: 48px;
+  min-height: 48px;
+}
+
+/* Semantic color utilities */
+.text-deficit {
+  color: hsl(var(--color-deficit));
+}
+
+.text-surplus {
+  color: hsl(var(--color-surplus));
+}
+
+.text-maintenance {
+  color: hsl(var(--color-maintenance));
+}
+
+.text-extreme {
+  color: hsl(var(--color-extreme));
+}
+
+.bg-deficit {
+  background-color: hsl(var(--color-deficit));
+}
+
+.bg-surplus {
+  background-color: hsl(var(--color-surplus));
+}
+
+.bg-deficit\/10 {
+  background-color: hsl(var(--color-deficit) / 0.1);
+}
+
+.bg-surplus\/10 {
+  background-color: hsl(var(--color-surplus) / 0.1);
 }
 
 /* Scrollbar styling for a cleaner look */
@@ -57,4 +282,79 @@
 }
 ::-webkit-scrollbar-thumb {
   @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+}
+
+/* Respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .progress-ring-circle {
+    transition: stroke-dashoffset 0.01ms;
+  }
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  @apply sr-only;
+}
+
+.skip-link:focus {
+  @apply not-sr-only absolute top-4 left-4 z-50 bg-primary text-white px-4 py-2 rounded-md;
+}
+
+/* Animations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes progress-fill {
+  from {
+    stroke-dashoffset: var(--circumference);
+  }
+  to {
+    stroke-dashoffset: var(--target-offset);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    filter: drop-shadow(0 0 4px hsl(var(--color-deficit))); 
+  }
+  50% { 
+    filter: drop-shadow(0 0 12px hsl(var(--color-deficit))); 
+  }
+}
+
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

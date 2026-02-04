@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
 import { format } from "date-fns"
-import { Trash2, Edit } from "lucide-react"
+import { Trash2, Edit, UtensilsCrossed, Undo2, Check } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditFoodDialog } from "@/components/edit-food-dialog"
+import { cn } from "@/lib/utils"
 
 interface FoodEntry {
   id: string
@@ -28,47 +29,102 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
   const [entryToDelete, setEntryToDelete] = useState<FoodEntry | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [entryToEdit, setEntryToEdit] = useState<FoodEntry | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [recentlyDeleted, setRecentlyDeleted] = useState<FoodEntry | null>(null)
 
   async function handleDelete(id: string) {
+    setDeletingId(id)
     try {
       const response = await fetch(`/api/food?id=${id}`, {
         method: "DELETE",
       })
 
       if (response.ok) {
-        toast.success("Food entry deleted successfully!")
+        // Success feedback per guidelines - with undo option
+        toast.success(
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-deficit/20 flex items-center justify-center">
+              <Check className="w-4 h-4 text-deficit" />
+            </div>
+            <div>
+              <p className="font-medium">Entrada eliminada</p>
+              <p className="text-sm text-zinc-400">Registro de comida borrado</p>
+            </div>
+          </div>
+        )
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "Failed to delete food entry")
+        // Error message per guidelines - calm, solution-focused
+        toast.error(errorData.error || "No se pudo eliminar. Intenta de nuevo.")
       }
     } catch (error) {
       console.error("Error deleting food entry:", error)
-      toast.error("An error occurred while deleting the food entry")
+      toast.error("Error de conexión. Verifica tu red.")
+    } finally {
+      setDeletingId(null)
     }
   }
 
   return (
     <>
-      <div className="w-full overflow-hidden">
-        {entries.map((entry) => (
+      <div 
+        className="w-full overflow-hidden rounded-lg"
+        role="list"
+        aria-label="Lista de comidas registradas"
+      >
+        {entries.map((entry, index) => (
           <div
             key={entry.id}
-            className="flex items-center border p-2 sm:p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b w-full overflow-hidden"
+            role="listitem"
+            className={cn(
+              "flex items-center border border-white/5 p-3 sm:p-4 gap-3",
+              "transition-all duration-200 ease-out",
+              "hover:bg-white/[0.02] hover:border-white/10",
+              "focus-within:bg-white/[0.02] focus-within:border-white/10",
+              "group cursor-default",
+              index === 0 && "rounded-t-lg",
+              index === entries.length - 1 && "rounded-b-lg",
+              index !== entries.length - 1 && "border-b-0",
+              deletingId === entry.id && "opacity-50 pointer-events-none"
+            )}
           >
+            {/* Icon indicator */}
+            <div className="hidden sm:flex w-8 h-8 rounded-lg bg-surplus/10 items-center justify-center shrink-0">
+              <UtensilsCrossed className="w-4 h-4 text-surplus" aria-hidden="true" />
+            </div>
+            
+            {/* Entry content */}
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-sm sm:text-base truncate" title={entry.name}>
+              <p 
+                className="font-semibold text-sm sm:text-base text-white truncate" 
+                title={entry.name}
+              >
                 {entry.name}
               </p>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}
+              <p className="text-xs text-zinc-500">
+                {new Date(entry.date).toLocaleDateString('es-ES', { 
+                  weekday: 'short',
+                  month: 'short', 
+                  day: 'numeric', 
+                  timeZone: 'UTC' 
+                })}
               </p>
             </div>
-            <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto">
-              <span className="text-xs sm:text-sm font-medium whitespace-nowrap">
-                {Math.round(entry.calories)} kcal
-              </span>
-              <div className="hidden sm:flex items-center">
+            
+            {/* Calories display - value large, unit small per guidelines */}
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0 ml-auto">
+              <div className="text-right">
+                <span className="text-sm sm:text-base font-bold text-white">
+                  {Math.round(entry.calories).toLocaleString()}
+                </span>
+                <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500 ml-1">
+                  kcal
+                </span>
+              </div>
+              
+              {/* Action buttons with proper touch targets */}
+              <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -76,7 +132,8 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
                     setEntryToEdit(entry)
                     setEditDialogOpen(true)
                   }}
-                  className="hover:bg-muted h-8 w-8"
+                  className="h-9 w-9 hover:bg-white/10 text-zinc-400 hover:text-white"
+                  aria-label={`Editar ${entry.name}`}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -87,7 +144,8 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
                     setEntryToDelete(entry)
                     setDeleteDialogOpen(true)
                   }}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                  className="h-9 w-9 text-zinc-400 hover:text-destructive hover:bg-destructive/10"
+                  aria-label={`Eliminar ${entry.name}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -96,11 +154,12 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
           </div>
         ))}
       </div>
+      
       {showViewAll && (
         <div className="mt-4 flex justify-center">
           <Link href="/food/all">
             <Button variant="outline" className="w-full">
-              View all
+              Ver todo
             </Button>
           </Link>
         </div>
@@ -121,9 +180,9 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
             setEntryToDelete(null)
           }
         }}
-        title="Delete Food Entry"
-        description="Are you sure you want to delete this food entry? This action cannot be undone."
-        itemName={entryToDelete ? `${entryToDelete.name} - ${format(new Date(entryToDelete.date), "MMM d, yyyy")}` : undefined}
+        title="Eliminar entrada de comida"
+        description="¿Eliminar este registro? Esta acción no se puede deshacer."
+        itemName={entryToDelete ? `${entryToDelete.name} - ${format(new Date(entryToDelete.date), "d MMM yyyy")}` : undefined}
       />
     </>
   )

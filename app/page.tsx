@@ -304,12 +304,12 @@ export default async function Dashboard() {
                   <div className="flex items-baseline gap-2">
                     <div
                       className={cn(
-                        "text-2xl font-bold tracking-tight",
+                        "text-xl font-bold tracking-tight px-2 rounded-[4px] py-0.5",
                         data.netCalories < 0
-                          ? "text-green-500"
+                          ? "text-green-500 bg-green-500/10 border border-green-500/20"
                           : data.netCalories > 0
-                          ? "text-primary"
-                          : "text-zinc-500"
+                          ? "text-primary bg-primary/10 border border-primary/20"
+                          : "text-zinc-500 bg-zinc-500/10 border border-zinc-500/20"
                       )}
                     >
                       {data.netCalories > 0 ? "+" : ""}
@@ -452,40 +452,72 @@ export default async function Dashboard() {
 
           {/* Recent entries - Simplified on mobile */}
           <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-6 md:grid-cols-2">
-            <Card className="overflow-hidden">
-              <CardHeader className="pb-2 sm:pb-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Recent Exercises
+            <Card className="overflow-hidden glass-card">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="flex items-center gap-2 text-sm sm:text-base font-semibold">
+                  <Activity className="h-4 w-4 text-deficit" />
+                  Ejercicios Recientes
                 </CardTitle>
-                <CardDescription className="hidden sm:block">
-                  Your latest exercise activities
+                <CardDescription className="hidden sm:block text-xs text-zinc-500">
+                  Tus últimas actividades de ejercicio
                 </CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
                 {data.recentExercises.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No exercises recorded yet
-                  </p>
+                  /* Empty state per guidelines - with clear CTA */
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="w-12 h-12 mb-3 rounded-full bg-white/5 flex items-center justify-center">
+                      <Activity className="w-6 h-6 text-zinc-600" />
+                    </div>
+                    <h3 className="text-sm font-medium text-zinc-300 mb-1">
+                      Sin ejercicios registrados
+                    </h3>
+                    <p className="text-xs text-zinc-500 mb-4 max-w-[200px]">
+                      Registra tu actividad física para ver tu progreso
+                    </p>
+                    <a href="/exercise">
+                      <button className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+                        <Activity className="w-3 h-3" />
+                        Agregar ejercicio
+                      </button>
+                    </a>
+                  </div>
                 ) : (
                   <ExerciseEntryList entries={data.recentExercises.slice(0, 3)} />
                 )}
               </CardContent>
             </Card>
 
-            <Card className="overflow-hidden">
-              <CardHeader className="pb-2 sm:pb-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                  <UtensilsCrossed className="h-4 w-4 sm:h-5 sm:w-5" />
-                  Recent Food Entries
+            <Card className="overflow-hidden glass-card">
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="flex items-center gap-2 text-sm sm:text-base font-semibold">
+                  <UtensilsCrossed className="h-4 w-4 text-surplus" />
+                  Comidas Recientes
                 </CardTitle>
-                <CardDescription className="hidden sm:block">Your latest food consumption</CardDescription>
+                <CardDescription className="hidden sm:block text-xs text-zinc-500">
+                  Tu consumo de alimentos reciente
+                </CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
                 {data.recentFoods.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">
-                    No food entries yet
-                  </p>
+                  /* Empty state per guidelines - with clear CTA */
+                  <div className="flex flex-col items-center justify-center py-8 text-center">
+                    <div className="w-12 h-12 mb-3 rounded-full bg-white/5 flex items-center justify-center">
+                      <UtensilsCrossed className="w-6 h-6 text-zinc-600" />
+                    </div>
+                    <h3 className="text-sm font-medium text-zinc-300 mb-1">
+                      Sin comidas registradas
+                    </h3>
+                    <p className="text-xs text-zinc-500 mb-4 max-w-[200px]">
+                      Comienza a registrar lo que comes para un seguimiento completo
+                    </p>
+                    <a href="/food">
+                      <button className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+                        <UtensilsCrossed className="w-3 h-3" />
+                        Agregar comida
+                      </button>
+                    </a>
+                  </div>
                 ) : (
                   <FoodEntryList entries={data.recentFoods.slice(0, 3)} />
                 )}

@@ -30,10 +30,36 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${barlow.variable} ${barlowCondensed.variable} font-body antialiased bg-background text-foreground`}>
+    <html lang="es" className="dark">
+      <body className={`${barlow.variable} ${barlowCondensed.variable} font-body antialiased text-foreground relative`}>
+        {/* Background gradient orbs - fancy subtle effect */}
+        <div className="bg-orb-container" aria-hidden="true">
+          <div className="bg-orb bg-orb-primary" />
+          <div className="bg-orb bg-orb-secondary" />
+        </div>
+        
+        {/* Skip link for accessibility */}
+        <a 
+          href="#main-content" 
+          className="skip-link"
+        >
+          Saltar al contenido principal
+        </a>
+        
         <Providers>{children}</Providers>
-        <Toaster position="top-right" richColors />
+        
+        <Toaster 
+          position="top-right" 
+          richColors 
+          toastOptions={{
+            className: "glass-card",
+            style: {
+              background: "rgba(24, 24, 27, 0.95)",
+              border: "1px solid rgba(255, 255, 255, 0.05)",
+              backdropFilter: "blur(10px)",
+            }
+          }}
+        />
       </body>
     </html>
   );

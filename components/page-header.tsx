@@ -21,24 +21,29 @@ export function PageHeader({
   const router = useRouter();
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-10">
+    <header 
+      id="main-content"
+      className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10"
+      role="banner"
+    >
       <div className="flex items-center gap-4">
         {showBackButton && (
           <Button
             variant="ghost"
             size="icon"
             onClick={() => router.back()}
-            className="h-8 w-8 rounded-md border border-white/[0.05] hover:bg-white/[0.05]"
+            className="h-9 w-9 rounded-lg border border-white/[0.05] hover:bg-white/[0.05] touch-target"
+            aria-label="Volver atrás"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
         )}
         <div className="flex flex-col">
-          <h1 className="text-3xl font-heading font-bold text-white tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-heading font-bold text-white tracking-tight">
             {title}
           </h1>
           {description && (
-            <p className="text-sm font-medium text-zinc-500 mt-1">
+            <p className="text-xs sm:text-sm font-medium text-zinc-500 mt-1">
               {description}
             </p>
           )}
@@ -50,6 +55,6 @@ export function PageHeader({
           <FittyButton />
         </div>
       )}
-    </div>
+    </header>
   );
 }
