@@ -30,55 +30,45 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
     return (
       <Card className="glass-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wider text-slate-400">
-            <Calendar className="h-5 w-5 text-primary" />
+          <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+            <Calendar className="h-3.5 w-3.5" />
             Registro Diario
           </CardTitle>
-          <CardDescription className="text-slate-500">
-            Seguimiento de calorías, BMR y TDEE
-          </CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-slate-500 italic">
-            No hay datos disponibles. ¡Empieza a registrar tu comida y ejercicio!
-          </p>
+          <p className="text-xs text-zinc-600 italic">No hay registros aún.</p>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="glass-card border-none overflow-hidden">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wider text-slate-400">
-            <Calendar className="h-5 w-5 text-primary" />
-            Registro Diario
-          </CardTitle>
-          <CardDescription className="text-slate-500">
-            Últimos 7 días de actividad
-          </CardDescription>
-        </div>
+    <Card className="glass-card">
+      <CardHeader className="flex flex-row items-center justify-between pb-4">
+        <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+          <Calendar className="h-3.5 w-3.5" />
+          Registro Diario
+        </CardTitle>
         <Link href="/register/all">
-          <Button variant="outline" size="sm" className="btn-hover rounded-xl border-white/10 text-slate-300">
-            Ver Todo <ChevronRight className="ml-1 h-4 w-4" />
+          <Button variant="ghost" size="sm" className="h-7 text-[10px] uppercase tracking-widest text-zinc-500 hover:text-white">
+            Ver todo <ChevronRight className="ml-1 h-3 w-3" />
           </Button>
         </Link>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto -mx-6 px-6">
-          <table className="w-full text-sm min-w-[600px]">
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs min-w-[500px]">
             <thead>
-              <tr className="border-b border-white/5">
-                <th className="text-left py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">Fecha</th>
-                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">BMR</th>
-                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">TDEE</th>
-                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">Consumo</th>
-                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">Gasto</th>
-                <th className="text-right py-4 px-2 font-heading font-bold uppercase tracking-widest text-[10px] text-slate-500">Neto</th>
+              <tr className="text-[10px] text-zinc-600 uppercase tracking-widest border-b border-white/[0.03]">
+                <th className="text-left font-medium pb-3 px-2">Fecha</th>
+                <th className="text-right font-medium pb-3 px-2">BMR</th>
+                <th className="text-right font-medium pb-3 px-2">TDEE</th>
+                <th className="text-right font-medium pb-3 px-2">Consumo</th>
+                <th className="text-right font-medium pb-3 px-2">Gasto</th>
+                <th className="text-right font-medium pb-3 px-2">Neto</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-white/[0.02]">
               {dailyData.map((day, index) => {
                 const totalBurnt = day.tdee + day.caloriesBurnt;
                 const netCalories = day.caloriesConsumed - totalBurnt;
@@ -87,45 +77,39 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
                 const dateStr = day.date.toLocaleDateString('es-ES', { 
                   month: 'short', 
                   day: 'numeric', 
-                  year: 'numeric', 
                   timeZone: 'UTC' 
                 });
 
                 return index < 7 && (
-                  <tr key={index} className="group hover:bg-white/[0.02] transition-colors">
-                    <td className="py-4 px-2 font-bold text-slate-200 whitespace-nowrap">
+                  <tr key={index} className="group transition-colors">
+                    <td className="py-3 px-2 text-zinc-400 font-medium">
                       {dateStr}
                     </td>
-                    <td className="py-4 px-2 text-right text-slate-500 whitespace-nowrap font-heading">
-                      {day.bmr > 0 ? `${Math.round(day.bmr)}` : "-"}
+                    <td className="py-3 px-2 text-right text-zinc-600">
+                      {day.bmr > 0 ? Math.round(day.bmr) : "-"}
                     </td>
-                    <td className="py-4 px-2 text-right text-slate-500 whitespace-nowrap font-heading">
-                      {day.tdee > 0 ? `${Math.round(day.tdee)}` : "-"}
+                    <td className="py-3 px-2 text-right text-zinc-600">
+                      {day.tdee > 0 ? Math.round(day.tdee) : "-"}
                     </td>
-                    <td className="py-4 px-2 text-right text-slate-200 whitespace-nowrap font-heading">
+                    <td className="py-3 px-2 text-right text-zinc-300">
                       {Math.round(day.caloriesConsumed)}
                     </td>
-                    <td className="py-4 px-2 text-right text-slate-200 whitespace-nowrap font-heading">
+                    <td className="py-3 px-2 text-right text-zinc-300">
                       {Math.round(day.caloriesBurnt)}
                     </td>
-                    <td className="py-4 px-2 text-right whitespace-nowrap">
-                      <div className={cn(
-                        "inline-flex items-center px-2 py-1 rounded-lg font-heading font-bold text-xs",
-                        isDeficit ? "bg-secondary/10 text-secondary" : netCalories > 0 ? "bg-primary/10 text-primary" : "bg-white/5 text-slate-400"
+                    <td className="py-3 px-2 text-right">
+                      <span className={cn(
+                        "font-bold",
+                        isDeficit ? "text-green-500" : netCalories > 0 ? "text-primary" : "text-zinc-500"
                       )}>
                         {netCalories > 0 ? "+" : ""}{Math.round(netCalories)}
-                      </div>
+                      </span>
                     </td>
                   </tr>
                 );
               })}
             </tbody>
           </table>
-        </div>
-        <div className="mt-6 flex flex-wrap gap-4 text-[10px] text-slate-500 font-heading uppercase tracking-widest border-t border-white/5 pt-4">
-          <p><strong className="text-slate-400">BMR:</strong> Metabolismo Basal</p>
-          <p><strong className="text-slate-400">TDEE:</strong> Gasto Energético Total (BMR × actividad)</p>
-          <p><strong className="text-slate-400">NETO:</strong> Consumo - (TDEE + Ejercicio)</p>
         </div>
       </CardContent>
     </Card>

@@ -259,181 +259,134 @@ export default async function Dashboard() {
           <MobileQuickActions />
 
           <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-            <WeightGaugeCard
-              currentWeight={data.latestWeight?.weight || null}
-              targetWeightMin={data.targetWeightMin}
-              targetWeightMax={data.targetWeightMax}
-              milestoneStep={data.milestoneStep}
-              weightDate={data.latestWeight?.date || null}
-            />
+            <div className="h-[180px]">
+              <WeightGaugeCard
+                currentWeight={data.latestWeight?.weight || null}
+                targetWeightMin={data.targetWeightMin}
+                targetWeightMax={data.targetWeightMax}
+                milestoneStep={data.milestoneStep}
+                weightDate={data.latestWeight?.date || null}
+              />
+            </div>
 
-            <IFCard
-              ifType={data.user?.ifType || null}
-              ifStartTime={data.user?.ifStartTime || null}
-            />
+            <div className="h-[180px]">
+              <IFCard
+                ifType={data.user?.ifType || null}
+                ifStartTime={data.user?.ifStartTime || null}
+              />
+            </div>
 
-            {/* BMI Card - Hidden on mobile (per SPEC-V2 de-emphasis) */}
-            <div className="hidden sm:block">
+            <div className="h-[180px] hidden sm:block">
               <BMICard
                 bmi={data.bmi}
                 currentWeight={data.latestWeight?.weight || null}
                 height={data.user?.height || null}
-                targetWeightMin={data.targetWeightMin}
-                targetWeightMax={data.targetWeightMax}
-                milestoneStep={data.milestoneStep}
               />
             </div>
-
-            {/* <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Calories Burnt</CardTitle>
-                <Flame className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {Math.round(data.totalCaloriesBurnt)} kcal
-                </div>
-                <p className="text-xs text-muted-foreground">All time</p>
-              </CardContent>
-            </Card> */}
           </div>
 
           <div className="mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            <Card
-              className={cn(
-                "glass-card border-none transition-all duration-300",
-                data.netCalories < 0
-                  ? "shadow-green-500/10"
-                  : data.netCalories > 0
-                  ? "shadow-red-500/10"
-                  : "shadow-yellow-500/10"
-              )}
-            >
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">
-                  Calorías Netas
-                </CardTitle>
-                {data.netCalories < 0 ? (
-                  <TrendingDown className="h-4 w-4 text-secondary" />
-                ) : data.netCalories > 0 ? (
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                ) : (
-                  <TrendingUp className="h-4 w-4 text-yellow-400" />
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+            <div className="h-[180px]">
+              <Card className="glass-card h-full">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
+                    Calorías Netas
+                  </CardTitle>
+                  {data.netCalories < 0 ? (
+                    <TrendingDown className="h-3.5 w-3.5 text-green-500" />
+                  ) : data.netCalories > 0 ? (
+                    <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                  ) : (
+                    <TrendingUp className="h-3.5 w-3.5 text-zinc-500" />
+                  )}
+                </CardHeader>
+                <CardContent className="pt-2">
                   <div className="flex items-baseline gap-2">
                     <div
                       className={cn(
-                        "text-3xl font-heading font-bold",
+                        "text-2xl font-bold tracking-tight",
                         data.netCalories < 0
-                          ? "text-secondary"
+                          ? "text-green-500"
                           : data.netCalories > 0
                           ? "text-primary"
-                          : "text-yellow-400"
+                          : "text-zinc-500"
                       )}
                     >
                       {data.netCalories > 0 ? "+" : ""}
                       {Math.round(data.netCalories)} 
-                      <span className="text-xs uppercase ml-1">kcal</span>
+                      <span className="text-[10px] uppercase font-bold ml-1 opacity-50 tracking-widest">kcal</span>
                     </div>
                   </div>
-                  <div className="space-y-2 text-xs">
-                    <div className="flex justify-between items-center px-2 py-1.5 rounded-lg bg-white/5">
-                      <span className="text-slate-400 uppercase font-heading text-[10px] tracking-wider">Días Registrados</span>
-                      <span className="font-bold text-slate-200">
-                        {data.dailyData.length}
-                      </span>
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-[11px] uppercase tracking-tight text-zinc-500 font-bold">
+                    <div className="flex flex-col">
+                      <span>Días</span>
+                      <span className="text-zinc-300">{data.dailyData.length}</span>
                     </div>
-                    <div className="flex justify-between items-center px-2 py-1.5 rounded-lg bg-white/5">
-                      <span className="text-slate-400 uppercase font-heading text-[10px] tracking-wider">Consumo Total</span>
-                      <span className="font-bold text-slate-200">
-                        {Math.round(data.totalCaloriesConsumed)} <span className="text-[10px] text-slate-500">kcal</span>
-                      </span>
+                    <div className="flex flex-col">
+                      <span>Cons.</span>
+                      <span className="text-zinc-300">{Math.round(data.totalCaloriesConsumed)}</span>
                     </div>
-                    <div className="flex justify-between items-center px-2 py-1.5 rounded-lg bg-white/5">
-                      <span className="text-slate-400 uppercase font-heading text-[10px] tracking-wider">Gasto Total</span>
-                      <span className="font-bold text-slate-200">
-                        {Math.round(data.totalCaloriesBurnt)} <span className="text-[10px] text-slate-500">kcal</span>
-                      </span>
+                    <div className="flex flex-col">
+                      <span>Gasto</span>
+                      <span className="text-zinc-300">{Math.round(data.totalCaloriesBurnt)}</span>
                     </div>
                   </div>
-                  <p className="text-[11px] text-slate-500 italic px-1">
-                    {data.netCalories < 0
-                      ? "¡Déficit calórico detectado! Excelente para perder peso."
-                      : data.netCalories > 0
-                      ? "Superávit calórico detectado."
-                      : "Balance perfecto."}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
 
-            <DailyTargetRingCard
-              date={data.dailyData[0]?.date ?? null}
-              caloriesConsumed={data.dailyData[0]?.caloriesConsumed ?? null}
-              dailyTarget={data.dailyData[0]?.tdee ?? null}
-              netCalories={data.dailyData[0]?.netCalories ?? null}
-            />
-            {/* Trend Insights - Hidden on mobile */}
-            <Card className="hidden sm:block glass-card border-none overflow-hidden">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">Insights de Tendencia</CardTitle>
-                <TrendingDown className="h-4 w-4 text-primary" />
-              </CardHeader>
-              <CardContent className="space-y-4 text-sm pt-2">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/5">
-                    <span className="text-slate-400 font-heading text-[10px] uppercase tracking-wider">Déficit Prom. (7d)</span>
-                    <span className="font-bold text-slate-200">
+            <div className="h-[180px]">
+              <DailyTargetRingCard
+                date={data.dailyData[0]?.date ?? null}
+                caloriesConsumed={data.dailyData[0]?.caloriesConsumed ?? null}
+                dailyTarget={data.dailyData[0]?.tdee ?? null}
+                netCalories={data.dailyData[0]?.netCalories ?? null}
+              />
+            </div>
+
+            <div className="h-[180px] hidden sm:block">
+              <Card className="glass-card h-full">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">Tendencia</CardTitle>
+                  <TrendingDown className="h-3.5 w-3.5 text-zinc-600" />
+                </CardHeader>
+                <CardContent className="pt-2 space-y-3">
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-zinc-500 font-bold uppercase tracking-tight">Déficit (7d)</span>
+                    <span className="text-zinc-300 font-bold">
                       {data.trendInsights.avgDeficit !== null
-                        ? `${Math.round(data.trendInsights.avgDeficit)} kcal/día`
+                        ? `${Math.round(data.trendInsights.avgDeficit)} kcal`
                         : "—"}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/5">
-                    <span className="text-slate-400 font-heading text-[10px] uppercase tracking-wider">Consumo Prom. (7d)</span>
-                    <span className="font-bold text-slate-200">
-                      {data.trendInsights.avgIntake !== null
-                        ? `${Math.round(data.trendInsights.avgIntake)} kcal/día`
-                        : "—"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/5">
-                    <span className="text-slate-400 font-heading text-[10px] uppercase tracking-wider">Ritmo Proyectado</span>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-zinc-500 font-bold uppercase tracking-tight">Ritmo</span>
                     <span className={cn(
                       "font-bold",
-                      data.trendInsights.projectedKgPerWeek === null ? "text-slate-200" :
-                      data.trendInsights.projectedKgPerWeek < 0 ? "text-secondary" : "text-primary"
+                      data.trendInsights.projectedKgPerWeek === null ? "text-zinc-300" :
+                      data.trendInsights.projectedKgPerWeek < 0 ? "text-green-500" : "text-primary"
                     )}>
                       {data.trendInsights.projectedKgPerWeek === null
                         ? "—"
-                        : data.trendInsights.projectedKgPerWeek < 0
-                        ? `${Math.abs(data.trendInsights.projectedKgPerWeek).toFixed(2)} kg/semana`
-                        : `${data.trendInsights.projectedKgPerWeek.toFixed(2)} kg/semana`}
+                        : `${Math.abs(data.trendInsights.projectedKgPerWeek).toFixed(2)} kg/sem`}
                     </span>
                   </div>
-                </div>
-                {data.warnings.length > 0 && (
-                  <div className="mt-2 rounded-xl bg-primary/10 border border-primary/20 p-3 text-[11px] text-primary flex gap-2 items-start">
-                    <Info className="h-4 w-4 shrink-0" />
-                    <div className="space-y-1">
-                      {data.warnings.map((w, idx) => (
-                        <p key={idx}>{w}</p>
-                      ))}
+                  {data.warnings.length > 0 && (
+                    <div className="mt-1 flex gap-1.5 items-start text-[10px] text-primary/80 font-bold uppercase tracking-tight leading-tight">
+                      <Info className="h-3 w-3 shrink-0 mt-0.5" />
+                      <p className="line-clamp-2">{data.warnings[0]}</p>
                     </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
             {/* Weight Progress - Hidden on mobile, full width */}
-            <Card className="hidden sm:block sm:col-span-2 lg:col-span-3 glass-card border-none overflow-hidden">
+            <Card className="hidden sm:block sm:col-span-2 lg:col-span-3 glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-1">
-                <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
                   Progreso de Peso
                 </CardTitle>
-                <Weight className="h-4 w-4 text-primary" />
+                <Weight className="h-3.5 w-3.5 text-zinc-600" />
               </CardHeader>
               <CardContent>
                 <WeightChart weights={weights} chartHeight={200} />
@@ -443,60 +396,50 @@ export default async function Dashboard() {
 
           {/* Calendars and Quality - Hidden on mobile */}
           <div className="mt-6 hidden sm:grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <Card className="md:col-span-2 lg:col-span-1 glass-card border-none overflow-hidden">
+            <Card className="md:col-span-2 lg:col-span-1 glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">
-                  Calendario de Ejercicio
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
+                  Calendario Ejercicio
                 </CardTitle>
-                <Activity className="h-4 w-4 text-primary" />
+                <Activity className="h-3.5 w-3.5 text-zinc-600" />
               </CardHeader>
               <CardContent>
                 <ExerciseCalendar exerciseDays={data.exerciseDays} />
               </CardContent>
             </Card>
-            <Card className="md:col-span-2 lg:col-span-1 glass-card border-none overflow-hidden">
+            <Card className="md:col-span-2 lg:col-span-1 glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">
-                  Calendario de Comida
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
+                  Calendario Comida
                 </CardTitle>
-                <UtensilsCrossed className="h-4 w-4 text-primary" />
+                <UtensilsCrossed className="h-3.5 w-3.5 text-zinc-600" />
               </CardHeader>
               <CardContent>
                 <FoodCalendar foodDays={data.foodDays} />
               </CardContent>
             </Card>
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400">Calidad del Déficit</CardTitle>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Calidad Déficit</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 text-sm pt-2">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/5">
-                    <span className="text-slate-400 font-heading text-[10px] uppercase tracking-wider">Días de Entrenamiento (7d)</span>
-                    <span className="font-bold text-slate-200">{data.qualityInsights.trainingDays}</span>
+              <CardContent className="space-y-3 pt-2">
+                <div className="space-y-1.5 text-[11px]">
+                  <div className="flex justify-between items-center text-zinc-500">
+                    <span>Días Entrenamiento</span>
+                    <span className="text-zinc-300 font-medium">{data.qualityInsights.trainingDays}</span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/5">
-                    <span className="text-slate-400 font-heading text-[10px] uppercase tracking-wider">Déficit en Entrenamiento</span>
-                    <span className="font-bold text-slate-200">
+                  <div className="flex justify-between items-center text-zinc-500">
+                    <span>Déficit en Entren.</span>
+                    <span className="text-zinc-300 font-medium">
                       {data.qualityInsights.trainingDeficitDays}/{data.qualityInsights.trainingDays}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/5">
-                    <span className="text-slate-400 font-heading text-[10px] uppercase tracking-wider">Proteína Registrada</span>
-                    <span className="font-bold text-slate-200">
+                  <div className="flex justify-between items-center text-zinc-500">
+                    <span>Proteína Ok</span>
+                    <span className="text-zinc-300 font-medium">
                       {data.qualityInsights.proteinTrackedDays}/7
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-white/5">
-                    <span className="text-slate-400 font-heading text-[10px] uppercase tracking-wider">Días Alta Proteína ({">="}25%)</span>
-                    <span className="font-bold text-slate-200">
-                      {data.qualityInsights.highProteinDays}/7
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-start gap-2 text-[10px] text-slate-500 leading-tight bg-white/5 p-2 rounded-lg">
-                  <Info className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-                  <span>Una nutrición balanceada en días de entrenamiento apoya el progreso sostenible.</span>
                 </div>
               </CardContent>
             </Card>

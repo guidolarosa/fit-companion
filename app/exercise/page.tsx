@@ -42,20 +42,20 @@ export default async function ExercisePage() {
           <PageHeader title="Exercise & Calorie Burn" />
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Registrar Ejercicio</CardTitle>
-                <CardDescription className="text-slate-500">Registra tu actividad física y calorías quemadas</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Registrar Ejercicio</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Registra tu actividad física y calorías quemadas</CardDescription>
               </CardHeader>
               <CardContent>
                 <ExerciseForm />
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Sugerencias de IA</CardTitle>
-                <CardDescription className="text-slate-500">Pide recomendaciones a la IA</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Sugerencias de IA</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Pide recomendaciones a la IA</CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
                 <ExerciseAgent />
@@ -63,17 +63,17 @@ export default async function ExercisePage() {
             </Card>
           </div>
 
-          <Card className="mt-6 glass-card border-none overflow-hidden">
+          <Card className="mt-6 glass-card">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wider text-slate-400">
-                <Flame className="h-5 w-5 text-primary" />
+              <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                <Flame className="h-3.5 w-3.5" />
                 Historial de Ejercicio
               </CardTitle>
-              <CardDescription className="text-slate-500">Tus actividades recientes</CardDescription>
+              <CardDescription className="text-[11px] text-zinc-600">Tus actividades recientes</CardDescription>
             </CardHeader>
             <CardContent className="overflow-hidden">
               {exercises.length === 0 ? (
-                <p className="text-sm text-slate-500 italic">Aún no hay ejercicios registrados</p>
+                <p className="text-xs text-zinc-600 italic">Aún no hay ejercicios registrados</p>
               ) : (
                 <ExerciseEntryList entries={exercises} showViewAll={totalCount > 10} />
               )}

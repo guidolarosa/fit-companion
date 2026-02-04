@@ -43,20 +43,20 @@ export default async function FoodPage() {
           <PageHeader title="Food & Nutrition" />
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Registrar Comida</CardTitle>
-                <CardDescription className="text-slate-500">Registra tu consumo de alimentos y calorías</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Registrar Comida</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Registra tu consumo de alimentos y calorías</CardDescription>
               </CardHeader>
               <CardContent>
                 <FoodForm />
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Sugerencias de IA</CardTitle>
-                <CardDescription className="text-slate-500">Consulta opciones saludables con la IA</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Sugerencias de IA</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Consulta opciones saludables con la IA</CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
                 <FoodAgent />
@@ -65,27 +65,27 @@ export default async function FoodPage() {
           </div>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Lista de Productos Saludables</CardTitle>
-                <CardDescription className="text-slate-500">Crea y exporta tu lista de compras</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Lista de Productos Saludables</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Crea y exporta tu lista de compras</CardDescription>
               </CardHeader>
               <CardContent>
                 <HealthyProductsList />
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wider text-slate-400">
-                  <UtensilsCrossed className="h-5 w-5 text-primary" />
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                  <UtensilsCrossed className="h-3.5 w-3.5" />
                   Historial de Comida
                 </CardTitle>
-                <CardDescription className="text-slate-500">Tus registros recientes</CardDescription>
+                <CardDescription className="text-[11px] text-zinc-600">Tus registros recientes</CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
                 {foods.length === 0 ? (
-                  <p className="text-sm text-slate-500 italic">Aún no hay registros de comida</p>
+                  <p className="text-xs text-zinc-600 italic">Aún no hay registros de comida</p>
                 ) : (
                   <FoodEntryList entries={foods} showViewAll={totalCount > 5} />
                 )}

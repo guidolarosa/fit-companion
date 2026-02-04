@@ -42,20 +42,20 @@ export default async function WeightPage() {
           <PageHeader title="Weight Tracking" />
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Registrar Peso</CardTitle>
-                <CardDescription className="text-slate-500">Registra tu peso actual en kilogramos</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Registrar Peso</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Registra tu peso actual en kilogramos</CardDescription>
               </CardHeader>
               <CardContent>
                 <WeightForm />
               </CardContent>
             </Card>
 
-            <Card className="glass-card border-none overflow-hidden">
+            <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Historial de Peso</CardTitle>
-                <CardDescription className="text-slate-500">Días con registros de peso</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Historial de Peso</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Días con registros de peso</CardDescription>
               </CardHeader>
               <CardContent>
                 <WeightCalendar weightDays={weightDays} />
@@ -65,10 +65,10 @@ export default async function WeightPage() {
 
           {/* Second row: Weight Progress Chart */}
           {weights.length > 0 && (
-            <Card className="mt-6 glass-card border-none overflow-hidden">
+            <Card className="mt-6 glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Progreso de Peso</CardTitle>
-                <CardDescription className="text-slate-500">Seguimiento de tu peso a lo largo del tiempo</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Progreso de Peso</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Seguimiento de tu peso a lo largo del tiempo</CardDescription>
               </CardHeader>
               <CardContent>
                 <WeightChart weights={weights} />
@@ -78,10 +78,10 @@ export default async function WeightPage() {
 
           {/* Third row: Weight Entry List */}
           {weights.length > 0 && (
-            <Card className="mt-6 glass-card border-none overflow-hidden">
+            <Card className="mt-6 glass-card">
               <CardHeader>
-                <CardTitle className="font-heading uppercase tracking-wider text-slate-400">Todos los Registros</CardTitle>
-                <CardDescription className="text-slate-500">Lista completa de tus registros de peso</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Todos los Registros</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">Lista completa de tus registros de peso</CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
                 <WeightEntryList entries={weights} />

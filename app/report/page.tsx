@@ -106,7 +106,7 @@ export default function ReportPage() {
         : `${new Date(startDate).toLocaleDateString('es-ES')} a ${new Date(endDate).toLocaleDateString('es-ES')}`
 
       doc.setFontSize(22)
-      doc.setTextColor(249, 115, 22) // Primary Orange
+      doc.setTextColor(249, 115, 22)
       doc.text(title, 14, 22)
       
       doc.setFontSize(11)
@@ -155,17 +155,6 @@ export default function ReportPage() {
         margin: { left: 14 },
         tableWidth: 80,
       })
-
-      if (reportData.stats.outliers.length > 0) {
-        doc.setFontSize(14)
-        doc.setTextColor(0)
-        doc.text("Días Atípicos", 100, currentY + 5)
-        doc.setFontSize(9)
-        doc.setTextColor(60)
-        reportData.stats.outliers.slice(0, 5).forEach((outlier, idx) => {
-          doc.text(`• ${outlier.date}: ${outlier.reason}`, 100, currentY + 12 + (idx * 5))
-        })
-      }
 
       doc.addPage()
       doc.setFontSize(14)
@@ -242,8 +231,8 @@ export default function ReportPage() {
     if (!reportData) return []
     const { deficit, maintenance, surplus } = reportData.stats.classification
     return [
-      { name: 'Déficit', value: deficit, color: 'hsl(var(--secondary))' },
-      { name: 'Mantenimiento', value: maintenance, color: '#facc15' },
+      { name: 'Déficit', value: deficit, color: 'rgb(34 197 94)' },
+      { name: 'Mantenimiento', value: maintenance, color: 'rgb(161 161 170)' },
       { name: 'Superávit', value: surplus, color: 'hsl(var(--primary))' },
     ]
   }, [reportData])
@@ -256,53 +245,47 @@ export default function ReportPage() {
         <div className="mx-auto max-w-5xl">
           <PageHeader
             title="Reportes e Insights"
-            description="Visualiza tus tendencias y obtén un análisis detallado de tu progreso."
+            description="Visualiza tus tendencias y progreso."
           />
 
-          <Card className="mt-8 glass-card border-none overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-secondary opacity-50" />
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 font-heading uppercase tracking-wider text-slate-400">
-                <Calendar className="h-5 w-5 text-primary" />
-                Configuración del Reporte
+          <Card className="glass-card">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                <Calendar className="h-3.5 w-3.5 text-primary" />
+                Configuración
               </CardTitle>
-              <CardDescription className="text-slate-500">
-                Selecciona el período para generar insights y gráficos.
-              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent>
               <div className="flex flex-col sm:flex-row items-center gap-6">
-                <div className="flex items-center space-x-6 p-1 bg-white/5 rounded-xl border border-white/5">
+                <div className="flex items-center space-x-1 p-1 bg-white/[0.03] rounded-md">
                   <div className={cn(
-                    "flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer transition-all",
-                    rangeType === "period" ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-slate-200"
+                    "px-4 py-1.5 rounded-sm cursor-pointer transition-all text-[10px] uppercase font-bold tracking-widest",
+                    rangeType === "period" ? "bg-white/[0.05] text-primary" : "text-zinc-500 hover:text-zinc-300"
                   )} onClick={() => setRangeType("period")}>
-                    <input type="radio" checked={rangeType === "period"} readOnly className="hidden" />
-                    <Label className="cursor-pointer font-heading font-bold uppercase tracking-widest text-[10px]">Período</Label>
+                    Período
                   </div>
                   <div className={cn(
-                    "flex items-center space-x-2 px-4 py-2 rounded-lg cursor-pointer transition-all",
-                    rangeType === "all" ? "bg-primary text-white shadow-lg" : "text-slate-400 hover:text-slate-200"
+                    "px-4 py-1.5 rounded-sm cursor-pointer transition-all text-[10px] uppercase font-bold tracking-widest",
+                    rangeType === "all" ? "bg-white/[0.05] text-primary" : "text-zinc-500 hover:text-zinc-300"
                   )} onClick={() => setRangeType("all")}>
-                    <input type="radio" checked={rangeType === "all"} readOnly className="hidden" />
-                    <Label className="cursor-pointer font-heading font-bold uppercase tracking-widest text-[10px]">Todo</Label>
+                    Todo
                   </div>
                 </div>
 
                 {rangeType === "period" && (
-                  <div className="flex items-center gap-3 flex-1 bg-white/5 p-1 rounded-xl border border-white/5">
+                  <div className="flex items-center gap-2">
                     <Input
                       type="date"
                       value={startDate}
                       onChange={(e) => setStartDate(e.target.value)}
-                      className="bg-transparent border-none focus-visible:ring-0 h-10 font-heading font-bold text-slate-200"
+                      className="h-9 bg-white/[0.02] border-white/[0.05] text-xs text-zinc-300"
                     />
-                    <ChevronRight className="h-4 w-4 text-slate-600" />
+                    <span className="text-zinc-600">—</span>
                     <Input
                       type="date"
                       value={endDate}
                       onChange={(e) => setEndDate(e.target.value)}
-                      className="bg-transparent border-none focus-visible:ring-0 h-10 font-heading font-bold text-slate-200"
+                      className="h-9 bg-white/[0.02] border-white/[0.05] text-xs text-zinc-300"
                     />
                   </div>
                 )}
@@ -310,9 +293,9 @@ export default function ReportPage() {
                 <Button 
                   onClick={fetchReportData} 
                   disabled={isFetching}
-                  className="w-full sm:w-auto ml-auto btn-hover rounded-xl px-8 h-12 font-heading font-bold uppercase tracking-widest"
+                  className="w-full sm:w-auto ml-auto h-9 text-[10px] font-bold uppercase tracking-widest"
                 >
-                  {isFetching ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Activity className="mr-2 h-4 w-4" />}
+                  {isFetching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Activity className="h-3.5 w-3.5 mr-2" />}
                   Analizar
                 </Button>
               </div>
@@ -320,189 +303,99 @@ export default function ReportPage() {
           </Card>
 
           {reportData && (
-            <div className="mt-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="mt-8 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
               
-              <Card className="glass-card border-none overflow-hidden group">
-                <div className="absolute top-0 left-0 w-1 h-full bg-primary opacity-50" />
-                <CardHeader>
-                  <CardTitle className="text-sm font-heading font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                    <Info className="h-4 w-4 text-primary" />
-                    Resumen del Período
+              <Card className="glass-card border-l-primary border-l-2">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                    <Info className="h-3.5 w-3.5 text-primary" />
+                    Resumen
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-xl font-heading font-bold leading-relaxed text-slate-100 italic">
+                  <p className="text-lg font-medium leading-relaxed text-zinc-200 italic">
                     &ldquo;{reportData.stats.narrative}&rdquo;
                   </p>
                 </CardContent>
               </Card>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="glass-card border-none overflow-hidden">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="glass-card">
                   <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                      <div className="p-3 bg-primary/10 rounded-xl">
-                        <Flame className="h-6 w-6 text-primary" />
-                      </div>
-                      <div className={cn(
-                        "font-heading font-bold text-xs uppercase tracking-widest px-2 py-1 rounded-full bg-white/5",
-                        reportData.stats.avgDeficit < 0 ? "text-secondary" : "text-primary"
-                      )}>
-                        {reportData.stats.avgDeficit < 0 ? "Déficit" : "Superávit"}
-                      </div>
-                    </div>
-                    <div className="mt-6">
-                      <p className="text-[10px] font-heading font-bold uppercase tracking-widest text-slate-500">Déficit Diario Promedio</p>
-                      <h3 className="text-3xl font-heading font-bold text-slate-50 mt-1">
-                        {Math.round(reportData.stats.avgDeficit)} <span className="text-sm text-slate-500 uppercase">kcal</span>
-                      </h3>
-                    </div>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Déficit Diario</p>
+                    <h3 className="text-2xl font-bold text-white mt-1">
+                      {Math.round(reportData.stats.avgDeficit)} <span className="text-[10px] text-zinc-600 uppercase">kcal</span>
+                    </h3>
                   </CardContent>
                 </Card>
 
-                <Card className="glass-card border-none overflow-hidden">
+                <Card className="glass-card">
                   <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                      <div className="p-3 bg-secondary/10 rounded-xl">
-                        <Target className="h-6 w-6 text-secondary" />
-                      </div>
-                      <div className="font-heading font-bold text-xs uppercase tracking-widest text-slate-500">Semanal</div>
-                    </div>
-                    <div className="mt-6">
-                      <p className="text-[10px] font-heading font-bold uppercase tracking-widest text-slate-500">Cambio Proyectado</p>
-                      <h3 className="text-3xl font-heading font-bold text-slate-50 mt-1">
-                        {reportData.stats.projectedWeightChange > 0 ? "+" : ""}
-                        {reportData.stats.projectedWeightChange.toFixed(2)} <span className="text-sm text-slate-500 uppercase">kg</span>
-                      </h3>
-                    </div>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Cambio Proyectado</p>
+                    <h3 className="text-2xl font-bold text-white mt-1">
+                      {reportData.stats.projectedWeightChange > 0 ? "+" : ""}
+                      {reportData.stats.projectedWeightChange.toFixed(2)} <span className="text-[10px] text-zinc-600 uppercase">kg</span>
+                    </h3>
                   </CardContent>
                 </Card>
 
-                <Card className="glass-card border-none overflow-hidden">
+                <Card className="glass-card">
                   <CardContent className="pt-6">
-                    <div className="flex items-center justify-between">
-                      <div className="p-3 bg-blue-500/10 rounded-xl">
-                        <Calendar className="h-6 w-6 text-blue-400" />
-                      </div>
-                      <div className="font-heading font-bold text-xs uppercase tracking-widest text-secondary">Mejor: {reportData.stats.streaks.best} d</div>
-                    </div>
-                    <div className="mt-6">
-                      <p className="text-[10px] font-heading font-bold uppercase tracking-widest text-slate-500">Racha Actual</p>
-                      <h3 className="text-3xl font-heading font-bold text-slate-50 mt-1">
-                        {reportData.stats.streaks.current} <span className="text-sm text-slate-500 uppercase">días</span>
-                      </h3>
-                    </div>
+                    <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">Racha Actual</p>
+                    <h3 className="text-2xl font-bold text-white mt-1">
+                      {reportData.stats.streaks.current} <span className="text-[10px] text-zinc-600 uppercase">días</span>
+                    </h3>
                   </CardContent>
                 </Card>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <Card className="glass-card border-none overflow-hidden">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="glass-card">
                   <CardHeader>
-                    <CardTitle className="text-xs font-heading font-bold uppercase tracking-widest text-slate-500">Tendencia de Peso</CardTitle>
+                    <CardTitle className="text-[9px] font-bold uppercase tracking-widest text-zinc-600">Tendencia de Peso</CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[300px] pt-4">
+                  <CardContent className="h-[250px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                        <XAxis dataKey="date" fontSize={10} tickMargin={10} axisLine={false} tickLine={false} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                        <XAxis dataKey="date" fontSize={9} axisLine={false} tickLine={false} tick={{ fill: 'rgb(82 82 91)' }} />
                         <YAxis hide domain={['auto', 'auto']} />
-                        <Tooltip contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
-                        <Legend iconType="circle" />
-                        <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={3} dot={{ r: 4, fill: 'hsl(var(--primary))', strokeWidth: 0 }} name="Peso Real" connectNulls />
-                        <Line type="monotone" dataKey="movingAvgWeight" stroke="#9333ea" strokeWidth={2} dot={false} strokeDasharray="5 5" name="Media Móvil" connectNulls />
+                        <Tooltip contentStyle={{ backgroundColor: 'rgb(9 9 11)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '4px', fontSize: '10px' }} />
+                        <Line type="monotone" dataKey="weight" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3, fill: 'hsl(var(--primary))', strokeWidth: 0 }} name="Peso" connectNulls />
+                        <Line type="monotone" dataKey="movingAvgWeight" stroke="#9333ea" strokeWidth={1.5} dot={false} strokeDasharray="4 4" name="Media" connectNulls />
                       </LineChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
 
-                <Card className="glass-card border-none overflow-hidden">
+                <Card className="glass-card">
                   <CardHeader>
-                    <CardTitle className="text-xs font-heading font-bold uppercase tracking-widest text-slate-500">Consumo de Calorías</CardTitle>
+                    <CardTitle className="text-[9px] font-bold uppercase tracking-widest text-zinc-600">Consumo Calórico</CardTitle>
                   </CardHeader>
-                  <CardContent className="h-[300px] pt-4">
+                  <CardContent className="h-[250px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
-                        <XAxis dataKey="date" fontSize={10} tickMargin={10} axisLine={false} tickLine={false} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                        <XAxis dataKey="date" fontSize={9} axisLine={false} tickLine={false} tick={{ fill: 'rgb(82 82 91)' }} />
                         <YAxis hide />
-                        <Tooltip contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }} />
-                        <Legend iconType="circle" />
-                        <Bar dataKey="calories" fill="rgba(249, 115, 22, 0.3)" name="Consumo" radius={[4, 4, 0, 0]} />
-                        <Line type="monotone" dataKey="movingAvgCalories" stroke="#facc15" strokeWidth={2} dot={false} name="Promedio Semanal" />
+                        <Tooltip contentStyle={{ backgroundColor: 'rgb(9 9 11)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '4px', fontSize: '10px' }} />
+                        <Bar dataKey="calories" fill="rgba(249, 115, 22, 0.2)" name="Consumo" />
+                        <Line type="monotone" dataKey="movingAvgCalories" stroke="#facc15" strokeWidth={1.5} dot={false} name="Media" />
                       </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>
               </div>
 
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <Card className="lg:col-span-1 glass-card border-none overflow-hidden">
-                  <CardHeader>
-                    <CardTitle className="text-xs font-heading font-bold uppercase tracking-widest text-slate-500">Distribución del Período</CardTitle>
-                  </CardHeader>
-                  <CardContent className="h-[250px] flex flex-col items-center justify-center">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie data={classificationData} innerRadius={60} outerRadius={80} paddingAngle={8} dataKey="value" stroke="none">
-                          {classificationData.map((entry, index) => <Cell key={`cell-${index}`} fill={entry.color} />)}
-                        </Pie>
-                        <Tooltip />
-                        <Legend verticalAlign="bottom" align="center" />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-
-                <Card className="lg:col-span-2 glass-card border-none overflow-hidden">
-                  <CardHeader>
-                    <CardTitle className="text-xs font-heading font-bold uppercase tracking-widest text-slate-400">Días Atípicos e Insights</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {reportData.stats.outliers.length > 0 ? (
-                        reportData.stats.outliers.map((outlier, idx) => (
-                          <div key={idx} className="flex items-start gap-4 p-4 rounded-xl bg-white/5 border border-white/5 group hover:bg-white/10 transition-colors">
-                            <div className="p-2 bg-yellow-500/10 rounded-lg">
-                              <AlertCircle className="h-5 w-5 text-yellow-500" />
-                            </div>
-                            <div>
-                              <p className="text-xs font-heading font-bold uppercase tracking-widest text-slate-500">{outlier.date}</p>
-                              <p className="text-sm font-heading font-bold text-slate-200 mt-1">{outlier.reason}</p>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="flex flex-col items-center justify-center py-8 text-center">
-                          <Activity className="h-8 w-8 text-slate-700 mb-2" />
-                          <p className="text-sm text-slate-500 font-heading uppercase tracking-widest">No se detectaron días atípicos</p>
-                        </div>
-                      )}
-
-                      {reportData.stats.avgIntake < 1200 && (
-                        <div className="flex items-start gap-4 p-4 rounded-xl bg-primary/10 border border-primary/20">
-                          <div className="p-2 bg-primary/20 rounded-lg">
-                            <Info className="h-5 w-5 text-primary" />
-                          </div>
-                          <p className="text-sm font-heading font-bold text-primary leading-relaxed mt-1">
-                            Llevás varios días comiendo muy poco. A veces un pequeño ajuste ayuda a sostener el progreso de forma saludable.
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="flex justify-center sm:justify-end pt-8">
+              <div className="flex justify-end">
                 <Button 
                   onClick={generatePDF} 
                   disabled={isGenerating}
-                  size="lg"
-                  className="w-full sm:w-auto btn-hover rounded-2xl px-10 h-14 bg-secondary text-white font-heading font-bold uppercase tracking-widest shadow-xl shadow-secondary/20 border-none"
+                  size="sm"
+                  className="h-9 text-[10px] font-bold uppercase tracking-widest bg-zinc-800 text-white hover:bg-zinc-700"
                 >
-                  {isGenerating ? <Loader2 className="mr-2 h-5 w-5 animate-spin" /> : <FileText className="mr-2 h-5 w-5" />}
-                  Descargar Reporte PDF
+                  {isGenerating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <FileText className="h-3.5 w-3.5 mr-2" />}
+                  Exportar PDF
                 </Button>
               </div>
 
@@ -510,17 +403,10 @@ export default function ReportPage() {
           )}
 
           {!reportData && !isFetching && (
-            <Card className="mt-8 border-dashed border-white/10 bg-transparent">
-              <CardContent className="py-20 flex flex-col items-center justify-center text-center">
-                <div className="p-6 bg-white/5 rounded-full mb-6">
-                  <FileText className="h-12 w-12 text-slate-700 opacity-50" />
-                </div>
-                <h3 className="text-xl font-heading font-bold text-slate-400 uppercase tracking-widest">Esperando análisis</h3>
-                <p className="text-sm text-slate-600 max-w-xs mt-2 font-heading tracking-tight">
-                  Selecciona un período y haz clic en &quot;Analizar&quot; para obtener tus insights personalizados.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="mt-20 flex flex-col items-center justify-center text-center opacity-30">
+              <FileText className="h-10 w-10 text-zinc-600 mb-4" />
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Selecciona un período para analizar</p>
+            </div>
           )}
         </div>
       </main>
