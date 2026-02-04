@@ -1,19 +1,24 @@
-"use client"
+"use client";
 
-import { useRouter } from "next/navigation"
-import { ChevronLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { FittyButton } from "@/components/fitty-button"
+import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FittyButton } from "@/components/fitty-button";
 
 interface PageHeaderProps {
-  title: string
-  description?: string
-  showBackOnMobile?: boolean
-  showFittyButton?: boolean
+  title: string;
+  description?: string;
+  showBackOnMobile?: boolean;
+  showFittyButton?: boolean;
 }
 
-export function PageHeader({ title, description, showBackOnMobile = true, showFittyButton = true }: PageHeaderProps) {
-  const router = useRouter()
+export function PageHeader({
+  title,
+  description,
+  showBackOnMobile = true,
+  showFittyButton = true,
+}: PageHeaderProps) {
+  const router = useRouter();
 
   return (
     <div className="flex items-center justify-between mb-6 sm:mb-8">
@@ -33,7 +38,9 @@ export function PageHeader({ title, description, showBackOnMobile = true, showFi
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
       </div>
+      
+
       {showFittyButton && <FittyButton />}
     </div>
-  )
+  );
 }

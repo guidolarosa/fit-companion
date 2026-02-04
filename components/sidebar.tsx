@@ -10,6 +10,7 @@ import {
   UtensilsCrossed, 
   MessageSquare, 
   Settings,
+  FileText,
   LogOut
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -21,6 +22,7 @@ const navigation = [
   { name: "Exercise", href: "/exercise", icon: Dumbbell },
   { name: "Food", href: "/food", icon: UtensilsCrossed },
   { name: "Fitty Assistant", href: "/agent", icon: MessageSquare },
+  { name: "Report", href: "/report", icon: FileText },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
 

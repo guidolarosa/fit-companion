@@ -13,6 +13,7 @@ import {
   Settings,
   Menu,
   X,
+  FileText,
   LogOut
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -23,7 +24,8 @@ const navigation = [
   { name: "Weight", href: "/weight", icon: Weight },
   { name: "Exercise", href: "/exercise", icon: Dumbbell },
   { name: "Food", href: "/food", icon: UtensilsCrossed },
-  { name: "Agent", href: "/agent", icon: MessageSquare },
+  { name: "Fitty Assistant", href: "/agent", icon: MessageSquare },
+  { name: "Report", href: "/report", icon: FileText },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
 

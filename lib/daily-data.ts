@@ -7,6 +7,7 @@ export interface DailyData {
   protein: number;
   bmr: number;
   tdee: number;
+  weight: number | null;
   netCalories: number;
   ratioToTdee: number | null;
   hasExercise: boolean;
@@ -91,6 +92,7 @@ export function aggregateDailyData(
         ...day,
         bmr,
         tdee,
+        weight,
         netCalories,
         ratioToTdee,
       };
