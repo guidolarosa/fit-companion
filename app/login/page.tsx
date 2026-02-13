@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import dynamic from "next/dynamic"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -19,6 +20,8 @@ import {
   Sparkles,
   Globe,
 } from "lucide-react"
+
+const Aurora = dynamic(() => import("@/components/aurora"), { ssr: false })
 
 export default function LoginPage() {
   const router = useRouter()
@@ -379,11 +382,16 @@ export default function LoginPage() {
 
       {/* Right Column - Hero Panel (desktop only) */}
       <div className="hidden lg:flex lg:w-[55%] xl:w-[60%] relative overflow-hidden">
-        {/* Abstract gradient background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-background" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/4" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/8 rounded-full blur-[100px] translate-y-1/3" />
-        <div className="absolute top-1/2 left-1/3 w-[300px] h-[300px] bg-green-500/5 rounded-full blur-[80px]" />
+        {/* Aurora background */}
+        <div className="absolute inset-0">
+          <Aurora
+            colorStops={["#EA580C", "#F59E0B", "#FACC15"]}
+            amplitude={1.0}
+            blend={0.6}
+            speed={0.4}
+          />
+          <div className="absolute inset-0 bg-background/50" />
+        </div>
 
         {/* Grid pattern overlay */}
         <div

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
+import dynamic from "next/dynamic"
 import {
   Weight,
   UtensilsCrossed,
@@ -26,6 +27,8 @@ import {
   FileText,
   Globe,
 } from "lucide-react"
+
+const Aurora = dynamic(() => import("@/components/aurora"), { ssr: false })
 
 // ─── Intersection Observer hook for scroll animations ───
 function useScrollReveal() {
@@ -198,11 +201,16 @@ export default function LandingPage() {
 
       {/* ═══ HERO SECTION ═══ */}
       <section className="relative pt-32 pb-20 lg:pt-44 lg:pb-32 overflow-hidden">
-        {/* Gradient background effects */}
+        {/* Aurora background effect */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[-30%] left-[50%] -translate-x-1/2 w-[900px] h-[600px] bg-primary/15 rounded-full blur-[150px]" />
-          <div className="absolute top-[20%] right-[-10%] w-[400px] h-[400px] bg-orange-600/8 rounded-full blur-[120px]" />
-          <div className="absolute bottom-[-20%] left-[-5%] w-[300px] h-[300px] bg-amber-500/5 rounded-full blur-[100px]" />
+          <Aurora
+            colorStops={["#EA580C", "#F59E0B", "#FACC15"]}
+            amplitude={1.2}
+            blend={0.7}
+            speed={0.5}
+          />
+          {/* Darken overlay for text readability */}
+          <div className="absolute inset-0 bg-background/60" />
           {/* Grid pattern */}
           <div
             className="absolute inset-0 opacity-[0.02]"
