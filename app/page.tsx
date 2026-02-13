@@ -374,6 +374,10 @@ export default async function Dashboard() {
                 caloriesConsumed={data.dailyData[0]?.caloriesConsumed ?? null}
                 dailyTarget={data.dailyData[0]?.tdee ?? null}
                 netCalories={data.dailyData[0]?.netCalories ?? null}
+                protein={data.dailyData[0]?.protein ?? 0}
+                carbs={data.dailyData[0]?.carbs ?? 0}
+                fiber={data.dailyData[0]?.fiber ?? 0}
+                currentWeight={data.latestWeight?.weight ?? null}
               />
             </div>
 
