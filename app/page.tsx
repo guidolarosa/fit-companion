@@ -32,6 +32,9 @@ import { redirect } from "next/navigation";
 import { WeightChart } from "@/components/weight-chart";
 import { ExerciseCalendar } from "@/components/exercise-calendar";
 import { FoodCalendar } from "@/components/food-calendar";
+import { WeeklyProgressCard } from "@/components/weekly-progress-card";
+import { WeeklyCaloriesChart } from "@/components/weekly-calories-chart";
+import { WaterCard } from "@/components/water-card";
 
 async function getWeightData(userId: string) {
   const weights = await prisma.weightEntry.findMany({
@@ -153,6 +156,37 @@ async function getDashboardData(userId: string) {
   const sustainabilityMode = (user as any)?.sustainabilityMode ?? "sustainable";
   const aggressiveThreshold = sustainabilityMode === "strict" ? 0.5 : 0.6;
 
+  // Build last 7 days data for weekly cards
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const sevenDaysAgo = new Date(now);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+  
+  const weekDayData: { date: string; consumed: number; burnt: number; tdee: number }[] = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(sevenDaysAgo);
+    d.setDate(d.getDate() + i);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const match = allDailyData.find(
+      (dd) => dd.date.toISOString().split("T")[0] === dateStr
+    );
+    if (match) {
+      weekDayData.push({
+        date: dateStr,
+        consumed: match.caloriesConsumed,
+        burnt: match.caloriesBurnt,
+        tdee: match.tdee,
+      });
+    }
+  }
+
+  // Calculate water target (ml) based on weight, age, and activity
+  // General formula: ~30-35ml per kg body weight, adjusted for activity
+  const currentWeight = latestWeight?.weight || 70;
+  const activityMultiplier = user?.lifestyle === "active" ? 40 : user?.lifestyle === "moderate" ? 35 : 30;
+  const waterTargetMl = Math.round(currentWeight * activityMultiplier);
+  const waterTargetGlasses = Math.round(waterTargetMl / 250); // 250ml per glass
+
   const last7 = dailyData.slice(0, 7);
   const avgDeficit = last7.length
     ? last7.reduce((sum, day) => sum + day.netCalories, 0) / last7.length
@@ -230,6 +264,8 @@ async function getDashboardData(userId: string) {
       extremeDeficitStreak,
       plateauDetected,
     },
+    weekDayData,
+    waterTargetGlasses,
   };
 }
 
@@ -377,6 +413,13 @@ export default async function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+          </div>
+
+           {/* Weekly overview + Water */}
+           <div className="mt-6 grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
+            <WeeklyProgressCard weekData={data.weekDayData} />
+            <WeeklyCaloriesChart weekData={data.weekDayData} />
+            <WaterCard targetGlasses={data.waterTargetGlasses} />
           </div>
 
           <div className="mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">

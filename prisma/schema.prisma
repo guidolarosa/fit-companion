@@ -29,6 +29,7 @@ model User {
   weightEntries  WeightEntry[]
   exercises      Exercise[]
   foodEntries    FoodEntry[]
+  waterEntries   WaterEntry[]
   accounts       Account[]
   sessions       Session[]
 }
@@ -66,6 +67,17 @@ model FoodEntry {
   sugar     Float? // sugar grams
   date      DateTime @default(now())
   createdAt DateTime @default(now())
+}
+
+model WaterEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  glasses   Int      // number of glasses consumed
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  @@unique([userId, date])
 }
 
 model Account {
