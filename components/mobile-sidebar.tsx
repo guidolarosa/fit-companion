@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   FileText,
+  FlaskConical,
   LogOut,
   ChevronRight
 } from "lucide-react"
@@ -26,6 +27,7 @@ const navigation = [
   { name: "Exercise", href: "/exercise", icon: Dumbbell },
   { name: "Food", href: "/food", icon: UtensilsCrossed },
   { name: "Assistant", href: "/agent", icon: MessageSquare },
+  { name: "Lab", href: "/lab", icon: FlaskConical },
   { name: "Report", href: "/report", icon: FileText },
   { name: "Settings", href: "/settings", icon: Settings },
 ]

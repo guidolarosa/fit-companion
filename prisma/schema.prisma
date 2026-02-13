@@ -30,6 +30,7 @@ model User {
   exercises      Exercise[]
   foodEntries    FoodEntry[]
   waterEntries   WaterEntry[]
+  labFiles       LabFile[]
   accounts       Account[]
   sessions       Session[]
 }
@@ -66,6 +67,16 @@ model FoodEntry {
   fiber     Float? // fiber grams
   sugar     Float? // sugar grams
   date      DateTime @default(now())
+  createdAt DateTime @default(now())
+}
+
+model LabFile {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String   // original filename
+  content   String   // extracted text content from the file
+  mimeType  String   // e.g. application/pdf, image/png
   createdAt DateTime @default(now())
 }
 

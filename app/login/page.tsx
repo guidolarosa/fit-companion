@@ -13,6 +13,7 @@ import {
   BarChart3,
   Droplets,
   Brain,
+  FlaskConical,
   ChevronRight,
   Sparkles,
 } from "lucide-react"
@@ -23,7 +24,9 @@ const features = [
   { icon: Activity, title: "Registro de ejercicio", desc: "Lleva un historial de tu actividad física" },
   { icon: BarChart3, title: "Reportes e insights", desc: "Análisis de tendencias y resúmenes con IA" },
   { icon: Droplets, title: "Hidratación", desc: "Contador diario de vasos de agua con meta personalizada" },
+  { icon: FlaskConical, title: "Análisis de laboratorio", desc: "Sube tus estudios y obtené insights con IA" },
   { icon: Brain, title: "Asistente con IA", desc: "Estimación de macros y asesoría nutricional inteligente" },
+  { icon: Sparkles, title: "100% gratuito", desc: "Todos tus datos privados y seguros, sin costos ocultos" },
 ]
 
 export default function LoginPage() {
