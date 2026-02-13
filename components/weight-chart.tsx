@@ -14,7 +14,7 @@ interface WeightChartProps {
   chartHeight?: number;
 }
 
-export function WeightChart({ weights, chartHeight = 300 }: WeightChartProps) {
+export function WeightChart({ weights }: WeightChartProps) {
   if (weights.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center text-muted-foreground">
@@ -56,7 +56,7 @@ export function WeightChart({ weights, chartHeight = 300 }: WeightChartProps) {
   const domainMax = Math.ceil(maxWeight + padding)
 
   return (
-    <div style={{ width: "100%", height: `${chartHeight}px` }}>
+    <div style={{ width: "100%", height: `432px` }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />

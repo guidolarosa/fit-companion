@@ -259,7 +259,7 @@ export default async function Dashboard() {
           <MobileQuickActions />
 
           <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-            <div className="h-[180px]">
+            <div className="">
               <WeightGaugeCard
                 currentWeight={data.latestWeight?.weight || null}
                 targetWeightMin={data.targetWeightMin}
@@ -269,24 +269,21 @@ export default async function Dashboard() {
               />
             </div>
 
-            <div className="h-[180px]">
+            <div className="">
               <IFCard
                 ifType={data.user?.ifType || null}
                 ifStartTime={data.user?.ifStartTime || null}
               />
             </div>
 
-            <div className="h-[180px] hidden sm:block">
+            <div className="">
               <BMICard
                 bmi={data.bmi}
                 currentWeight={data.latestWeight?.weight || null}
                 height={data.user?.height || null}
               />
             </div>
-          </div>
-
-          <div className="mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="h-[180px]">
+            <div className="">
               <Card className="glass-card h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
@@ -335,7 +332,7 @@ export default async function Dashboard() {
               </Card>
             </div>
 
-            <div className="h-[180px]">
+            <div className="">
               <DailyTargetRingCard
                 date={data.dailyData[0]?.date ?? null}
                 caloriesConsumed={data.dailyData[0]?.caloriesConsumed ?? null}
@@ -344,7 +341,7 @@ export default async function Dashboard() {
               />
             </div>
 
-            <div className="h-[180px] hidden sm:block">
+            <div className="">
               <Card className="glass-card h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">Tendencia</CardTitle>
@@ -380,6 +377,9 @@ export default async function Dashboard() {
                 </CardContent>
               </Card>
             </div>
+          </div>
+
+          <div className="mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
             {/* Weight Progress - Hidden on mobile, full width */}
             <Card className="hidden sm:block sm:col-span-2 lg:col-span-3 glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-1">
@@ -395,7 +395,7 @@ export default async function Dashboard() {
           </div>
 
           {/* Calendars and Quality - Hidden on mobile */}
-          <div className="mt-6 hidden sm:grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-6 hidden sm:grid gap-6 md:grid-cols-2 lg:grid-cols-2">
             <Card className="md:col-span-2 lg:col-span-1 glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
@@ -416,31 +416,6 @@ export default async function Dashboard() {
               </CardHeader>
               <CardContent>
                 <FoodCalendar foodDays={data.foodDays} />
-              </CardContent>
-            </Card>
-            <Card className="glass-card">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Calidad Déficit</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 pt-2">
-                <div className="space-y-1.5 text-[11px]">
-                  <div className="flex justify-between items-center text-zinc-500">
-                    <span>Días Entrenamiento</span>
-                    <span className="text-zinc-300 font-medium">{data.qualityInsights.trainingDays}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-zinc-500">
-                    <span>Déficit en Entren.</span>
-                    <span className="text-zinc-300 font-medium">
-                      {data.qualityInsights.trainingDeficitDays}/{data.qualityInsights.trainingDays}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-zinc-500">
-                    <span>Proteína Ok</span>
-                    <span className="text-zinc-300 font-medium">
-                      {data.qualityInsights.proteinTrackedDays}/7
-                    </span>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>

@@ -41,7 +41,7 @@ export default async function ExercisePage() {
         <div className="mx-auto max-w-7xl">
           <PageHeader title="Exercise & Calorie Burn" />
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-1">
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Registrar Ejercicio</CardTitle>
@@ -49,16 +49,6 @@ export default async function ExercisePage() {
               </CardHeader>
               <CardContent>
                 <ExerciseForm />
-              </CardContent>
-            </Card>
-
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Sugerencias de IA</CardTitle>
-                <CardDescription className="text-[11px] text-zinc-600">Pide recomendaciones a la IA</CardDescription>
-              </CardHeader>
-              <CardContent className="overflow-hidden">
-                <ExerciseAgent />
               </CardContent>
             </Card>
           </div>

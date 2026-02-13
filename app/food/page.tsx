@@ -42,7 +42,7 @@ export default async function FoodPage() {
         <div className="mx-auto max-w-7xl">
           <PageHeader title="Food & Nutrition" />
 
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-1">
             <Card className="glass-card">
               <CardHeader>
                 <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Registrar Comida</CardTitle>
@@ -53,15 +53,6 @@ export default async function FoodPage() {
               </CardContent>
             </Card>
 
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Sugerencias de IA</CardTitle>
-                <CardDescription className="text-[11px] text-zinc-600">Consulta opciones saludables con la IA</CardDescription>
-              </CardHeader>
-              <CardContent className="overflow-hidden">
-                <FoodAgent />
-              </CardContent>
-            </Card>
           </div>
 
           <div className="mt-6 grid gap-6 lg:grid-cols-2">

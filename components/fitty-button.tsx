@@ -34,7 +34,7 @@ export function FittyButton() {
       <Button
         onClick={() => setOpen(true)}
         variant="outline"
-        className="gap-2 hidden sm:flex"
+        className="gap-2 hidden lg:flex"
         size="sm"
       >
         <Sparkles className="h-4 w-4" />
