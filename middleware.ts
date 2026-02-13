@@ -5,10 +5,11 @@ import { auth } from "@/lib/auth"
 export async function middleware(request: NextRequest) {
   const session = await auth()
 
-  // Allow access to auth routes and login page
+  // Allow access to auth routes, login page, and landing page
   if (
     request.nextUrl.pathname.startsWith("/api/auth") ||
     request.nextUrl.pathname.startsWith("/login") ||
+    request.nextUrl.pathname.startsWith("/landing") ||
     request.nextUrl.pathname.startsWith("/_next") ||
     request.nextUrl.pathname === "/favicon.ico"
   ) {
@@ -33,7 +34,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api/auth|login|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api/auth|login|landing|_next/static|_next/image|favicon.ico).*)",
   ],
 }
 
