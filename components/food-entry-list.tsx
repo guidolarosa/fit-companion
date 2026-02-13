@@ -15,6 +15,11 @@ interface FoodEntry {
   id: string
   name: string
   calories: number
+  protein?: number | null
+  carbs?: number | null
+  fat?: number | null
+  fiber?: number | null
+  sugar?: number | null
   date: Date | string
 }
 
@@ -102,14 +107,26 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
               >
                 {entry.name}
               </p>
-              <p className="text-xs text-zinc-500">
-                {new Date(entry.date).toLocaleDateString('es-ES', { 
-                  weekday: 'short',
-                  month: 'short', 
-                  day: 'numeric', 
-                  timeZone: 'UTC' 
-                })}
-              </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-xs text-zinc-500">
+                  {new Date(entry.date).toLocaleDateString('es-ES', { 
+                    weekday: 'short',
+                    month: 'short', 
+                    day: 'numeric', 
+                    timeZone: 'UTC' 
+                  })}
+                </p>
+                {(entry.protein != null || entry.carbs != null || entry.fat != null) && (
+                  <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-zinc-500">
+                    <span className="text-zinc-600">|</span>
+                    {entry.protein != null && <span>P:{Math.round(entry.protein)}g</span>}
+                    {entry.carbs != null && <span>C:{Math.round(entry.carbs)}g</span>}
+                    {entry.fat != null && <span>F:{Math.round(entry.fat)}g</span>}
+                    {entry.fiber != null && <span>Fb:{Math.round(entry.fiber)}g</span>}
+                    {entry.sugar != null && <span>S:{Math.round(entry.sugar)}g</span>}
+                  </div>
+                )}
+              </div>
             </div>
             
             {/* Calories display - value large, unit small per guidelines */}

@@ -27,17 +27,30 @@ export async function GET(request: NextRequest) {
       select: {
         name: true,
         calories: true,
+        protein: true,
+        carbs: true,
+        fat: true,
+        fiber: true,
+        sugar: true,
       },
       orderBy: { date: "desc" },
       take: 50,
     })
 
-    // Deduplicate by name, keeping the most recent entry's calories
-    const seen = new Map<string, { name: string; calories: number }>()
+    // Deduplicate by name, keeping the most recent entry's values
+    const seen = new Map<string, { name: string; calories: number; protein: number | null; carbs: number | null; fat: number | null; fiber: number | null; sugar: number | null }>()
     for (const entry of entries) {
       const key = entry.name.toLowerCase()
       if (!seen.has(key)) {
-        seen.set(key, { name: entry.name, calories: entry.calories })
+        seen.set(key, {
+          name: entry.name,
+          calories: entry.calories,
+          protein: entry.protein,
+          carbs: entry.carbs,
+          fat: entry.fat,
+          fiber: entry.fiber,
+          sugar: entry.sugar,
+        })
       }
     }
 

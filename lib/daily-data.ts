@@ -5,6 +5,10 @@ export interface DailyData {
   caloriesConsumed: number;
   caloriesBurnt: number;
   protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+  sugar: number;
   bmr: number;
   tdee: number;
   weight: number | null;
@@ -25,6 +29,10 @@ export function aggregateDailyData(
       caloriesConsumed: number;
       caloriesBurnt: number;
       protein: number;
+      carbs: number;
+      fat: number;
+      fiber: number;
+      sugar: number;
       date: Date;
       hasExercise: boolean;
     }
@@ -45,6 +53,10 @@ export function aggregateDailyData(
         caloriesConsumed: 0,
         caloriesBurnt: exercise.calories,
         protein: 0,
+        carbs: 0,
+        fat: 0,
+        fiber: 0,
+        sugar: 0,
         date: new Date(Date.UTC(y, m - 1, d)),
         hasExercise: true,
       });
@@ -54,6 +66,10 @@ export function aggregateDailyData(
   // Aggregate foods by day
   foods.forEach((food) => {
     const protein = (food as any).protein || 0;
+    const carbs = (food as any).carbs || 0;
+    const fat = (food as any).fat || 0;
+    const fiber = (food as any).fiber || 0;
+    const sugar = (food as any).sugar || 0;
     const dayKey = food.date instanceof Date
       ? food.date.toISOString().split("T")[0]
       : new Date(food.date).toISOString().split("T")[0];
@@ -61,12 +77,20 @@ export function aggregateDailyData(
     if (existing) {
       existing.caloriesConsumed += food.calories;
       existing.protein += protein;
+      existing.carbs += carbs;
+      existing.fat += fat;
+      existing.fiber += fiber;
+      existing.sugar += sugar;
     } else {
       const [y, m, d] = dayKey.split("-").map(Number);
       dailyDataMap.set(dayKey, {
         caloriesConsumed: food.calories,
         caloriesBurnt: 0,
         protein,
+        carbs,
+        fat,
+        fiber,
+        sugar,
         date: new Date(Date.UTC(y, m - 1, d)),
         hasExercise: false,
       });

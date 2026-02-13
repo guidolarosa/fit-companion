@@ -19,6 +19,11 @@ interface FoodEntry {
   id: string
   name: string
   calories: number
+  protein?: number | null
+  carbs?: number | null
+  fat?: number | null
+  fiber?: number | null
+  sugar?: number | null
   date: Date | string
 }
 
@@ -32,6 +37,11 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
   const router = useRouter()
   const [name, setName] = useState("")
   const [calories, setCalories] = useState("")
+  const [protein, setProtein] = useState("")
+  const [carbs, setCarbs] = useState("")
+  const [fat, setFat] = useState("")
+  const [fiber, setFiber] = useState("")
+  const [sugar, setSugar] = useState("")
   const [date, setDate] = useState("")
   const [time, setTime] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -40,6 +50,11 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
     if (entry) {
       setName(entry.name)
       setCalories(entry.calories.toString())
+      setProtein(entry.protein != null ? entry.protein.toString() : "")
+      setCarbs(entry.carbs != null ? entry.carbs.toString() : "")
+      setFat(entry.fat != null ? entry.fat.toString() : "")
+      setFiber(entry.fiber != null ? entry.fiber.toString() : "")
+      setSugar(entry.sugar != null ? entry.sugar.toString() : "")
       const entryDate = new Date(entry.date)
       // Extract components from UTC to respect "Pinned UTC"
       const y = entryDate.getUTCFullYear()
@@ -69,6 +84,11 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
           id: entry.id,
           name,
           calories: parseFloat(calories),
+          protein: protein ? parseFloat(protein) : null,
+          carbs: carbs ? parseFloat(carbs) : null,
+          fat: fat ? parseFloat(fat) : null,
+          fiber: fiber ? parseFloat(fiber) : null,
+          sugar: sugar ? parseFloat(sugar) : null,
           date: dateTimeStr,
         }),
       })
@@ -122,6 +142,73 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
               placeholder="Enter calories consumed"
               required
             />
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="edit-protein" className="text-xs">Protein (g)</Label>
+              <Input
+                id="edit-protein"
+                type="number"
+                step="0.1"
+                min="0"
+                value={protein}
+                onChange={(e) => setProtein(e.target.value)}
+                placeholder="0"
+                className="h-9"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="edit-carbs" className="text-xs">Carbs (g)</Label>
+              <Input
+                id="edit-carbs"
+                type="number"
+                step="0.1"
+                min="0"
+                value={carbs}
+                onChange={(e) => setCarbs(e.target.value)}
+                placeholder="0"
+                className="h-9"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="edit-fat" className="text-xs">Fat (g)</Label>
+              <Input
+                id="edit-fat"
+                type="number"
+                step="0.1"
+                min="0"
+                value={fat}
+                onChange={(e) => setFat(e.target.value)}
+                placeholder="0"
+                className="h-9"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="edit-fiber" className="text-xs">Fiber (g)</Label>
+              <Input
+                id="edit-fiber"
+                type="number"
+                step="0.1"
+                min="0"
+                value={fiber}
+                onChange={(e) => setFiber(e.target.value)}
+                placeholder="0"
+                className="h-9"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="edit-sugar" className="text-xs">Sugar (g)</Label>
+              <Input
+                id="edit-sugar"
+                type="number"
+                step="0.1"
+                min="0"
+                value={sugar}
+                onChange={(e) => setSugar(e.target.value)}
+                placeholder="0"
+                className="h-9"
+              />
+            </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 min-w-0">

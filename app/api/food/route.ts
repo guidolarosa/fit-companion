@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     const userId = userResult.id
 
     const body = await request.json()
-    const { name, calories, date } = body
+    const { name, calories, date, protein, carbs, fat, fiber, sugar } = body
 
     if (!name || !calories || typeof calories !== "number" || calories <= 0) {
       return NextResponse.json(
@@ -23,6 +23,11 @@ export async function POST(request: NextRequest) {
         userId,
         name,
         calories,
+        protein: typeof protein === "number" ? protein : null,
+        carbs: typeof carbs === "number" ? carbs : null,
+        fat: typeof fat === "number" ? fat : null,
+        fiber: typeof fiber === "number" ? fiber : null,
+        sugar: typeof sugar === "number" ? sugar : null,
         date: date ? new Date(date) : new Date(),
       },
     })
@@ -44,7 +49,7 @@ export async function PUT(request: NextRequest) {
     const userId = userResult.id
 
     const body = await request.json()
-    const { id, name, calories, date } = body
+    const { id, name, calories, date, protein, carbs, fat, fiber, sugar } = body
 
     if (!id) {
       return NextResponse.json(
@@ -77,6 +82,11 @@ export async function PUT(request: NextRequest) {
       data: {
         name,
         calories,
+        protein: typeof protein === "number" ? protein : null,
+        carbs: typeof carbs === "number" ? carbs : null,
+        fat: typeof fat === "number" ? fat : null,
+        fiber: typeof fiber === "number" ? fiber : null,
+        sugar: typeof sugar === "number" ? sugar : null,
         date: date ? new Date(date) : entry.date,
       },
     })

@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { SettingsForm } from "@/components/settings-form"
+import { BackfillMacrosButton } from "@/components/backfill-macros-button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { PageHeader } from "@/components/page-header"
 import { getCurrentUser } from "@/lib/get-session"
@@ -45,6 +46,18 @@ export default async function SettingsPage() {
                 milestoneStep: (user as any).milestoneStep ?? null,
                 sustainabilityMode: (user as any).sustainabilityMode ?? null,
               }} />
+            </CardContent>
+          </Card>
+
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Data Tools</CardTitle>
+              <CardDescription>
+                Manage and enrich your existing data
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <BackfillMacrosButton />
             </CardContent>
           </Card>
         </div>

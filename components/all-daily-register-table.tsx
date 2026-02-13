@@ -59,7 +59,7 @@ export function AllDailyRegisterTable({ dailyData, currentPage, totalPages }: Al
   return (
     <>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm min-w-[600px]">
+        <table className="w-full text-sm min-w-[900px]">
           <thead>
             <tr className="border-b">
               <th className="text-left p-3 font-semibold">Date</th>
@@ -68,6 +68,11 @@ export function AllDailyRegisterTable({ dailyData, currentPage, totalPages }: Al
               <th className="text-right p-3 font-semibold">Consumed</th>
               <th className="text-right p-3 font-semibold">Burnt</th>
               <th className="text-right p-3 font-semibold">Net</th>
+              <th className="text-right p-3 font-semibold text-xs">Prot</th>
+              <th className="text-right p-3 font-semibold text-xs">Carbs</th>
+              <th className="text-right p-3 font-semibold text-xs">Fat</th>
+              <th className="text-right p-3 font-semibold text-xs">Fiber</th>
+              <th className="text-right p-3 font-semibold text-xs">Sugar</th>
             </tr>
           </thead>
           <tbody>
@@ -118,6 +123,21 @@ export function AllDailyRegisterTable({ dailyData, currentPage, totalPages }: Al
                     <span className={`${netBadgeClass} rounded-md px-2 py-1`}>
                       {Math.round(netCalories)}
                     </span>
+                  </td>
+                  <td className="p-3 text-right text-xs text-muted-foreground whitespace-nowrap">
+                    {day.protein > 0 ? `${Math.round(day.protein)}g` : "-"}
+                  </td>
+                  <td className="p-3 text-right text-xs text-muted-foreground whitespace-nowrap">
+                    {day.carbs > 0 ? `${Math.round(day.carbs)}g` : "-"}
+                  </td>
+                  <td className="p-3 text-right text-xs text-muted-foreground whitespace-nowrap">
+                    {day.fat > 0 ? `${Math.round(day.fat)}g` : "-"}
+                  </td>
+                  <td className="p-3 text-right text-xs text-muted-foreground whitespace-nowrap">
+                    {day.fiber > 0 ? `${Math.round(day.fiber)}g` : "-"}
+                  </td>
+                  <td className="p-3 text-right text-xs text-muted-foreground whitespace-nowrap">
+                    {day.sugar > 0 ? `${Math.round(day.sugar)}g` : "-"}
                   </td>
                 </tr>
               );

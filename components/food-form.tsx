@@ -11,6 +11,11 @@ import { Sparkles } from "lucide-react"
 interface FoodSuggestion {
   name: string
   calories: number
+  protein?: number | null
+  carbs?: number | null
+  fat?: number | null
+  fiber?: number | null
+  sugar?: number | null
 }
 
 export function FoodForm() {
@@ -32,6 +37,11 @@ export function FoodForm() {
 
   const [name, setName] = useState("")
   const [calories, setCalories] = useState("")
+  const [protein, setProtein] = useState("")
+  const [carbs, setCarbs] = useState("")
+  const [fat, setFat] = useState("")
+  const [fiber, setFiber] = useState("")
+  const [sugar, setSugar] = useState("")
   const [date, setDate] = useState(getLocalDateString())
   const [time, setTime] = useState(getLocalTimeString())
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -94,6 +104,11 @@ export function FoodForm() {
   function handleSelectSuggestion(suggestion: FoodSuggestion) {
     setName(suggestion.name)
     setCalories(suggestion.calories.toString())
+    setProtein(suggestion.protein != null ? suggestion.protein.toString() : "")
+    setCarbs(suggestion.carbs != null ? suggestion.carbs.toString() : "")
+    setFat(suggestion.fat != null ? suggestion.fat.toString() : "")
+    setFiber(suggestion.fiber != null ? suggestion.fiber.toString() : "")
+    setSugar(suggestion.sugar != null ? suggestion.sugar.toString() : "")
     setSuggestions([])
     setShowSuggestions(false)
   }
@@ -116,7 +131,12 @@ export function FoodForm() {
         const data = await response.json()
         if (data.calories > 0) {
           setCalories(data.calories.toString())
-          toast.success(`Estimated ${data.calories} kcal`)
+          if (data.protein != null) setProtein(data.protein.toString())
+          if (data.carbs != null) setCarbs(data.carbs.toString())
+          if (data.fat != null) setFat(data.fat.toString())
+          if (data.fiber != null) setFiber(data.fiber.toString())
+          if (data.sugar != null) setSugar(data.sugar.toString())
+          toast.success(`Estimated ${data.calories} kcal + macros`)
         } else {
           toast.error("Could not estimate calories for this item")
         }
@@ -145,6 +165,11 @@ export function FoodForm() {
         body: JSON.stringify({
           name,
           calories: parseFloat(calories),
+          protein: protein ? parseFloat(protein) : null,
+          carbs: carbs ? parseFloat(carbs) : null,
+          fat: fat ? parseFloat(fat) : null,
+          fiber: fiber ? parseFloat(fiber) : null,
+          sugar: sugar ? parseFloat(sugar) : null,
           date: dateTimeStr,
         }),
       })
@@ -152,6 +177,11 @@ export function FoodForm() {
       if (response.ok) {
         setName("")
         setCalories("")
+        setProtein("")
+        setCarbs("")
+        setFat("")
+        setFiber("")
+        setSugar("")
         setDate(getLocalDateString())
         setTime(getLocalTimeString())
         toast.success("Food entry created successfully!")
@@ -234,6 +264,73 @@ export function FoodForm() {
         <p className="text-xs text-muted-foreground">
           Enter manually or click the AI button to estimate
         </p>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="space-y-1">
+          <Label htmlFor="protein" className="text-xs">Protein (g)</Label>
+          <Input
+            id="protein"
+            type="number"
+            step="0.1"
+            min="0"
+            value={protein}
+            onChange={(e) => setProtein(e.target.value)}
+            placeholder="0"
+            className="h-9"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="carbs" className="text-xs">Carbs (g)</Label>
+          <Input
+            id="carbs"
+            type="number"
+            step="0.1"
+            min="0"
+            value={carbs}
+            onChange={(e) => setCarbs(e.target.value)}
+            placeholder="0"
+            className="h-9"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="fat" className="text-xs">Fat (g)</Label>
+          <Input
+            id="fat"
+            type="number"
+            step="0.1"
+            min="0"
+            value={fat}
+            onChange={(e) => setFat(e.target.value)}
+            placeholder="0"
+            className="h-9"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="fiber" className="text-xs">Fiber (g)</Label>
+          <Input
+            id="fiber"
+            type="number"
+            step="0.1"
+            min="0"
+            value={fiber}
+            onChange={(e) => setFiber(e.target.value)}
+            placeholder="0"
+            className="h-9"
+          />
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="sugar" className="text-xs">Sugar (g)</Label>
+          <Input
+            id="sugar"
+            type="number"
+            step="0.1"
+            min="0"
+            value={sugar}
+            onChange={(e) => setSugar(e.target.value)}
+            placeholder="0"
+            className="h-9"
+          />
+        </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2 min-w-0">

@@ -59,7 +59,11 @@ model FoodEntry {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   name      String
   calories  Float // calories consumed
-  protein   Float? // protein grams (optional)
+  protein   Float? // protein grams
+  carbs     Float? // carbohydrates grams
+  fat       Float? // fat grams
+  fiber     Float? // fiber grams
+  sugar     Float? // sugar grams
   date      DateTime @default(now())
   createdAt DateTime @default(now())
 }

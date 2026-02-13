@@ -15,6 +15,11 @@ interface FoodEntry {
   id: string
   name: string
   calories: number
+  protein?: number | null
+  carbs?: number | null
+  fat?: number | null
+  fiber?: number | null
+  sugar?: number | null
   date: Date | string
 }
 
@@ -97,58 +102,135 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
       <div className="overflow-x-auto">
         <div className="min-w-full">
           {/* Table header */}
-          <div className="grid grid-cols-12 gap-4 p-3 border-b font-semibold text-sm text-muted-foreground">
-            <div className="col-span-4 sm:col-span-5">Food Name</div>
-            <div className="col-span-3 sm:col-span-2">Date</div>
-            <div className="col-span-3 sm:col-span-2 text-right">Calories</div>
-            <div className="col-span-2 sm:col-span-3 text-right">Actions</div>
+          <div className="hidden sm:grid sm:grid-cols-[2fr_1fr_repeat(6,minmax(0,1fr))_auto] gap-2 p-3 border-b font-semibold text-xs text-muted-foreground">
+            <div>Food Name</div>
+            <div>Date</div>
+            <div className="text-right">Kcal</div>
+            <div className="text-right">Prot</div>
+            <div className="text-right">Carbs</div>
+            <div className="text-right">Fat</div>
+            <div className="text-right">Fiber</div>
+            <div className="text-right">Sugar</div>
+            <div className="text-right w-20">Actions</div>
+          </div>
+
+          {/* Mobile header */}
+          <div className="grid grid-cols-12 gap-4 p-3 border-b font-semibold text-sm text-muted-foreground sm:hidden">
+            <div className="col-span-5">Food Name</div>
+            <div className="col-span-3">Date</div>
+            <div className="col-span-2 text-right">Kcal</div>
+            <div className="col-span-2 text-right">Actions</div>
           </div>
 
           {/* Table rows */}
           {entries.map((entry) => (
-            <div
-              key={entry.id}
-              className="grid grid-cols-12 gap-4 p-3 border-b last:border-b-0 items-center hover:bg-muted/50 transition-colors"
-            >
-              <div className="col-span-4 sm:col-span-5 min-w-0">
-                <p className="font-semibold truncate" title={entry.name}>
-                  {entry.name}
-                </p>
+            <div key={entry.id}>
+              {/* Desktop row */}
+              <div
+                className="hidden sm:grid sm:grid-cols-[2fr_1fr_repeat(6,minmax(0,1fr))_auto] gap-2 p-3 border-b last:border-b-0 items-center hover:bg-muted/50 transition-colors"
+              >
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm truncate" title={entry.name}>
+                    {entry.name}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <CaloriePill calories={entry.calories} />
+                </div>
+                <div className="text-right text-xs text-muted-foreground">
+                  {entry.protein != null ? `${Math.round(entry.protein)}g` : '-'}
+                </div>
+                <div className="text-right text-xs text-muted-foreground">
+                  {entry.carbs != null ? `${Math.round(entry.carbs)}g` : '-'}
+                </div>
+                <div className="text-right text-xs text-muted-foreground">
+                  {entry.fat != null ? `${Math.round(entry.fat)}g` : '-'}
+                </div>
+                <div className="text-right text-xs text-muted-foreground">
+                  {entry.fiber != null ? `${Math.round(entry.fiber)}g` : '-'}
+                </div>
+                <div className="text-right text-xs text-muted-foreground">
+                  {entry.sugar != null ? `${Math.round(entry.sugar)}g` : '-'}
+                </div>
+                <div className="flex items-center justify-end gap-1 w-20">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setEntryToEdit(entry)
+                      setEditDialogOpen(true)
+                    }}
+                    className="hover:bg-muted h-8 w-8"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setEntryToDelete(entry)
+                      setDeleteDialogOpen(true)
+                    }}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-              <div className="col-span-3 sm:col-span-2">
-                <p className="text-sm text-muted-foreground">
-                  {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
-                </p>
-                <p className="text-xs text-muted-foreground sm:hidden">
-                  {new Date(entry.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })}
-                </p>
-              </div>
-              <div className="col-span-3 sm:col-span-2 text-right">
-                <CaloriePill calories={entry.calories} />
-              </div>
-              <div className="col-span-2 sm:col-span-3 flex items-center justify-end gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setEntryToEdit(entry)
-                    setEditDialogOpen(true)
-                  }}
-                  className="hover:bg-muted h-8 w-8"
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setEntryToDelete(entry)
-                    setDeleteDialogOpen(true)
-                  }}
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+
+              {/* Mobile row */}
+              <div
+                className="grid grid-cols-12 gap-4 p-3 border-b last:border-b-0 items-center hover:bg-muted/50 transition-colors sm:hidden"
+              >
+                <div className="col-span-5 min-w-0">
+                  <p className="font-semibold text-sm truncate" title={entry.name}>
+                    {entry.name}
+                  </p>
+                  {(entry.protein != null || entry.carbs != null || entry.fat != null) && (
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {entry.protein != null && `P:${Math.round(entry.protein)}g `}
+                      {entry.carbs != null && `C:${Math.round(entry.carbs)}g `}
+                      {entry.fat != null && `F:${Math.round(entry.fat)}g`}
+                    </p>
+                  )}
+                </div>
+                <div className="col-span-3">
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })}
+                  </p>
+                </div>
+                <div className="col-span-2 text-right">
+                  <CaloriePill calories={entry.calories} />
+                </div>
+                <div className="col-span-2 flex items-center justify-end gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setEntryToEdit(entry)
+                      setEditDialogOpen(true)
+                    }}
+                    className="hover:bg-muted h-8 w-8"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setEntryToDelete(entry)
+                      setDeleteDialogOpen(true)
+                    }}
+                    className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

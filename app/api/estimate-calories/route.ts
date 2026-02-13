@@ -29,10 +29,12 @@ export async function POST(request: NextRequest) {
       messages: [
         {
           role: "system",
-          content: `You are a nutrition assistant. When given a food item description, estimate its calorie content.
-Reply with ONLY a single integer number representing the estimated calories. No text, no units, no explanation.
-If the description is unclear or not a food item, reply with 0.
-Base your estimates on typical serving sizes unless specified otherwise.`
+          content: `You are a nutrition assistant. When given a food item description, estimate its nutritional content.
+Reply with ONLY a JSON object with these keys: calories (integer), protein (float, grams), carbs (float, grams), fat (float, grams), fiber (float, grams), sugar (float, grams).
+Example: {"calories":350,"protein":25.0,"carbs":40.0,"fat":8.0,"fiber":3.0,"sugar":5.0}
+If the description is unclear or not a food item, reply with all zeros.
+Base your estimates on typical serving sizes unless specified otherwise.
+Do NOT include any text, explanation, or markdown. Only the JSON object.`
         },
         {
           role: "user",
@@ -40,17 +42,30 @@ Base your estimates on typical serving sizes unless specified otherwise.`
         }
       ],
       temperature: 0.3,
-      max_tokens: 20,
+      max_tokens: 100,
     })
 
-    const responseText = completion.choices[0]?.message?.content?.trim() || "0"
-    const calories = parseInt(responseText, 10)
-
-    if (isNaN(calories) || calories < 0) {
-      return NextResponse.json({ calories: 0 }, { status: 200 })
+    const responseText = completion.choices[0]?.message?.content?.trim() || "{}"
+    
+    try {
+      const parsed = JSON.parse(responseText)
+      const result = {
+        calories: Math.max(0, parseInt(parsed.calories, 10) || 0),
+        protein: Math.max(0, parseFloat(parsed.protein) || 0),
+        carbs: Math.max(0, parseFloat(parsed.carbs) || 0),
+        fat: Math.max(0, parseFloat(parsed.fat) || 0),
+        fiber: Math.max(0, parseFloat(parsed.fiber) || 0),
+        sugar: Math.max(0, parseFloat(parsed.sugar) || 0),
+      }
+      return NextResponse.json(result, { status: 200 })
+    } catch {
+      // Fallback: try to parse as a plain number (backward compat)
+      const calories = parseInt(responseText, 10)
+      if (!isNaN(calories) && calories > 0) {
+        return NextResponse.json({ calories, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0 }, { status: 200 })
+      }
+      return NextResponse.json({ calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0 }, { status: 200 })
     }
-
-    return NextResponse.json({ calories }, { status: 200 })
   } catch (error) {
     console.error("Error estimating calories:", error)
     return NextResponse.json(

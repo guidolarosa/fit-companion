@@ -33,12 +33,14 @@ const navigation = [
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
-  const [isCollapsed, setIsCollapsed] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("sidebar-collapsed") === "true"
-    }
-    return false
-  })
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [hasMounted, setHasMounted] = useState(false)
+
+  useEffect(() => {
+    const stored = localStorage.getItem("sidebar-collapsed") === "true"
+    setIsCollapsed(stored)
+    setHasMounted(true)
+  }, [])
 
   function toggleCollapsed() {
     const next = !isCollapsed
@@ -55,7 +57,8 @@ export function Sidebar() {
   return (
     <div 
       className={cn(
-        "hidden lg:flex h-screen flex-col border-r border-white/[0.05] bg-background transition-all duration-300 ease-in-out relative",
+        "hidden lg:flex h-screen flex-col border-r border-white/[0.05] bg-background relative",
+        hasMounted ? "transition-all duration-300 ease-in-out" : "",
         isCollapsed ? "w-16" : "w-64"
       )}
     >

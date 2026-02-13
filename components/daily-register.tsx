@@ -16,6 +16,11 @@ interface DailyData {
   date: Date;
   caloriesConsumed: number;
   caloriesBurnt: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+  sugar: number;
   bmr: number;
   tdee: number;
   netCalories: number;
@@ -57,7 +62,7 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-          <table className="w-full text-xs min-w-[500px]">
+          <table className="w-full text-xs min-w-[600px]">
             <thead>
               <tr className="text-[10px] text-zinc-600 uppercase tracking-widest border-b border-white/[0.03]">
                 <th className="text-left font-medium pb-3 px-2">Fecha</th>
@@ -66,6 +71,11 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
                 <th className="text-right font-medium pb-3 px-2">Consumo</th>
                 <th className="text-right font-medium pb-3 px-2">Gasto</th>
                 <th className="text-right font-medium pb-3 px-2">Neto</th>
+                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">Prot</th>
+                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">Carbs</th>
+                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">Fat</th>
+                <th className="text-right font-medium pb-3 px-2 hidden xl:table-cell">Fiber</th>
+                <th className="text-right font-medium pb-3 px-2 hidden xl:table-cell">Sugar</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.02]">
@@ -104,6 +114,21 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
                       )}>
                         {netCalories > 0 ? "+" : ""}{Math.round(netCalories)}
                       </span>
+                    </td>
+                    <td className="py-3 px-2 text-right text-zinc-500 hidden lg:table-cell">
+                      {day.protein > 0 ? `${Math.round(day.protein)}g` : "-"}
+                    </td>
+                    <td className="py-3 px-2 text-right text-zinc-500 hidden lg:table-cell">
+                      {day.carbs > 0 ? `${Math.round(day.carbs)}g` : "-"}
+                    </td>
+                    <td className="py-3 px-2 text-right text-zinc-500 hidden lg:table-cell">
+                      {day.fat > 0 ? `${Math.round(day.fat)}g` : "-"}
+                    </td>
+                    <td className="py-3 px-2 text-right text-zinc-500 hidden xl:table-cell">
+                      {day.fiber > 0 ? `${Math.round(day.fiber)}g` : "-"}
+                    </td>
+                    <td className="py-3 px-2 text-right text-zinc-500 hidden xl:table-cell">
+                      {day.sugar > 0 ? `${Math.round(day.sugar)}g` : "-"}
                     </td>
                   </tr>
                 );
