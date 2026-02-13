@@ -54,12 +54,15 @@ export function Sidebar() {
     router.refresh()
   }
 
+  // Before mount, render at collapsed width + invisible to prevent any flash
+  const mounted = hasMounted
+
   return (
     <div 
       className={cn(
         "hidden lg:flex h-screen flex-col border-r border-white/[0.05] bg-background relative",
-        hasMounted ? "transition-all duration-300 ease-in-out" : "",
-        isCollapsed ? "w-16" : "w-64"
+        mounted ? "transition-all duration-300 ease-in-out opacity-100" : "opacity-0 w-16",
+        mounted && (isCollapsed ? "w-16" : "w-64")
       )}
     >
       <div className={cn(

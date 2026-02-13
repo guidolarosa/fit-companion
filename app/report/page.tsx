@@ -137,7 +137,30 @@ export default function ReportPage() {
       doc.text(`Racha Actual: ${reportData.stats.streaks.current} días`, 100, currentY)
       doc.text(`Mejor Racha: ${reportData.stats.streaks.best} días`, 100, currentY + 6)
 
-      currentY += 25
+      currentY += 20
+
+      // Macro averages
+      const daysWithData = reportData.dailyData.length || 1
+      const avgProtein = reportData.dailyData.reduce((s: number, d: any) => s + (d.protein || 0), 0) / daysWithData
+      const avgCarbs = reportData.dailyData.reduce((s: number, d: any) => s + (d.carbs || 0), 0) / daysWithData
+      const avgFat = reportData.dailyData.reduce((s: number, d: any) => s + (d.fat || 0), 0) / daysWithData
+      const avgFiber = reportData.dailyData.reduce((s: number, d: any) => s + (d.fiber || 0), 0) / daysWithData
+      const avgSugar = reportData.dailyData.reduce((s: number, d: any) => s + (d.sugar || 0), 0) / daysWithData
+
+      doc.setFontSize(14)
+      doc.setTextColor(0)
+      doc.text("Macronutrientes Promedio Diario", 14, currentY)
+      currentY += 8
+      doc.setFontSize(11)
+      doc.setTextColor(60)
+      doc.text(`Proteína: ${Math.round(avgProtein)}g`, 14, currentY)
+      doc.text(`Carbohidratos: ${Math.round(avgCarbs)}g`, 70, currentY)
+      doc.text(`Grasa: ${Math.round(avgFat)}g`, 140, currentY)
+      currentY += 6
+      doc.text(`Fibra: ${Math.round(avgFiber)}g`, 14, currentY)
+      doc.text(`Azúcar: ${Math.round(avgSugar)}g`, 70, currentY)
+
+      currentY += 13
 
       const totalDays = reportData.stats.classification.deficit + reportData.stats.classification.maintenance + reportData.stats.classification.surplus
       const classRows = [
@@ -186,6 +209,11 @@ export default function ReportPage() {
           weight,
           Math.round(day.caloriesConsumed),
           Math.round(day.caloriesBurnt),
+          day.protein ? Math.round(day.protein) : "-",
+          day.carbs ? Math.round(day.carbs) : "-",
+          day.fat ? Math.round(day.fat) : "-",
+          day.fiber ? Math.round(day.fiber) : "-",
+          day.sugar ? Math.round(day.sugar) : "-",
           dayFoods || "-",
           dayExercises || "-"
         ]
@@ -193,15 +221,25 @@ export default function ReportPage() {
 
       autoTable(doc, {
         startY: 30,
-        head: [['Fecha', 'Peso', 'Consumo', 'Gasto', 'Alimentos', 'Ejercicios']],
+        head: [['Fecha', 'Peso', 'Kcal', 'Gasto', 'Prot(g)', 'Carbs(g)', 'Fat(g)', 'Fibra(g)', 'Azúcar(g)', 'Alimentos', 'Ejercicios']],
         body: tableRows,
         theme: 'striped',
-        headStyles: { fillColor: [249, 115, 22] },
-        styles: { fontSize: 8 },
+        headStyles: { fillColor: [249, 115, 22], fontSize: 6.5 },
+        styles: { fontSize: 6.5, cellPadding: 2 },
         columnStyles: {
-          4: { cellWidth: 40 },
-          5: { cellWidth: 40 }
-        }
+          0: { cellWidth: 18 },
+          1: { cellWidth: 14 },
+          2: { cellWidth: 12 },
+          3: { cellWidth: 12 },
+          4: { cellWidth: 12 },
+          5: { cellWidth: 12 },
+          6: { cellWidth: 10 },
+          7: { cellWidth: 12 },
+          8: { cellWidth: 14 },
+          9: { cellWidth: 36 },
+          10: { cellWidth: 30 }
+        },
+        margin: { left: 8, right: 8 },
       })
 
       doc.save(`reporte-fit-companion-${new Date().toISOString().split('T')[0]}.pdf`)
@@ -223,8 +261,25 @@ export default function ReportPage() {
       calories: day.caloriesConsumed,
       movingAvgCalories: reportData.stats.movingAvgCalories[idx],
       net: day.netCalories,
-      burnt: day.caloriesBurnt
+      burnt: day.caloriesBurnt,
+      protein: day.protein || 0,
+      carbs: day.carbs || 0,
+      fat: day.fat || 0,
+      fiber: day.fiber || 0,
+      sugar: day.sugar || 0,
     }))
+  }, [reportData])
+
+  const macroAverages = useMemo(() => {
+    if (!reportData || reportData.dailyData.length === 0) return null
+    const n = reportData.dailyData.length
+    return {
+      protein: Math.round(reportData.dailyData.reduce((s: number, d: any) => s + (d.protein || 0), 0) / n),
+      carbs: Math.round(reportData.dailyData.reduce((s: number, d: any) => s + (d.carbs || 0), 0) / n),
+      fat: Math.round(reportData.dailyData.reduce((s: number, d: any) => s + (d.fat || 0), 0) / n),
+      fiber: Math.round(reportData.dailyData.reduce((s: number, d: any) => s + (d.fiber || 0), 0) / n),
+      sugar: Math.round(reportData.dailyData.reduce((s: number, d: any) => s + (d.sugar || 0), 0) / n),
+    }
   }, [reportData])
 
   const classificationData = useMemo(() => {
@@ -386,6 +441,54 @@ export default function ReportPage() {
                   </CardContent>
                 </Card>
               </div>
+
+              {/* Macro Averages */}
+              {macroAverages && (
+                <>
+                  <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    {[
+                      { label: "Proteína", value: macroAverages.protein, unit: "g", color: "text-blue-400" },
+                      { label: "Carbohidratos", value: macroAverages.carbs, unit: "g", color: "text-amber-400" },
+                      { label: "Grasa", value: macroAverages.fat, unit: "g", color: "text-rose-400" },
+                      { label: "Fibra", value: macroAverages.fiber, unit: "g", color: "text-emerald-400" },
+                      { label: "Azúcar", value: macroAverages.sugar, unit: "g", color: "text-purple-400" },
+                    ].map((m) => (
+                      <Card key={m.label} className="glass-card">
+                        <CardContent className="pt-4 pb-3 px-4">
+                          <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">{m.label}</p>
+                          <h3 className={cn("text-xl font-bold mt-1", m.color)}>
+                            {m.value} <span className="text-[10px] text-zinc-600">{m.unit}/día</span>
+                          </h3>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+
+                  <Card className="glass-card">
+                    <CardHeader>
+                      <CardTitle className="text-[9px] font-bold uppercase tracking-widest text-zinc-600">Macronutrientes por Día</CardTitle>
+                    </CardHeader>
+                    <CardContent className="h-[280px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.03)" />
+                          <XAxis dataKey="date" fontSize={9} axisLine={false} tickLine={false} tick={{ fill: 'rgb(82 82 91)' }} />
+                          <YAxis hide />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: 'rgb(9 9 11)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '4px', fontSize: '10px' }}
+                            formatter={(value: number, name: string) => [`${Math.round(value)}g`, name]}
+                          />
+                          <Legend wrapperStyle={{ fontSize: '10px' }} />
+                          <Bar dataKey="protein" stackId="macros" fill="rgb(96 165 250)" name="Proteína" />
+                          <Bar dataKey="carbs" stackId="macros" fill="rgb(251 191 36)" name="Carbs" />
+                          <Bar dataKey="fat" stackId="macros" fill="rgb(251 113 133)" name="Grasa" />
+                          <Bar dataKey="fiber" stackId="macros" fill="rgb(52 211 153)" name="Fibra" radius={[2, 2, 0, 0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
 
               <div className="flex justify-end">
                 <Button 
