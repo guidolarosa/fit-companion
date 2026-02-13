@@ -5,6 +5,7 @@ import { Weight, Plus, TrendingDown, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 interface WeightGaugeCardProps {
   currentWeight: number | null
@@ -20,13 +21,15 @@ export function WeightGaugeCard({
   targetWeightMax,
   weightDate,
 }: WeightGaugeCardProps) {
+  const t = useTranslations("dashboard")
+
   // Empty state with clear CTA per guidelines
   if (!currentWeight || !targetWeightMin || !targetWeightMax) {
     return (
       <Card className="glass-card h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-            Peso Actual
+            {t("weightTitle")}
           </CardTitle>
           <Weight className="h-3.5 w-3.5 text-zinc-600" />
         </CardHeader>
@@ -35,12 +38,12 @@ export function WeightGaugeCard({
             <Weight className="w-5 h-5 text-zinc-600" />
           </div>
           <p className="text-xs text-zinc-500 mb-3">
-            Sin registros de peso
+            {t("weightEmpty")}
           </p>
           <Link href="/weight">
             <Button size="sm" variant="outline" className="h-8 text-xs">
               <Plus className="w-3 h-3 mr-1" />
-              Registrar peso
+              {t("weightRegister")}
             </Button>
           </Link>
         </CardContent>
@@ -77,10 +80,10 @@ export function WeightGaugeCard({
 
   // Status text for accessibility
   const statusText = inRange 
-    ? "En rango objetivo" 
+    ? t("weightInRange")
     : isAboveTarget 
-    ? `${distance.toFixed(1)} kg sobre el objetivo`
-    : `${distance.toFixed(1)} kg bajo el objetivo`
+    ? t("weightAbove", { distance: distance.toFixed(1) })
+    : t("weightBelow", { distance: distance.toFixed(1) })
 
   // Format date for display
   const formattedDate = weightDate 
@@ -95,7 +98,7 @@ export function WeightGaugeCard({
     <Card className="glass-card h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
         <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-          Peso Actual
+          {t("weightTitle")}
         </CardTitle>
         <Weight className={cn(
           "h-3.5 w-3.5 transition-colors",
@@ -109,7 +112,7 @@ export function WeightGaugeCard({
             className="relative flex shrink-0 justify-center items-end"
             style={{ width: '100px', height: '60px' }}
             role="status"
-            aria-label={`Peso actual: ${currentWeight.toFixed(1)} kilogramos. ${statusText}. Meta: ${targetWeightMin.toFixed(1)} a ${targetWeightMax.toFixed(1)} kilogramos.`}
+            aria-label={`${t("weightTitle")}: ${currentWeight.toFixed(1)} kg. ${statusText}. ${t("weightGoal")}: ${targetWeightMin.toFixed(1)} – ${targetWeightMax.toFixed(1)} kg.`}
           >
             <svg 
               width="120" 
@@ -152,16 +155,16 @@ export function WeightGaugeCard({
           <div className="flex-1 min-w-0">
             <div className="space-y-1.5 text-[11px] uppercase font-bold tracking-tight">
               <div className="flex justify-between text-zinc-500">
-                <span>Meta</span>
+                <span>{t("weightGoal")}</span>
                 <span className="text-zinc-300">
                   {targetWeightMin.toFixed(1)}–{targetWeightMax.toFixed(1)}
                 </span>
               </div>
               <div className="flex justify-between text-zinc-500">
-                <span>Estado</span>
+                <span>{t("weightStatus")}</span>
                 {inRange ? (
                   <span className="text-deficit flex items-center gap-1">
-                    En rango
+                    {t("weightInRangeShort")}
                   </span>
                 ) : isAboveTarget ? (
                   <span className="text-surplus flex items-center gap-1">
@@ -177,7 +180,7 @@ export function WeightGaugeCard({
               </div>
               {formattedDate && (
                 <div className="flex justify-between text-zinc-500">
-                  <span>Último</span>
+                  <span>{t("weightLast")}</span>
                   <span className="text-zinc-400 normal-case">{formattedDate}</span>
                 </div>
               )}

@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +21,7 @@ interface User {
   targetWeightMax: number | null
   milestoneStep: number | null
   sustainabilityMode: string | null
+  locale?: string | null
 }
 
 interface SettingsFormProps {
@@ -28,6 +30,8 @@ interface SettingsFormProps {
 
 export function SettingsForm({ user }: SettingsFormProps) {
   const router = useRouter()
+  const t = useTranslations("settings")
+  const tc = useTranslations("common")
   const [name, setName] = useState(user.name || "")
   const [height, setHeight] = useState(user.height?.toString() || "")
   const [age, setAge] = useState(user.age?.toString() || "")
@@ -38,6 +42,7 @@ export function SettingsForm({ user }: SettingsFormProps) {
   const [targetWeightMax, setTargetWeightMax] = useState(user.targetWeightMax?.toString() || "")
   const [milestoneStep, setMilestoneStep] = useState(user.milestoneStep?.toString() || "1")
   const [sustainabilityMode, setSustainabilityMode] = useState(user.sustainabilityMode || "sustainable")
+  const [locale, setLocale] = useState(user.locale || "es")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
@@ -59,19 +64,22 @@ export function SettingsForm({ user }: SettingsFormProps) {
           targetWeightMax: targetWeightMax ? parseFloat(targetWeightMax) : null,
           milestoneStep: milestoneStep ? parseFloat(milestoneStep) : null,
           sustainabilityMode: sustainabilityMode || null,
+          locale,
         }),
       })
 
       if (response.ok) {
-        toast.success("Settings updated successfully!")
+        // Set locale cookie for middleware/i18n
+        document.cookie = `locale=${locale}; path=/; max-age=${60 * 60 * 24 * 365}`
+        toast.success(t("updatedSuccess"))
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "Failed to update settings")
+        toast.error(errorData.error || t("updateFailedFallback"))
       }
     } catch (error) {
       console.error("Error updating settings:", error)
-      toast.error("An error occurred while updating settings")
+      toast.error(t("updateError"))
     } finally {
       setIsSubmitting(false)
     }
@@ -79,20 +87,34 @@ export function SettingsForm({ user }: SettingsFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
-        <Input
-          id="name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Enter your name"
-        />
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">{t("nameLabel")}</Label>
+          <Input
+            id="name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder={t("namePlaceholder")}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="locale">{t("languageLabel")}</Label>
+          <Select
+            id="locale"
+            value={locale}
+            onChange={(e) => setLocale(e.target.value)}
+          >
+            <option value="es">{t("languageEs")}</option>
+            <option value="en">{t("languageEn")}</option>
+          </Select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="height">Height (cm)</Label>
+          <Label htmlFor="height">{t("heightLabel")}</Label>
           <Input
             id="height"
             type="number"
@@ -100,13 +122,13 @@ export function SettingsForm({ user }: SettingsFormProps) {
             min="0"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
-            placeholder="Enter your height in centimeters"
+            placeholder={t("heightPlaceholder")}
             className="min-w-0"
           />
         </div>
 
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="age">Age</Label>
+          <Label htmlFor="age">{t("ageLabel")}</Label>
           <Input
             id="age"
             type="number"
@@ -114,29 +136,29 @@ export function SettingsForm({ user }: SettingsFormProps) {
             max="150"
             value={age}
             onChange={(e) => setAge(e.target.value)}
-            placeholder="Enter your age"
+            placeholder={t("agePlaceholder")}
             className="min-w-0"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="lifestyle">Lifestyle</Label>
+        <Label htmlFor="lifestyle">{t("lifestyleLabel")}</Label>
         <Select
           id="lifestyle"
           value={lifestyle}
           onChange={(e) => setLifestyle(e.target.value)}
         >
-          <option value="">Select lifestyle</option>
-          <option value="sedentary">Sedentary (little to no exercise)</option>
-          <option value="moderate">Moderate (light exercise 1-3 days/week)</option>
-          <option value="active">Active (moderate to intense exercise 3+ days/week)</option>
+          <option value="">{t("lifestyleSelect")}</option>
+          <option value="sedentary">{t("lifestyleSedentary")}</option>
+          <option value="moderate">{t("lifestyleModerate")}</option>
+          <option value="active">{t("lifestyleActive")}</option>
         </Select>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="targetWeightMin">Target Weight Min (kg)</Label>
+          <Label htmlFor="targetWeightMin">{t("targetWeightMinLabel")}</Label>
           <Input
             id="targetWeightMin"
             type="number"
@@ -144,13 +166,13 @@ export function SettingsForm({ user }: SettingsFormProps) {
             min="0"
             value={targetWeightMin}
             onChange={(e) => setTargetWeightMin(e.target.value)}
-            placeholder="e.g., 62"
+            placeholder={t("targetWeightMinPlaceholder")}
             className="min-w-0"
           />
         </div>
 
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="targetWeightMax">Target Weight Max (kg)</Label>
+          <Label htmlFor="targetWeightMax">{t("targetWeightMaxLabel")}</Label>
           <Input
             id="targetWeightMax"
             type="number"
@@ -158,7 +180,7 @@ export function SettingsForm({ user }: SettingsFormProps) {
             min="0"
             value={targetWeightMax}
             onChange={(e) => setTargetWeightMax(e.target.value)}
-            placeholder="e.g., 66"
+            placeholder={t("targetWeightMaxPlaceholder")}
             className="min-w-0"
           />
         </div>
@@ -166,7 +188,7 @@ export function SettingsForm({ user }: SettingsFormProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="milestoneStep">Milestone Step (kg)</Label>
+          <Label htmlFor="milestoneStep">{t("milestoneStepLabel")}</Label>
           <Input
             id="milestoneStep"
             type="number"
@@ -174,49 +196,49 @@ export function SettingsForm({ user }: SettingsFormProps) {
             min="0"
             value={milestoneStep}
             onChange={(e) => setMilestoneStep(e.target.value)}
-            placeholder="e.g., 2"
+            placeholder={t("milestoneStepPlaceholder")}
             className="min-w-0"
           />
           <p className="text-xs text-muted-foreground">
-            Next milestone delta (e.g., lose 3 kg).
+            {t("milestoneStepHelp")}
           </p>
         </div>
 
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="sustainabilityMode">Sustainability Mode</Label>
+          <Label htmlFor="sustainabilityMode">{t("sustainabilityLabel")}</Label>
           <Select
             id="sustainabilityMode"
             value={sustainabilityMode}
             onChange={(e) => setSustainabilityMode(e.target.value)}
           >
-            <option value="strict">Strict</option>
-            <option value="sustainable">Sustainable</option>
+            <option value="strict">{t("sustainabilityStrict")}</option>
+            <option value="sustainable">{t("sustainabilitySustainable")}</option>
           </Select>
           <p className="text-xs text-muted-foreground">
-            Strict = minimal warnings. Sustainable = softer caps and nudges.
+            {t("sustainabilityHelp")}
           </p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="ifType">Intermittent Fasting Type</Label>
+          <Label htmlFor="ifType">{t("ifTypeLabel")}</Label>
           <Select
             id="ifType"
             value={ifType}
             onChange={(e) => setIfType(e.target.value)}
             className="min-w-0"
           >
-            <option value="">No IF</option>
-            <option value="16:8">16:8 (16h fast, 8h eating)</option>
-            <option value="18:6">18:6 (18h fast, 6h eating)</option>
-            <option value="20:4">20:4 (20h fast, 4h eating)</option>
-            <option value="OMAD">OMAD (23h fast, 1h eating)</option>
+            <option value="">{t("ifTypeNone")}</option>
+            <option value="16:8">{t("ifType168")}</option>
+            <option value="18:6">{t("ifType186")}</option>
+            <option value="20:4">{t("ifType204")}</option>
+            <option value="OMAD">{t("ifTypeOmad")}</option>
           </Select>
         </div>
 
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="ifStartTime">Eating Window Start Time</Label>
+          <Label htmlFor="ifStartTime">{t("ifStartLabel")}</Label>
           <Input
             id="ifStartTime"
             type="time"
@@ -227,15 +249,14 @@ export function SettingsForm({ user }: SettingsFormProps) {
             className="min-w-0"
           />
           <p className="text-xs text-muted-foreground">
-            When your eating window starts each day
+            {t("ifStartHelp")}
           </p>
         </div>
       </div>
 
       <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Saving..." : "Save Settings"}
+        {isSubmitting ? tc("saving") : t("saveButton")}
       </Button>
     </form>
   )
 }
-

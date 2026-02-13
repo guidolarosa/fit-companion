@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -43,6 +44,7 @@ export default async function AllExerciseEntriesPage({ searchParams }: PageProps
 
   const page = Math.max(1, parseInt(searchParams.page || "1", 10))
   const { exercises, totalCount, totalPages, currentPage } = await getAllExerciseEntries(user.id, page)
+  const t = await getTranslations("exercise")
 
   // Redirect if page is out of bounds (only if there are entries)
   if (totalCount > 0 && currentPage > totalPages) {
@@ -62,7 +64,7 @@ export default async function AllExerciseEntriesPage({ searchParams }: PageProps
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
               </Link>
-              <h1 className="text-2xl sm:text-3xl font-bold">All Exercise Entries</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">{t("allTitle")}</h1>
             </div>
           </div>
 
@@ -70,13 +72,13 @@ export default async function AllExerciseEntriesPage({ searchParams }: PageProps
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Flame className="h-5 w-5" />
-                Exercise Entries ({totalCount})
+                {t("allCardTitle")} ({totalCount})
               </CardTitle>
-              <CardDescription>All your recorded exercises and calories burnt</CardDescription>
+              <CardDescription>{t("allCardDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
               {exercises.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No exercises recorded yet</p>
+                <p className="text-sm text-muted-foreground">{t("allEmpty")}</p>
               ) : (
                 <AllExerciseEntriesTable entries={exercises} currentPage={currentPage} totalPages={totalPages} />
               )}

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Droplets, Plus, Minus } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 const ML_PER_GLASS = 250
 
@@ -15,6 +16,7 @@ interface WaterCardProps {
 }
 
 export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps) {
+  const t = useTranslations("dashboard")
   const [glasses, setGlasses] = useState(initialGlasses)
   const [isSaving, setIsSaving] = useState(false)
 
@@ -46,11 +48,11 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
       })
       if (!res.ok) {
         setGlasses(prev)
-        toast.error("Error al guardar")
+        toast.error(t("waterSaveError"))
       }
     } catch {
       setGlasses(prev)
-      toast.error("Error de conexión")
+      toast.error(t("waterConnectionError"))
     } finally {
       setIsSaving(false)
     }
@@ -65,7 +67,7 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
     <Card className="glass-card h-full">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-          Agua
+          {t("waterTitle")}
         </CardTitle>
         <Droplets className={cn("h-3.5 w-3.5", isComplete ? "text-blue-400" : "text-zinc-600")} />
       </CardHeader>
@@ -77,11 +79,11 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
                 {glasses}
               </span>
               <span className="text-[10px] text-zinc-600 uppercase font-bold tracking-widest">
-                / {targetGlasses} vasos
+                / {targetGlasses} {t("waterGlasses")}
               </span>
             </div>
             <p className="text-[10px] text-zinc-600 mt-0.5">
-              {totalMl} ml / {targetMl} ml ({ML_PER_GLASS} ml/vaso)
+              {totalMl} ml / {targetMl} ml ({ML_PER_GLASS} {t("waterMlPerGlass")})
             </p>
           </div>
 
@@ -131,7 +133,7 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
               )}
               onClick={() => updateGlasses(i < glasses ? i : i + 1)}
               disabled={isSaving}
-              title={`Vaso ${i + 1}`}
+              title={t("waterGlassTitle", { n: i + 1 })}
             >
               <Droplets className="h-2.5 w-2.5" />
             </button>
@@ -140,7 +142,7 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
 
         {isComplete && (
           <p className="text-[10px] text-blue-400 font-bold uppercase tracking-widest mt-3">
-            Meta alcanzada
+            {t("waterGoalReached")}
           </p>
         )}
       </CardContent>

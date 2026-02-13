@@ -11,6 +11,7 @@ import { Calendar, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
 
 interface DailyData {
   date: Date;
@@ -31,17 +32,20 @@ interface DailyRegisterProps {
 }
 
 export function DailyRegister({ dailyData }: DailyRegisterProps) {
+  const t = useTranslations("report");
+  const tc = useTranslations("common");
+
   if (dailyData.length === 0) {
     return (
       <Card className="glass-card">
         <CardHeader>
           <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
             <Calendar className="h-3.5 w-3.5" />
-            Registro Diario
+            {t("registerTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-zinc-600 italic">No hay registros aún.</p>
+          <p className="text-xs text-zinc-600 italic">{t("registerEmpty")}</p>
         </CardContent>
       </Card>
     );
@@ -52,11 +56,11 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
           <Calendar className="h-3.5 w-3.5" />
-          Registro Diario
+          {t("registerTitle")}
         </CardTitle>
         <Link href="/register/all">
           <Button variant="ghost" size="sm" className="h-7 text-[10px] uppercase tracking-widest text-zinc-500 hover:text-white">
-            Ver todo <ChevronRight className="ml-1 h-3 w-3" />
+            {tc("viewAll")} <ChevronRight className="ml-1 h-3 w-3" />
           </Button>
         </Link>
       </CardHeader>
@@ -65,17 +69,17 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
           <table className="w-full text-xs min-w-[600px]">
             <thead>
               <tr className="text-[10px] text-zinc-600 uppercase tracking-widest border-b border-white/[0.03]">
-                <th className="text-left font-medium pb-3 px-2">Fecha</th>
-                <th className="text-right font-medium pb-3 px-2">BMR</th>
-                <th className="text-right font-medium pb-3 px-2">TDEE</th>
-                <th className="text-right font-medium pb-3 px-2">Consumo</th>
-                <th className="text-right font-medium pb-3 px-2">Gasto</th>
-                <th className="text-right font-medium pb-3 px-2">Neto</th>
-                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">Prot</th>
-                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">Carbs</th>
-                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">Fat</th>
-                <th className="text-right font-medium pb-3 px-2 hidden xl:table-cell">Fiber</th>
-                <th className="text-right font-medium pb-3 px-2 hidden xl:table-cell">Sugar</th>
+                <th className="text-left font-medium pb-3 px-2">{t("colDate")}</th>
+                <th className="text-right font-medium pb-3 px-2">{t("colBMR")}</th>
+                <th className="text-right font-medium pb-3 px-2">{t("colTDEE")}</th>
+                <th className="text-right font-medium pb-3 px-2">{t("colConsumed")}</th>
+                <th className="text-right font-medium pb-3 px-2">{t("colBurnt")}</th>
+                <th className="text-right font-medium pb-3 px-2">{t("colNet")}</th>
+                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">{tc("protShort")}</th>
+                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">{tc("carbsShort")}</th>
+                <th className="text-right font-medium pb-3 px-2 hidden lg:table-cell">{tc("fatShort")}</th>
+                <th className="text-right font-medium pb-3 px-2 hidden xl:table-cell">{tc("fiberShort")}</th>
+                <th className="text-right font-medium pb-3 px-2 hidden xl:table-cell">{tc("sugarShort")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.02]">

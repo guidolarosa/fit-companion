@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditFoodDialog } from "@/components/edit-food-dialog"
 import { CaloriePill } from "@/components/calorie-pill"
+import { useTranslations } from "next-intl"
 
 interface FoodEntry {
   id: string
@@ -32,6 +33,8 @@ interface AllFoodEntriesTableProps {
 export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoodEntriesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations("food")
+  const tc = useTranslations("common")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [entryToDelete, setEntryToDelete] = useState<FoodEntry | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -44,15 +47,15 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
       })
 
       if (response.ok) {
-        toast.success("Food entry deleted successfully!")
+        toast.success(t("allDeletedSuccess"))
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "Failed to delete food entry")
+        toast.error(errorData.error || t("allDeleteFailedFallback"))
       }
     } catch (error) {
       console.error("Error deleting food entry:", error)
-      toast.error("An error occurred while deleting the food entry")
+      toast.error(t("allDeleteError"))
     }
   }
 
@@ -103,23 +106,23 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
         <div className="min-w-full">
           {/* Table header */}
           <div className="hidden sm:grid sm:grid-cols-[2fr_1fr_repeat(6,minmax(0,1fr))_auto] gap-2 p-3 border-b font-semibold text-xs text-muted-foreground">
-            <div>Food Name</div>
-            <div>Date</div>
-            <div className="text-right">Kcal</div>
-            <div className="text-right">Prot</div>
-            <div className="text-right">Carbs</div>
-            <div className="text-right">Fat</div>
-            <div className="text-right">Fiber</div>
-            <div className="text-right">Sugar</div>
-            <div className="text-right w-20">Actions</div>
+            <div>{t("tableNameHeader")}</div>
+            <div>{t("tableDateHeader")}</div>
+            <div className="text-right">{t("tableKcalHeader")}</div>
+            <div className="text-right">{tc("protShort")}</div>
+            <div className="text-right">{tc("carbsShort")}</div>
+            <div className="text-right">{tc("fatShort")}</div>
+            <div className="text-right">{tc("fiberShort")}</div>
+            <div className="text-right">{tc("sugarShort")}</div>
+            <div className="text-right w-20">{tc("actions")}</div>
           </div>
 
           {/* Mobile header */}
           <div className="grid grid-cols-12 gap-4 p-3 border-b font-semibold text-sm text-muted-foreground sm:hidden">
-            <div className="col-span-5">Food Name</div>
-            <div className="col-span-3">Date</div>
-            <div className="col-span-2 text-right">Kcal</div>
-            <div className="col-span-2 text-right">Actions</div>
+            <div className="col-span-5">{t("tableNameHeader")}</div>
+            <div className="col-span-3">{t("tableDateHeader")}</div>
+            <div className="col-span-2 text-right">{t("tableKcalHeader")}</div>
+            <div className="col-span-2 text-right">{tc("actions")}</div>
           </div>
 
           {/* Table rows */}
@@ -193,9 +196,9 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
                   </p>
                   {(entry.protein != null || entry.carbs != null || entry.fat != null) && (
                     <p className="text-[10px] text-muted-foreground mt-0.5">
-                      {entry.protein != null && `P:${Math.round(entry.protein)}g `}
-                      {entry.carbs != null && `C:${Math.round(entry.carbs)}g `}
-                      {entry.fat != null && `F:${Math.round(entry.fat)}g`}
+                      {entry.protein != null && `${tc("protShort")}:${Math.round(entry.protein)}g `}
+                      {entry.carbs != null && `${tc("carbsShort")}:${Math.round(entry.carbs)}g `}
+                      {entry.fat != null && `${tc("fatShort")}:${Math.round(entry.fat)}g`}
                     </p>
                   )}
                 </div>
@@ -241,7 +244,7 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
       {totalPages > 1 && (
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
+            {tc("pageOf", { current: currentPage, total: totalPages })}
           </div>
           <div className="flex items-center gap-2">
             <Link href={createPageUrl(currentPage - 1)}>
@@ -308,8 +311,8 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
             setEntryToDelete(null)
           }
         }}
-        title="Delete Food Entry"
-        description="Are you sure you want to delete this food entry? This action cannot be undone."
+        title={t("allDeleteDialogTitle")}
+        description={t("allDeleteDialogDescription")}
         itemName={entryToDelete ? `${entryToDelete.name} - ${format(new Date(entryToDelete.date), "MMM d, yyyy")}` : undefined}
       />
     </>

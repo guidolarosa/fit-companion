@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,6 +36,8 @@ interface EditFoodDialogProps {
 
 export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProps) {
   const router = useRouter()
+  const t = useTranslations("food")
+  const tc = useTranslations("common")
   const [name, setName] = useState("")
   const [calories, setCalories] = useState("")
   const [protein, setProtein] = useState("")
@@ -94,16 +97,16 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
       })
 
       if (response.ok) {
-        toast.success("Food entry updated successfully!")
+        toast.success(t("updatedSuccess"))
         onOpenChange(false)
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "Failed to update food entry")
+        toast.error(errorData.error || t("updateFailedFallback"))
       }
     } catch (error) {
       console.error("Error updating food entry:", error)
-      toast.error("An error occurred while updating the food entry")
+      toast.error(t("updateError"))
     } finally {
       setIsSubmitting(false)
     }
@@ -113,25 +116,25 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Food Entry</DialogTitle>
+          <DialogTitle>{t("editDialogTitle")}</DialogTitle>
           <DialogDescription>
-            Update your food entry information
+            {t("editDialogDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-food-name">Food Name</Label>
+            <Label htmlFor="edit-food-name">{t("nameLabel")}</Label>
             <Input
               id="edit-food-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Grilled Chicken Breast, Apple, etc."
+              placeholder={t("namePlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="edit-food-calories">Calories</Label>
+            <Label htmlFor="edit-food-calories">{t("caloriesLabel")}</Label>
             <Input
               id="edit-food-calories"
               type="number"
@@ -139,13 +142,13 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
               min="0"
               value={calories}
               onChange={(e) => setCalories(e.target.value)}
-              placeholder="Enter calories consumed"
+              placeholder={t("caloriesPlaceholder")}
               required
             />
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <div className="space-y-1">
-              <Label htmlFor="edit-protein" className="text-xs">Protein (g)</Label>
+              <Label htmlFor="edit-protein" className="text-xs">{t("proteinLabel")}</Label>
               <Input
                 id="edit-protein"
                 type="number"
@@ -158,7 +161,7 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="edit-carbs" className="text-xs">Carbs (g)</Label>
+              <Label htmlFor="edit-carbs" className="text-xs">{t("carbsLabel")}</Label>
               <Input
                 id="edit-carbs"
                 type="number"
@@ -171,7 +174,7 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="edit-fat" className="text-xs">Fat (g)</Label>
+              <Label htmlFor="edit-fat" className="text-xs">{t("fatLabel")}</Label>
               <Input
                 id="edit-fat"
                 type="number"
@@ -184,7 +187,7 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="edit-fiber" className="text-xs">Fiber (g)</Label>
+              <Label htmlFor="edit-fiber" className="text-xs">{t("fiberLabel")}</Label>
               <Input
                 id="edit-fiber"
                 type="number"
@@ -197,7 +200,7 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="edit-sugar" className="text-xs">Sugar (g)</Label>
+              <Label htmlFor="edit-sugar" className="text-xs">{t("sugarLabel")}</Label>
               <Input
                 id="edit-sugar"
                 type="number"
@@ -212,7 +215,7 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-food-date">Date</Label>
+              <Label htmlFor="edit-food-date">{tc("date")}</Label>
               <Input
                 id="edit-food-date"
                 type="date"
@@ -223,7 +226,7 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
               />
             </div>
             <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-food-time">Time</Label>
+              <Label htmlFor="edit-food-time">{tc("time")}</Label>
               <Input
                 id="edit-food-time"
                 type="time"
@@ -241,10 +244,10 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {tc("cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Updating..." : "Update Entry"}
+              {isSubmitting ? tc("updating") : tc("updateEntry")}
             </Button>
           </DialogFooter>
         </form>
@@ -252,4 +255,3 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
     </Dialog>
   )
 }
-

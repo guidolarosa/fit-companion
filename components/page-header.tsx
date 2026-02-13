@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FittyButton } from "@/components/fitty-button";
@@ -19,6 +20,7 @@ export function PageHeader({
   showFittyButton = true,
 }: PageHeaderProps) {
   const router = useRouter();
+  const t = useTranslations("nav");
 
   return (
     <header 
@@ -33,7 +35,7 @@ export function PageHeader({
             size="icon"
             onClick={() => router.back()}
             className="h-9 w-9 rounded-lg border border-white/[0.05] hover:bg-white/[0.05] touch-target"
-            aria-label="Volver atrás"
+            aria-label={t("back")}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>

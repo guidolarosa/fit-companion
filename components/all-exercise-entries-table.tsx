@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditExerciseDialog } from "@/components/edit-exercise-dialog"
 import { CaloriePill } from "@/components/calorie-pill"
+import { useTranslations } from "next-intl"
 
 interface ExerciseEntry {
   id: string
@@ -28,6 +29,8 @@ interface AllExerciseEntriesTableProps {
 export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: AllExerciseEntriesTableProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const t = useTranslations("exercise")
+  const tc = useTranslations("common")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [entryToDelete, setEntryToDelete] = useState<ExerciseEntry | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -40,15 +43,15 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
       })
 
       if (response.ok) {
-        toast.success("Exercise entry deleted successfully!")
+        toast.success(t("allDeletedSuccess"))
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "Failed to delete exercise entry")
+        toast.error(errorData.error || t("allDeleteFailedFallback"))
       }
     } catch (error) {
       console.error("Error deleting exercise entry:", error)
-      toast.error("An error occurred while deleting the exercise entry")
+      toast.error(t("allDeleteError"))
     }
   }
 
@@ -99,11 +102,11 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
         <div className="min-w-full">
           {/* Table header */}
           <div className="grid grid-cols-12 gap-4 p-3 border-b font-semibold text-sm text-muted-foreground">
-            <div className="col-span-4 sm:col-span-4">Exercise</div>
-            <div className="col-span-3 sm:col-span-3">Date</div>
-            <div className="col-span-3 sm:col-span-2 text-right">Calories</div>
-            <div className="hidden sm:block sm:col-span-1 text-right">Mins</div>
-            <div className="col-span-2 sm:col-span-2 text-right">Actions</div>
+            <div className="col-span-4 sm:col-span-4">{t("tableExerciseHeader")}</div>
+            <div className="col-span-3 sm:col-span-3">{t("tableDateHeader")}</div>
+            <div className="col-span-3 sm:col-span-2 text-right">{t("tableCaloriesHeader")}</div>
+            <div className="hidden sm:block sm:col-span-1 text-right">{t("tableMinsHeader")}</div>
+            <div className="col-span-2 sm:col-span-2 text-right">{tc("actions")}</div>
           </div>
 
           {/* Table rows */}
@@ -164,7 +167,7 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
       {totalPages > 1 && (
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
+            {tc("pageOf", { current: currentPage, total: totalPages })}
           </div>
           <div className="flex items-center gap-2">
             <Link href={createPageUrl(currentPage - 1)}>
@@ -217,8 +220,8 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
             setEntryToDelete(null)
           }
         }}
-        title="Delete Exercise Entry"
-        description="Are you sure you want to delete this exercise entry? This action cannot be undone."
+        title={t("allDeleteDialogTitle")}
+        description={t("allDeleteDialogDescription")}
         itemName={
           entryToDelete ? `${entryToDelete.name} - ${format(new Date(entryToDelete.date), "MMM d, yyyy")}` : undefined
         }
@@ -226,6 +229,3 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
     </>
   )
 }
-
-
-

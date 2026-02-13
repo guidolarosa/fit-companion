@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
 import { Check, X, Download } from "lucide-react"
 
@@ -26,6 +26,8 @@ const defaultProducts = [
 ]
 
 export function HealthyProductsList() {
+  const t = useTranslations("healthyProducts")
+  const tc = useTranslations("common")
   const [products, setProducts] = useState(
     defaultProducts.map((name) => ({ name, checked: false }))
   )
@@ -53,10 +55,10 @@ export function HealthyProductsList() {
     const uncheckedProducts = products.filter((p) => !p.checked)
 
     const list = [
-      "=== CHECKED ITEMS ===",
+      t("exportChecked"),
       ...checkedProducts.map((p) => `✓ ${p.name}`),
       "",
-      "=== TO BUY ===",
+      t("exportToBuy"),
       ...uncheckedProducts.map((p) => `- ${p.name}`),
     ].join("\n")
 
@@ -76,11 +78,11 @@ export function HealthyProductsList() {
           value={newProduct}
           onChange={(e) => setNewProduct(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addProduct())}
-          placeholder="Add a product..."
+          placeholder={t("addPlaceholder")}
           className="flex-1"
         />
         <Button onClick={addProduct} disabled={!newProduct.trim()}>
-          Add
+          {tc("add")}
         </Button>
       </div>
 
@@ -117,9 +119,8 @@ export function HealthyProductsList() {
 
       <Button onClick={exportList} className="w-full" variant="outline">
         <Download className="mr-2 h-4 w-4" />
-        Export Shopping List
+        {t("exportButton")}
       </Button>
     </div>
   )
 }
-

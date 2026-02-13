@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Activity, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 interface BMICardProps {
   bmi: number | null
@@ -12,50 +13,52 @@ interface BMICardProps {
 
 // BMI categories with semantic colors per guidelines
 function getBMICategory(bmi: number): { 
-  label: string
+  labelKey: string
   color: string
   bgColor: string
   progress: number
-  description: string
+  descriptionKey: string
 } {
   if (bmi < 18.5) return { 
-    label: "Bajo peso", 
+    labelKey: "bmiUnderweight", 
     color: "text-maintenance", // Blue for info
     bgColor: "bg-maintenance/10",
     progress: (bmi / 18.5) * 30,
-    description: "Por debajo del rango saludable"
+    descriptionKey: "bmiUnderweightDesc"
   }
   if (bmi < 25) return { 
-    label: "Normal", 
+    labelKey: "bmiNormal", 
     color: "text-deficit", // Green for healthy
     bgColor: "bg-deficit/10",
     progress: 30 + ((bmi - 18.5) / 6.5) * 40,
-    description: "Rango saludable"
+    descriptionKey: "bmiNormalDesc"
   }
   if (bmi < 30) return { 
-    label: "Sobrepeso", 
+    labelKey: "bmiOverweight", 
     color: "text-surplus", // Orange for attention
     bgColor: "bg-surplus/10",
     progress: 70 + ((bmi - 25) / 5) * 20,
-    description: "Por encima del rango saludable"
+    descriptionKey: "bmiOverweightDesc"
   }
   return { 
-    label: "Obesidad", 
+    labelKey: "bmiObese", 
     color: "text-extreme", // Red for concern
     bgColor: "bg-extreme/10",
     progress: 90 + Math.min(((bmi - 30) / 10) * 10, 10),
-    description: "Requiere atención médica"
+    descriptionKey: "bmiObeseDesc"
   }
 }
 
 export function BMICard({ bmi, currentWeight, height }: BMICardProps) {
+  const t = useTranslations("dashboard")
+
   // Empty state per guidelines
   if (!bmi) {
     return (
       <Card className="glass-card h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-            IMC
+            {t("bmiTitle")}
           </CardTitle>
           <Activity className="h-3.5 w-3.5 text-zinc-600" />
         </CardHeader>
@@ -64,20 +67,22 @@ export function BMICard({ bmi, currentWeight, height }: BMICardProps) {
             <Activity className="w-5 h-5 text-zinc-600" />
           </div>
           <p className="text-xs text-zinc-500">
-            Registra tu peso y altura
+            {t("bmiEmpty")}
           </p>
         </CardContent>
       </Card>
     )
   }
 
-  const { label, color, bgColor, progress, description } = getBMICategory(bmi)
+  const { labelKey, color, bgColor, progress, descriptionKey } = getBMICategory(bmi)
+  const label = t(labelKey)
+  const description = t(descriptionKey)
 
   return (
     <Card className="glass-card h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
         <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-          IMC
+          {t("bmiTitle")}
         </CardTitle>
         <Activity className={cn(
           "h-3.5 w-3.5 transition-colors",
@@ -89,7 +94,7 @@ export function BMICard({ bmi, currentWeight, height }: BMICardProps) {
         <div 
           className="flex items-end gap-2 mb-3"
           role="status"
-          aria-label={`Índice de Masa Corporal: ${bmi.toFixed(1)}. Categoría: ${label}. ${description}`}
+          aria-label={`${t("bmiTitle")}: ${bmi.toFixed(1)}. ${label}. ${description}`}
         >
           <span className="text-2xl font-bold text-white tracking-tight leading-none" aria-hidden="true">
             {bmi.toFixed(1)}
@@ -126,9 +131,9 @@ export function BMICard({ bmi, currentWeight, height }: BMICardProps) {
         
         {/* Scale labels */}
         <div className="flex justify-between text-[9px] font-bold uppercase tracking-widest text-zinc-500 mb-auto">
-          <span>Bajo</span>
-          <span className="text-deficit/60">Saludable</span>
-          <span>Alto</span>
+          <span>{t("bmiScaleLow")}</span>
+          <span className="text-deficit/60">{t("bmiScaleHealthy")}</span>
+          <span>{t("bmiScaleHigh")}</span>
         </div>
 
         {/* Info - compact */}

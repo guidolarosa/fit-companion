@@ -5,6 +5,7 @@ import { Flame, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 interface DailyTargetRingCardProps {
   date: Date | null
@@ -91,12 +92,14 @@ export function DailyTargetRingCard({
   fiber = 0,
   currentWeight,
 }: DailyTargetRingCardProps) {
+  const t = useTranslations("dashboard")
+
   if (!caloriesConsumed || !dailyTarget || dailyTarget <= 0) {
     return (
       <Card className="glass-card h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-            Consumo Hoy
+            {t("consumptionTitle")}
           </CardTitle>
           <Flame className="h-3.5 w-3.5 text-zinc-600" />
         </CardHeader>
@@ -104,11 +107,11 @@ export function DailyTargetRingCard({
           <div className="w-10 h-10 mb-2 rounded-full bg-white/5 flex items-center justify-center">
             <Flame className="w-5 h-5 text-zinc-600" />
           </div>
-          <p className="text-xs text-zinc-500 mb-3">Sin registros hoy</p>
+          <p className="text-xs text-zinc-500 mb-3">{t("consumptionEmpty")}</p>
           <Link href="/food">
             <Button size="sm" variant="outline" className="h-8 text-xs">
               <Plus className="w-3 h-3 mr-1" />
-              Registrar comida
+              {t("consumptionRegister")}
             </Button>
           </Link>
         </CardContent>
@@ -129,7 +132,7 @@ export function DailyTargetRingCard({
     <Card className="glass-card h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 px-4 pt-4">
         <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-          Consumo Hoy
+          {t("consumptionTitle")}
         </CardTitle>
         <Flame className="h-3.5 w-3.5 text-zinc-600" />
       </CardHeader>
@@ -172,7 +175,7 @@ export function DailyTargetRingCard({
             <MiniGauge
               value={protein}
               target={targets.protein}
-              label="Prot"
+              label={t("consumptionProt")}
               unit="g"
               color="rgb(96 165 250)"
               bgColor="rgba(96,165,250,0.1)"
@@ -180,7 +183,7 @@ export function DailyTargetRingCard({
             <MiniGauge
               value={carbs}
               target={targets.carbs}
-              label="Carbs"
+              label={t("consumptionCarbs")}
               unit="g"
               color="rgb(251 191 36)"
               bgColor="rgba(251,191,36,0.1)"
@@ -188,7 +191,7 @@ export function DailyTargetRingCard({
             <MiniGauge
               value={fiber}
               target={targets.fiber}
-              label="Fibra"
+              label={t("consumptionFiber")}
               unit="g"
               color="rgb(52 211 153)"
               bgColor="rgba(52,211,153,0.1)"
@@ -199,17 +202,17 @@ export function DailyTargetRingCard({
         {/* Bottom stats row */}
         <div className="mt-3 flex justify-between text-[10px] font-bold uppercase tracking-tight text-zinc-500">
           <div className="flex flex-col items-center">
-            <span>Meta</span>
+            <span>{t("consumptionGoal")}</span>
             <span className="text-zinc-300">{Math.round(dailyTarget).toLocaleString()}</span>
           </div>
           <div className="flex flex-col items-center">
-            <span>Progreso</span>
+            <span>{t("consumptionProgress")}</span>
             <span className={cn("font-bold", isExceeded ? "text-surplus" : "text-deficit")}>
               {(ratio * 100).toFixed(0)}%
             </span>
           </div>
           <div className="flex flex-col items-center">
-            <span>{remaining > 0 ? "Restante" : "Exceso"}</span>
+            <span>{remaining > 0 ? t("consumptionRemaining") : t("consumptionExcess")}</span>
             <span className={cn("font-bold", remaining > 0 ? "text-zinc-300" : "text-surplus")}>
               {Math.round(Math.abs(remaining)).toLocaleString()}
             </span>

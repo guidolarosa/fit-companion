@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,6 +32,8 @@ interface EditExerciseDialogProps {
 
 export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDialogProps) {
   const router = useRouter()
+  const t = useTranslations("exercise")
+  const tc = useTranslations("common")
   const [name, setName] = useState("")
   const [calories, setCalories] = useState("")
   const [duration, setDuration] = useState("")
@@ -78,16 +81,16 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
       })
 
       if (response.ok) {
-        toast.success("Exercise entry updated successfully!")
+        toast.success(t("updatedSuccess"))
         onOpenChange(false)
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "Failed to update exercise entry")
+        toast.error(errorData.error || t("updateFailedFallback"))
       }
     } catch (error) {
       console.error("Error updating exercise entry:", error)
-      toast.error("An error occurred while updating the exercise entry")
+      toast.error(t("updateError"))
     } finally {
       setIsSubmitting(false)
     }
@@ -97,25 +100,25 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Exercise Entry</DialogTitle>
+          <DialogTitle>{t("editDialogTitle")}</DialogTitle>
           <DialogDescription>
-            Update your exercise entry information
+            {t("editDialogDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-exercise-name">Exercise Name</Label>
+            <Label htmlFor="edit-exercise-name">{t("nameLabel")}</Label>
             <Input
               id="edit-exercise-name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="e.g., Running, Cycling, Swimming"
+              placeholder={t("namePlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="edit-exercise-calories">Calories Burnt</Label>
+            <Label htmlFor="edit-exercise-calories">{t("caloriesLabel")}</Label>
             <Input
               id="edit-exercise-calories"
               type="number"
@@ -123,24 +126,24 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
               min="0"
               value={calories}
               onChange={(e) => setCalories(e.target.value)}
-              placeholder="Enter calories burnt"
+              placeholder={t("caloriesPlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="edit-exercise-duration">Duration (minutes, optional)</Label>
+            <Label htmlFor="edit-exercise-duration">{t("durationLabel")}</Label>
             <Input
               id="edit-exercise-duration"
               type="number"
               min="0"
               value={duration}
               onChange={(e) => setDuration(e.target.value)}
-              placeholder="Enter duration in minutes"
+              placeholder={t("durationPlaceholder")}
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-exercise-date">Date</Label>
+              <Label htmlFor="edit-exercise-date">{tc("date")}</Label>
               <Input
                 id="edit-exercise-date"
                 type="date"
@@ -151,7 +154,7 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
               />
             </div>
             <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-exercise-time">Time</Label>
+              <Label htmlFor="edit-exercise-time">{tc("time")}</Label>
               <Input
                 id="edit-exercise-time"
                 type="time"
@@ -169,10 +172,10 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {tc("cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Updating..." : "Update Entry"}
+              {isSubmitting ? tc("updating") : tc("updateEntry")}
             </Button>
           </DialogFooter>
         </form>
@@ -180,4 +183,3 @@ export function EditExerciseDialog({ open, onOpenChange, entry }: EditExerciseDi
     </Dialog>
   )
 }
-

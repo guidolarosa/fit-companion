@@ -2,6 +2,39 @@ import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { requireApiUser } from "@/lib/get-api-user"
 
+export async function GET() {
+  try {
+    const userResult = await requireApiUser()
+    if (userResult instanceof NextResponse) return userResult
+    const userId = userResult.id
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        name: true,
+        height: true,
+        age: true,
+        lifestyle: true,
+        ifType: true,
+        ifStartTime: true,
+        targetWeightMin: true,
+        targetWeightMax: true,
+        milestoneStep: true,
+        sustainabilityMode: true,
+        locale: true,
+      },
+    })
+
+    return NextResponse.json(user)
+  } catch (error) {
+    console.error("Error fetching settings:", error)
+    return NextResponse.json(
+      { error: "Failed to fetch settings" },
+      { status: 500 }
+    )
+  }
+}
+
 export async function PUT(request: NextRequest) {
   try {
     const userResult = await requireApiUser()
@@ -20,6 +53,7 @@ export async function PUT(request: NextRequest) {
       targetWeightMax,
       milestoneStep,
       sustainabilityMode,
+      locale,
     } = body
 
     const user = await prisma.user.update({
@@ -35,6 +69,7 @@ export async function PUT(request: NextRequest) {
         targetWeightMax: targetWeightMax ? parseFloat(targetWeightMax) : null,
         milestoneStep: milestoneStep ? parseFloat(milestoneStep) : null,
         sustainabilityMode: sustainabilityMode || null,
+        ...(locale && { locale }),
       },
     })
 

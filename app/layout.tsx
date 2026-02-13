@@ -3,6 +3,8 @@ import { Barlow, Barlow_Condensed } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Toaster } from "sonner";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 const barlow = Barlow({ 
   subsets: ["latin"], 
@@ -24,13 +26,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="es" className="dark">
+    <html lang={locale} className="dark">
       <body className={`${barlow.variable} ${barlowCondensed.variable} font-body antialiased text-foreground relative`}>
         {/* Background gradient orbs - fancy subtle effect */}
         <div className="bg-orb-container" aria-hidden="true">
@@ -43,10 +48,14 @@ export default function RootLayout({
           href="#main-content" 
           className="skip-link"
         >
-          Saltar al contenido principal
+          {locale === "en" ? "Skip to main content" : "Saltar al contenido principal"}
         </a>
         
-        <Providers>{children}</Providers>
+        <Providers>
+          <NextIntlClientProvider messages={messages}>
+            {children}
+          </NextIntlClientProvider>
+        </Providers>
         
         <Toaster 
           position="top-right" 

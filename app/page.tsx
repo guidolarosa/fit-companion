@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { PageHeader } from "@/components/page-header";
 import { Sidebar } from "@/components/sidebar";
 import { MobileSidebar } from "@/components/mobile-sidebar";
@@ -199,10 +200,8 @@ async function getDashboardData(userId: string) {
   // Soft warnings
   const warnings: string[] = [];
   const today = dailyData[0];
-  if (today?.ratioToTdee !== null && today.ratioToTdee < aggressiveThreshold) {
-    warnings.push(
-      "Today's intake is very low versus TDEE. Long-term consistency matters more than speed."
-    );
+  if (today?.ratioToTdee != null && today.ratioToTdee < aggressiveThreshold) {
+    warnings.push("warningLowIntake");
   }
 
   // Deficit quality
@@ -280,6 +279,8 @@ export default async function Dashboard() {
 
   const weights = await getWeightData(user.id);
 
+  const t = await getTranslations("dashboard");
+
   return (
     <div className="flex h-screen">
       <Sidebar />
@@ -287,8 +288,8 @@ export default async function Dashboard() {
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
           <PageHeader 
-            title="Dashboard" 
-            description="Tu resumen diario de progreso y actividad" 
+            title={t("title")} 
+            description={t("description")} 
           />
 
           {/* Mobile Quick Actions */}
@@ -323,7 +324,7 @@ export default async function Dashboard() {
               <Card className="glass-card h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-                    Calorías Netas
+                    {t("netCalories")}
                   </CardTitle>
                   {data.netCalories < 0 ? (
                     <TrendingDown className="h-3.5 w-3.5 text-green-500" />
@@ -352,15 +353,15 @@ export default async function Dashboard() {
                   </div>
                   <div className="mt-4 grid grid-cols-3 gap-2 text-[11px] uppercase tracking-tight text-zinc-500 font-bold">
                     <div className="flex flex-col">
-                      <span>Días</span>
+                      <span>{t("daysLabel")}</span>
                       <span className="text-zinc-300">{data.dailyData.length}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span>Cons.</span>
+                      <span>{t("consumedLabel")}</span>
                       <span className="text-zinc-300">{Math.round(data.totalCaloriesConsumed)}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span>Gasto</span>
+                      <span>{t("spentLabel")}</span>
                       <span className="text-zinc-300">{Math.round(data.totalCaloriesBurnt)}</span>
                     </div>
                   </div>
@@ -384,12 +385,12 @@ export default async function Dashboard() {
             <div className="">
               <Card className="glass-card h-full">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">Tendencia</CardTitle>
+                  <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">{t("trend")}</CardTitle>
                   <TrendingDown className="h-3.5 w-3.5 text-zinc-600" />
                 </CardHeader>
                 <CardContent className="pt-2 space-y-3">
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-zinc-500 font-bold uppercase tracking-tight">Déficit (7d)</span>
+                    <span className="text-zinc-500 font-bold uppercase tracking-tight">{t("deficit7d")}</span>
                     <span className="text-zinc-300 font-bold">
                       {data.trendInsights.avgDeficit !== null
                         ? `${Math.round(data.trendInsights.avgDeficit)} kcal`
@@ -397,7 +398,7 @@ export default async function Dashboard() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-zinc-500 font-bold uppercase tracking-tight">Ritmo</span>
+                    <span className="text-zinc-500 font-bold uppercase tracking-tight">{t("pace")}</span>
                     <span className={cn(
                       "font-bold",
                       data.trendInsights.projectedKgPerWeek === null ? "text-zinc-300" :
@@ -405,13 +406,13 @@ export default async function Dashboard() {
                     )}>
                       {data.trendInsights.projectedKgPerWeek === null
                         ? "—"
-                        : `${Math.abs(data.trendInsights.projectedKgPerWeek).toFixed(2)} kg/sem`}
+                        : `${Math.abs(data.trendInsights.projectedKgPerWeek).toFixed(2)} ${t("paceUnit")}`}
                     </span>
                   </div>
                   {data.warnings.length > 0 && (
                     <div className="mt-1 flex gap-1.5 items-start text-[10px] text-primary/80 font-bold uppercase tracking-tight leading-tight">
                       <Info className="h-3 w-3 shrink-0 mt-0.5" />
-                      <p className="line-clamp-2">{data.warnings[0]}</p>
+                      <p className="line-clamp-2">{t(data.warnings[0] as any)}</p>
                     </div>
                   )}
                 </CardContent>
@@ -431,7 +432,7 @@ export default async function Dashboard() {
             <Card className="hidden sm:block sm:col-span-2 lg:col-span-3 glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-1">
                 <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                  Progreso de Peso
+                  {t("weightProgress")}
                 </CardTitle>
                 <Weight className="h-3.5 w-3.5 text-zinc-600" />
               </CardHeader>
@@ -446,7 +447,7 @@ export default async function Dashboard() {
             <Card className="md:col-span-2 lg:col-span-1 glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                  Calendario Ejercicio
+                  {t("exerciseCalendar")}
                 </CardTitle>
                 <Activity className="h-3.5 w-3.5 text-zinc-600" />
               </CardHeader>
@@ -457,7 +458,7 @@ export default async function Dashboard() {
             <Card className="md:col-span-2 lg:col-span-1 glass-card">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                  Calendario Comida
+                  {t("foodCalendar")}
                 </CardTitle>
                 <UtensilsCrossed className="h-3.5 w-3.5 text-zinc-600" />
               </CardHeader>
@@ -478,10 +479,10 @@ export default async function Dashboard() {
               <CardHeader className="pb-2 sm:pb-4">
                 <CardTitle className="flex items-center gap-2 text-sm sm:text-base font-semibold">
                   <Activity className="h-4 w-4 text-deficit" />
-                  Ejercicios Recientes
+                  {t("recentExercises")}
                 </CardTitle>
                 <CardDescription className="hidden sm:block text-xs text-zinc-500">
-                  Tus últimas actividades de ejercicio
+                  {t("recentExercisesDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
@@ -492,15 +493,15 @@ export default async function Dashboard() {
                       <Activity className="w-6 h-6 text-zinc-600" />
                     </div>
                     <h3 className="text-sm font-medium text-zinc-300 mb-1">
-                      Sin ejercicios registrados
+                      {t("noExercises")}
                     </h3>
                     <p className="text-xs text-zinc-500 mb-4 max-w-[200px]">
-                      Registra tu actividad física para ver tu progreso
+                      {t("noExercisesDesc")}
                     </p>
                     <a href="/exercise">
                       <button className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
                         <Activity className="w-3 h-3" />
-                        Agregar ejercicio
+                        {t("addExercise")}
                       </button>
                     </a>
                   </div>
@@ -514,10 +515,10 @@ export default async function Dashboard() {
               <CardHeader className="pb-2 sm:pb-4">
                 <CardTitle className="flex items-center gap-2 text-sm sm:text-base font-semibold">
                   <UtensilsCrossed className="h-4 w-4 text-surplus" />
-                  Comidas Recientes
+                  {t("recentFoods")}
                 </CardTitle>
                 <CardDescription className="hidden sm:block text-xs text-zinc-500">
-                  Tu consumo de alimentos reciente
+                  {t("recentFoodsDesc")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
@@ -528,15 +529,15 @@ export default async function Dashboard() {
                       <UtensilsCrossed className="w-6 h-6 text-zinc-600" />
                     </div>
                     <h3 className="text-sm font-medium text-zinc-300 mb-1">
-                      Sin comidas registradas
+                      {t("noFoods")}
                     </h3>
                     <p className="text-xs text-zinc-500 mb-4 max-w-[200px]">
-                      Comienza a registrar lo que comes para un seguimiento completo
+                      {t("noFoodsDesc")}
                     </p>
                     <a href="/food">
                       <button className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors">
                         <UtensilsCrossed className="w-3 h-3" />
-                        Agregar comida
+                        {t("addFood")}
                       </button>
                     </a>
                   </div>

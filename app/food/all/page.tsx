@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -44,6 +45,7 @@ export default async function AllFoodEntriesPage({ searchParams }: PageProps) {
 
   const page = Math.max(1, parseInt(searchParams.page || "1", 10))
   const { foods, totalCount, totalPages, currentPage } = await getAllFoodEntries(user.id, page)
+  const t = await getTranslations("food")
   
   // Redirect if page is out of bounds (only if there are entries)
   if (totalCount > 0 && currentPage > totalPages) {
@@ -63,7 +65,7 @@ export default async function AllFoodEntriesPage({ searchParams }: PageProps) {
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
               </Link>
-              <h1 className="text-2xl sm:text-3xl font-bold">All Food Entries</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold">{t("allTitle")}</h1>
             </div>
           </div>
 
@@ -71,13 +73,13 @@ export default async function AllFoodEntriesPage({ searchParams }: PageProps) {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UtensilsCrossed className="h-5 w-5" />
-                Food Entries ({totalCount})
+                {t("allCardTitle")} ({totalCount})
               </CardTitle>
-              <CardDescription>All your recorded food entries and calories consumed</CardDescription>
+              <CardDescription>{t("allCardDescription")}</CardDescription>
             </CardHeader>
             <CardContent>
               {foods.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No food entries yet</p>
+                <p className="text-sm text-muted-foreground">{t("allEmpty")}</p>
               ) : (
                 <AllFoodEntriesTable 
                   entries={foods} 

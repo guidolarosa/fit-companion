@@ -3,6 +3,25 @@ import { prisma } from "@/lib/prisma";
 import { requireApiUser } from "@/lib/get-api-user";
 import { aggregateDailyData } from "@/lib/daily-data";
 import { calculateEnhancedStats } from "@/lib/stats";
+import { cookies } from "next/headers";
+
+// Load translation messages for stats narrative
+async function getStatsTranslator(): Promise<(key: string, params?: Record<string, string | number>) => string> {
+  const cookieStore = await cookies();
+  const locale = cookieStore.get("locale")?.value || "es";
+  const messages = (await import(`@/messages/${locale}.json`)).default;
+  const statsMessages = messages.stats || {};
+  
+  return (key: string, params?: Record<string, string | number>) => {
+    let result = statsMessages[key] || key;
+    if (params) {
+      Object.entries(params).forEach(([k, v]) => {
+        result = result.replace(`{${k}}`, String(v));
+      });
+    }
+    return result;
+  };
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -69,7 +88,9 @@ export async function GET(request: NextRequest) {
     // Sort by date ASC for the report
     filteredDailyData.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-    const stats = calculateEnhancedStats(filteredDailyData, foods, exercises);
+    // Get locale-aware translator for stats narrative
+    const translator = await getStatsTranslator();
+    const stats = calculateEnhancedStats(filteredDailyData, foods, exercises, translator);
 
     return NextResponse.json({
       dailyData: filteredDailyData,

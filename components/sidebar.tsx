@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
+import { useTranslations } from "next-intl"
 import { 
   LayoutDashboard, 
   Weight, 
@@ -21,20 +22,22 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
-const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Weight", href: "/weight", icon: Weight },
-  { name: "Exercise", href: "/exercise", icon: Dumbbell },
-  { name: "Food", href: "/food", icon: UtensilsCrossed },
-  { name: "Assistant", href: "/agent", icon: MessageSquare },
-  { name: "Lab", href: "/lab", icon: FlaskConical },
-  { name: "Report", href: "/report", icon: FileText },
-  { name: "Settings", href: "/settings", icon: Settings },
+const navigationItems = [
+  { key: "dashboard", href: "/", icon: LayoutDashboard },
+  { key: "weight", href: "/weight", icon: Weight },
+  { key: "exercise", href: "/exercise", icon: Dumbbell },
+  { key: "food", href: "/food", icon: UtensilsCrossed },
+  { key: "assistant", href: "/agent", icon: MessageSquare },
+  { key: "lab", href: "/lab", icon: FlaskConical },
+  { key: "report", href: "/report", icon: FileText },
+  { key: "settings", href: "/settings", icon: Settings },
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const t = useTranslations("nav")
+  const tc = useTranslations("common")
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [hasMounted, setHasMounted] = useState(false)
 
@@ -73,11 +76,11 @@ export function Sidebar() {
       )}>
         {isCollapsed ? (
           <div className="h-8 w-8 rounded bg-primary/10 flex items-center justify-center">
-            <span className="text-primary font-bold text-lg italic">F</span>
+            <span className="text-primary font-bold text-lg italic">{tc("brandLetter")}</span>
           </div>
         ) : (
           <h1 className="text-xl font-heading font-bold tracking-tight text-white whitespace-nowrap">
-            Fit<span className="text-primary">Companion</span>
+            {tc("brandFit")}<span className="text-primary">{tc("brandCompanion")}</span>
           </h1>
         )}
       </div>
@@ -86,14 +89,15 @@ export function Sidebar() {
         "flex-1 space-y-1",
         isCollapsed ? "px-2" : "px-3"
       )}>
-        {navigation.map((item) => {
+        {navigationItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.href
+          const label = t(item.key)
           return (
             <Link
-              key={item.name}
+              key={item.key}
               href={item.href}
-              title={isCollapsed ? item.name : undefined}
+              title={isCollapsed ? label : undefined}
               className={cn(
                 "flex items-center rounded-md transition-colors",
                 isCollapsed ? "justify-center h-10 w-full px-0" : "gap-3 px-3 py-2 text-sm",
@@ -103,7 +107,7 @@ export function Sidebar() {
               )}
             >
               <Icon className="h-4 w-4 shrink-0" />
-              {!isCollapsed && <span className="lg:text-[14px] font-medium">{item.name}</span>}
+              {!isCollapsed && <span className="lg:text-[14px] font-medium">{label}</span>}
             </Link>
           )
         })}
@@ -120,10 +124,10 @@ export function Sidebar() {
             isCollapsed ? "h-10 w-10 p-0 rounded-md" : "w-full justify-start h-9 text-xs"
           )}
           onClick={handleLogout}
-          title={isCollapsed ? "Cerrar Sesión" : undefined}
+          title={isCollapsed ? t("logout") : undefined}
         >
           <LogOut className="h-4 w-4 shrink-0" />
-          {!isCollapsed && <span className="ml-2">Cerrar Sesión</span>}
+          {!isCollapsed && <span className="ml-2">{t("logout")}</span>}
         </Button>
       </div>
 

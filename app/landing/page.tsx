@@ -1,7 +1,9 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import {
   Weight,
   UtensilsCrossed,
@@ -22,6 +24,7 @@ import {
   Apple,
   Dumbbell,
   FileText,
+  Globe,
 } from "lucide-react"
 
 // ─── Intersection Observer hook for scroll animations ───
@@ -52,123 +55,141 @@ function useScrollReveal() {
   return ref
 }
 
-// ─── Data ───
-const features = [
-  {
-    icon: Weight,
-    title: "Seguimiento de peso",
-    desc: "Registra tu peso diario y observa tendencias con gráficos interactivos y líneas de tendencia.",
-    color: "from-blue-500/20 to-blue-600/5",
-    iconColor: "text-blue-400",
-  },
-  {
-    icon: UtensilsCrossed,
-    title: "Control nutricional completo",
-    desc: "Calorías, proteínas, carbohidratos, grasa, fibra y azúcar. Todo estimado por IA en un click.",
-    color: "from-green-500/20 to-green-600/5",
-    iconColor: "text-green-400",
-  },
-  {
-    icon: Activity,
-    title: "Registro de ejercicio",
-    desc: "Lleva un historial detallado de tu actividad física con estimación inteligente de calorías quemadas.",
-    color: "from-purple-500/20 to-purple-600/5",
-    iconColor: "text-purple-400",
-  },
-  {
-    icon: BarChart3,
-    title: "Reportes e insights",
-    desc: "Análisis de tendencias, resúmenes con IA y reportes exportables en PDF con todos tus datos.",
-    color: "from-amber-500/20 to-amber-600/5",
-    iconColor: "text-amber-400",
-  },
-  {
-    icon: Droplets,
-    title: "Control de hidratación",
-    desc: "Contador diario de agua con meta personalizada según tu peso y nivel de actividad.",
-    color: "from-cyan-500/20 to-cyan-600/5",
-    iconColor: "text-cyan-400",
-  },
-  {
-    icon: FlaskConical,
-    title: "Análisis de laboratorio",
-    desc: "Sube tus estudios médicos y obtené análisis detallados e insights impulsados por IA.",
-    color: "from-rose-500/20 to-rose-600/5",
-    iconColor: "text-rose-400",
-  },
-]
-
-const steps = [
-  {
-    number: "01",
-    title: "Registra tu comida",
-    desc: "Escribí lo que comiste y nuestra IA estima calorías y macros al instante.",
-    icon: Apple,
-  },
-  {
-    number: "02",
-    title: "Registra tu ejercicio",
-    desc: "Agregá tu actividad y calculamos las calorías quemadas automáticamente.",
-    icon: Dumbbell,
-  },
-  {
-    number: "03",
-    title: "Seguí tu progreso",
-    desc: "Visualizá tus tendencias de peso, nutrición e hidratación con gráficos claros.",
-    icon: LineChart,
-  },
-  {
-    number: "04",
-    title: "Obtené insights",
-    desc: "Recibí reportes personalizados y análisis inteligentes para optimizar tu salud.",
-    icon: FileText,
-  },
-]
-
-const stats = [
-  { value: "6+", label: "Macronutrientes trackeados" },
-  { value: "IA", label: "Estimación automática" },
-  { value: "PDF", label: "Reportes exportables" },
-  { value: "24/7", label: "Acceso desde cualquier dispositivo" },
-]
-
-const benefits = [
-  "Estimación de calorías y macros con un click",
-  "Gráficos de tendencia de peso con proyección",
-  "Registro diario completo: comida, ejercicio, agua",
-  "Análisis de laboratorio con inteligencia artificial",
-  "Reportes detallados exportables en PDF",
-  "Metas personalizadas según tu cuerpo",
-]
-
 export default function LandingPage() {
   const containerRef = useScrollReveal()
+  const router = useRouter()
+  const t = useTranslations("landing")
+  const tc = useTranslations("common")
+
+  const [currentLocale, setCurrentLocale] = useState("es")
+
+  useEffect(() => {
+    const cookie = document.cookie.split("; ").find(c => c.startsWith("locale="))
+    if (cookie) setCurrentLocale(cookie.split("=")[1])
+  }, [])
+
+  function toggleLocale() {
+    const next = currentLocale === "es" ? "en" : "es"
+    document.cookie = `locale=${next}; path=/; max-age=${60 * 60 * 24 * 365}`
+    setCurrentLocale(next)
+    router.refresh()
+  }
+
+  // ─── Data ───
+  const features = [
+    {
+      key: "weight",
+      icon: Weight,
+      title: t("featureWeight"),
+      desc: t("featureWeightDesc"),
+      color: "from-blue-500/20 to-blue-600/5",
+      iconColor: "text-blue-400",
+    },
+    {
+      key: "nutrition",
+      icon: UtensilsCrossed,
+      title: t("featureNutrition"),
+      desc: t("featureNutritionDesc"),
+      color: "from-green-500/20 to-green-600/5",
+      iconColor: "text-green-400",
+    },
+    {
+      key: "exercise",
+      icon: Activity,
+      title: t("featureExercise"),
+      desc: t("featureExerciseDesc"),
+      color: "from-purple-500/20 to-purple-600/5",
+      iconColor: "text-purple-400",
+    },
+    {
+      key: "reports",
+      icon: BarChart3,
+      title: t("featureReports"),
+      desc: t("featureReportsDesc"),
+      color: "from-amber-500/20 to-amber-600/5",
+      iconColor: "text-amber-400",
+    },
+    {
+      key: "hydration",
+      icon: Droplets,
+      title: t("featureHydration"),
+      desc: t("featureHydrationDesc"),
+      color: "from-cyan-500/20 to-cyan-600/5",
+      iconColor: "text-cyan-400",
+    },
+    {
+      key: "lab",
+      icon: FlaskConical,
+      title: t("featureLab"),
+      desc: t("featureLabDesc"),
+      color: "from-rose-500/20 to-rose-600/5",
+      iconColor: "text-rose-400",
+    },
+  ]
+
+  const steps = [
+    { number: "01", title: t("howStep1Title"), desc: t("howStep1Desc"), icon: Apple },
+    { number: "02", title: t("howStep2Title"), desc: t("howStep2Desc"), icon: Dumbbell },
+    { number: "03", title: t("howStep3Title"), desc: t("howStep3Desc"), icon: LineChart },
+    { number: "04", title: t("howStep4Title"), desc: t("howStep4Desc"), icon: FileText },
+  ]
+
+  const stats = [
+    { key: "macros", value: "6+", label: t("statsMacros") },
+    { key: "ai", value: "IA", label: t("statsAI") },
+    { key: "pdf", value: "PDF", label: t("statsPDF") },
+    { key: "access", value: "24/7", label: t("statsAccess") },
+  ]
+
+  const benefits = [
+    { key: "cal", text: t("benefitCalorieEstimate") },
+    { key: "wt", text: t("benefitWeightTrend") },
+    { key: "daily", text: t("benefitDailyTracking") },
+    { key: "lab", text: t("benefitLabAnalysis") },
+    { key: "pdf", text: t("benefitPdfReports") },
+    { key: "goals", text: t("benefitPersonalGoals") },
+  ]
+
+  const weightLossBullets = [
+    { key: "1", text: t("weightLossBullet1") },
+    { key: "2", text: t("weightLossBullet2") },
+    { key: "3", text: t("weightLossBullet3") },
+    { key: "4", text: t("weightLossBullet4") },
+  ]
 
   return (
     <div ref={containerRef} className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* ═══ NAV BAR ═══ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/[0.04] bg-background/80 backdrop-blur-xl">
+      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/landing" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
               <Zap className="h-4 w-4 text-primary" />
             </div>
             <span className="text-lg font-heading font-bold tracking-tight text-white">
-              Fit<span className="text-primary">Companion</span>
+              {tc("brandFit")}<span className="text-primary">{tc("brandCompanion")}</span>
             </span>
           </Link>
           <div className="flex items-center gap-3">
+            <button
+              onClick={toggleLocale}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-colors"
+              title={currentLocale === "es" ? "Switch to English" : "Cambiar a Español"}
+            >
+              <Globe className="h-3.5 w-3.5" />
+              <span className="uppercase">{currentLocale === "es" ? "EN" : "ES"}</span>
+            </button>
             <Link
               href="/login"
               className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:inline-flex"
             >
-              Iniciar sesión
+              {t("navLogin")}
             </Link>
             <Link
               href="/login"
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
             >
-              Comenzar gratis
+              {t("navCta")}
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -198,21 +219,20 @@ export default function LandingPage() {
             <div className="reveal-on-scroll inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-8">
               <Sparkles className="h-3.5 w-3.5 text-primary" />
               <span className="text-[11px] font-bold uppercase tracking-widest text-primary">
-                Potenciado con inteligencia artificial
+                {t("heroBadge")}
               </span>
             </div>
 
             {/* Headline */}
             <h1 className="reveal-on-scroll text-4xl sm:text-5xl lg:text-7xl font-heading font-bold tracking-tight text-white leading-[1.1]">
-              Tu camino hacia
+              {t("heroTitle1")}
               <br />
-              <span className="text-primary">una vida más sana</span>
+              <span className="text-primary">{t("heroTitle2")}</span>
             </h1>
 
             {/* Subtitle */}
             <p className="reveal-on-scroll mt-6 text-base sm:text-lg text-zinc-400 max-w-xl mx-auto leading-relaxed">
-              Registra tu alimentación, ejercicio y peso. Obtené insights personalizados
-              con IA para alcanzar tus objetivos de salud y bienestar.
+              {t("heroSubtitle")}
             </p>
 
             {/* CTA buttons */}
@@ -221,14 +241,14 @@ export default function LandingPage() {
                 href="/login"
                 className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
               >
-                Empezar gratis
+                {t("heroCtaPrimary")}
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
               <a
                 href="#features"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-zinc-300 font-semibold text-sm hover:bg-white/[0.08] hover:border-white/[0.12] transition-all"
               >
-                Ver funcionalidades
+                {t("heroCtaSecondary")}
               </a>
             </div>
 
@@ -236,17 +256,17 @@ export default function LandingPage() {
             <div className="reveal-on-scroll mt-12 flex items-center justify-center gap-6 text-zinc-600 text-xs">
               <span className="flex items-center gap-1.5">
                 <Shield className="h-3.5 w-3.5" />
-                100% gratuito
+                {t("trustFree")}
               </span>
               <span className="w-1 h-1 rounded-full bg-zinc-700" />
               <span className="flex items-center gap-1.5">
                 <Shield className="h-3.5 w-3.5" />
-                Datos privados
+                {t("trustPrivate")}
               </span>
               <span className="w-1 h-1 rounded-full bg-zinc-700" />
               <span className="flex items-center gap-1.5">
                 <Brain className="h-3.5 w-3.5" />
-                Con IA
+                {t("trustAI")}
               </span>
             </div>
           </div>
@@ -267,7 +287,7 @@ export default function LandingPage() {
                 </div>
                 <div className="flex-1 flex justify-center">
                   <div className="px-4 py-1 rounded-md bg-white/[0.04] text-[10px] text-zinc-500">
-                    fitcompanion.app
+                    {t("mockupUrl")}
                   </div>
                 </div>
               </div>
@@ -277,13 +297,13 @@ export default function LandingPage() {
                 {/* Top row of metric cards */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   {[
-                    { label: "Peso actual", value: "78.2 kg", sub: "↓ 4.6 kg", color: "text-green-400" },
-                    { label: "Calorías hoy", value: "1,840", sub: "de 2,200 meta", color: "text-primary" },
-                    { label: "Ejercicio", value: "45 min", sub: "320 kcal quemadas", color: "text-purple-400" },
-                    { label: "Agua", value: "6/8", sub: "vasos completados", color: "text-cyan-400" },
+                    { key: "weight", label: t("mockupWeight"), value: "78.2 kg", sub: "↓ 4.6 kg", color: "text-green-400" },
+                    { key: "calories", label: t("mockupCalories"), value: "1,840", sub: "de 2,200 meta", color: "text-primary" },
+                    { key: "exercise", label: t("mockupExercise"), value: "45 min", sub: "320 kcal", color: "text-purple-400" },
+                    { key: "water", label: t("mockupWater"), value: "6/8", sub: "vasos", color: "text-cyan-400" },
                   ].map((card) => (
                     <div
-                      key={card.label}
+                      key={card.key}
                       className="rounded-lg bg-white/[0.03] border border-white/[0.06] p-3 sm:p-4"
                     >
                       <p className="text-[10px] text-zinc-500 uppercase tracking-wider">{card.label}</p>
@@ -298,8 +318,8 @@ export default function LandingPage() {
                 {/* Chart area mockup */}
                 <div className="rounded-lg bg-white/[0.03] border border-white/[0.06] p-4 sm:p-5">
                   <div className="flex items-center justify-between mb-4">
-                    <p className="text-xs font-medium text-zinc-400">Tendencia de peso</p>
-                    <p className="text-[10px] text-zinc-600">Últimos 30 días</p>
+                    <p className="text-xs font-medium text-zinc-400">{t("mockupChartTitle")}</p>
+                    <p className="text-[10px] text-zinc-600">{t("mockupChartPeriod")}</p>
                   </div>
                   {/* SVG chart mockup */}
                   <svg viewBox="0 0 600 120" className="w-full h-20 sm:h-28">
@@ -351,12 +371,12 @@ export default function LandingPage() {
                 {/* Bottom stats row */}
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: "Proteína", value: "82g", pct: "68%", color: "bg-blue-500" },
-                    { label: "Carbohidratos", value: "195g", pct: "75%", color: "bg-green-500" },
-                    { label: "Fibra", value: "22g", pct: "88%", color: "bg-amber-500" },
+                    { key: "protein", label: tc("protein"), value: "82g", pct: "68%", color: "bg-blue-500" },
+                    { key: "carbs", label: tc("carbs"), value: "195g", pct: "75%", color: "bg-green-500" },
+                    { key: "fiber", label: tc("fiber"), value: "22g", pct: "88%", color: "bg-amber-500" },
                   ].map((macro) => (
                     <div
-                      key={macro.label}
+                      key={macro.key}
                       className="rounded-lg bg-white/[0.03] border border-white/[0.06] p-3"
                     >
                       <p className="text-[10px] text-zinc-500">{macro.label}</p>
@@ -381,7 +401,7 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 py-12">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat) => (
-              <div key={stat.label} className="reveal-on-scroll text-center">
+              <div key={stat.key} className="reveal-on-scroll text-center">
                 <p className="text-2xl sm:text-3xl font-heading font-bold text-primary">{stat.value}</p>
                 <p className="text-xs text-zinc-500 mt-1">{stat.label}</p>
               </div>
@@ -397,16 +417,16 @@ export default function LandingPage() {
             <div className="reveal-on-scroll inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] mb-6">
               <Target className="h-3 w-3 text-primary" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-                Funcionalidades
+                {t("featuresBadge")}
               </span>
             </div>
             <h2 className="reveal-on-scroll text-3xl lg:text-4xl font-heading font-bold text-white">
-              Todo lo que necesitás
+              {t("featuresTitle1")}
               <br />
-              <span className="text-primary">en un solo lugar</span>
+              <span className="text-primary">{t("featuresTitle2")}</span>
             </h2>
             <p className="reveal-on-scroll mt-4 text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">
-              Herramientas completas para hacer seguimiento de tu salud, respaldadas por inteligencia artificial.
+              {t("featuresSubtitle")}
             </p>
           </div>
 
@@ -415,7 +435,7 @@ export default function LandingPage() {
               const Icon = feature.icon
               return (
                 <div
-                  key={feature.title}
+                  key={feature.key}
                   className="reveal-on-scroll group relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 hover:border-white/[0.1] hover:bg-white/[0.04] transition-all duration-300"
                 >
                   {/* Gradient accent on hover */}
@@ -447,24 +467,22 @@ export default function LandingPage() {
               <div className="reveal-on-scroll inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
                 <Brain className="h-3 w-3 text-primary" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
-                  Inteligencia artificial
+                  {t("aiBadge")}
                 </span>
               </div>
               <h2 className="reveal-on-scroll text-3xl lg:text-4xl font-heading font-bold text-white leading-tight">
-                La IA trabaja
+                {t("aiTitle1")}
                 <br />
-                <span className="text-primary">por vos</span>
+                <span className="text-primary">{t("aiTitle2")}</span>
               </h2>
               <p className="reveal-on-scroll mt-4 text-sm text-zinc-400 leading-relaxed max-w-md">
-                No necesitás contar calorías manualmente. Describí lo que comiste o
-                tu ejercicio y nuestra IA estima todo automáticamente: calorías,
-                proteínas, carbohidratos, grasa, fibra y azúcar.
+                {t("aiDescription")}
               </p>
               <ul className="reveal-on-scroll mt-8 space-y-3">
                 {benefits.map((benefit) => (
-                  <li key={benefit} className="flex items-start gap-3 text-sm text-zinc-400">
+                  <li key={benefit.key} className="flex items-start gap-3 text-sm text-zinc-400">
                     <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0 mt-0.5" />
-                    <span>{benefit}</span>
+                    <span>{benefit.text}</span>
                   </li>
                 ))}
               </ul>
@@ -473,7 +491,7 @@ export default function LandingPage() {
                   href="/login"
                   className="group inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                 >
-                  Probarlo ahora
+                  {t("aiCta")}
                   <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </div>
@@ -489,14 +507,14 @@ export default function LandingPage() {
                     <div className="w-6 h-6 rounded-md bg-primary/20 flex items-center justify-center">
                       <Sparkles className="h-3 w-3 text-primary" />
                     </div>
-                    <span className="text-xs font-medium text-zinc-400">Estimación con IA</span>
+                    <span className="text-xs font-medium text-zinc-400">{t("aiDemoLabel")}</span>
                   </div>
 
                   {/* User input */}
                   <div className="flex justify-end">
                     <div className="rounded-lg bg-primary/10 border border-primary/20 px-4 py-2.5 max-w-[80%]">
                       <p className="text-xs text-zinc-200">
-                        Almorcé un plato de arroz con pollo grillado y ensalada
+                        {t("aiDemoUserMsg")}
                       </p>
                     </div>
                   </div>
@@ -504,18 +522,18 @@ export default function LandingPage() {
                   {/* AI response */}
                   <div className="flex justify-start">
                     <div className="rounded-lg bg-white/[0.03] border border-white/[0.06] px-4 py-3 max-w-[90%]">
-                      <p className="text-xs text-zinc-300 mb-3">Estimación nutricional:</p>
+                      <p className="text-xs text-zinc-300 mb-3">{t("aiDemoResponseIntro")}</p>
                       <div className="grid grid-cols-3 gap-2">
                         {[
-                          { label: "Calorías", value: "520 kcal", color: "text-primary" },
-                          { label: "Proteína", value: "38g", color: "text-blue-400" },
-                          { label: "Carbohidratos", value: "52g", color: "text-green-400" },
-                          { label: "Grasa", value: "14g", color: "text-amber-400" },
-                          { label: "Fibra", value: "6g", color: "text-teal-400" },
-                          { label: "Azúcar", value: "3g", color: "text-rose-400" },
+                          { key: "cal", label: tc("calories"), value: "520 kcal", color: "text-primary" },
+                          { key: "prot", label: tc("protein"), value: "38g", color: "text-blue-400" },
+                          { key: "carbs", label: tc("carbs"), value: "52g", color: "text-green-400" },
+                          { key: "fat", label: tc("fat"), value: "14g", color: "text-amber-400" },
+                          { key: "fiber", label: tc("fiber"), value: "6g", color: "text-teal-400" },
+                          { key: "sugar", label: tc("sugar"), value: "3g", color: "text-rose-400" },
                         ].map((item) => (
                           <div
-                            key={item.label}
+                            key={item.key}
                             className="rounded-md bg-white/[0.03] border border-white/[0.04] p-2 text-center"
                           >
                             <p className={`text-sm font-bold ${item.color}`}>{item.value}</p>
@@ -531,7 +549,7 @@ export default function LandingPage() {
                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-pulse" />
                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-pulse" style={{ animationDelay: "150ms" }} />
                     <div className="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-pulse" style={{ animationDelay: "300ms" }} />
-                    <span className="text-[10px] text-zinc-600 ml-1">Registrado automáticamente</span>
+                    <span className="text-[10px] text-zinc-600 ml-1">{t("aiDemoAutoRegistered")}</span>
                   </div>
                 </div>
               </div>
@@ -547,14 +565,14 @@ export default function LandingPage() {
             <div className="reveal-on-scroll inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] mb-6">
               <Zap className="h-3 w-3 text-primary" />
               <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-                Cómo funciona
+                {t("howBadge")}
               </span>
             </div>
             <h2 className="reveal-on-scroll text-3xl lg:text-4xl font-heading font-bold text-white">
-              Simple y <span className="text-primary">efectivo</span>
+              {t("howTitle")}<span className="text-primary">{t("howTitleAccent")}</span>
             </h2>
             <p className="reveal-on-scroll mt-4 text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">
-              Cuatro pasos para tomar el control de tu salud y alcanzar tus objetivos.
+              {t("howSubtitle")}
             </p>
           </div>
 
@@ -572,7 +590,7 @@ export default function LandingPage() {
                       <Icon className="h-6 w-6 text-zinc-400 group-hover:text-primary transition-colors" />
                     </div>
                     <p className="text-[10px] font-bold text-primary/60 uppercase tracking-widest mb-2">
-                      Paso {step.number}
+                      {t("howStepPrefix")} {step.number}
                     </p>
                     <h3 className="text-sm font-semibold text-white mb-2">{step.title}</h3>
                     <p className="text-xs text-zinc-500 leading-relaxed">{step.desc}</p>
@@ -598,8 +616,8 @@ export default function LandingPage() {
                     <TrendingDown className="h-5 w-5 text-green-400" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-white">Progreso de peso</p>
-                    <p className="text-[10px] text-zinc-500">Últimos 3 meses</p>
+                    <p className="text-sm font-semibold text-white">{t("weightLossMockupTitle")}</p>
+                    <p className="text-[10px] text-zinc-500">{t("weightLossMockupPeriod")}</p>
                   </div>
                 </div>
 
@@ -612,11 +630,11 @@ export default function LandingPage() {
                 {/* Mini metrics row */}
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   {[
-                    { label: "Inicio", value: "82.8 kg" },
-                    { label: "Actual", value: "78.2 kg" },
-                    { label: "Meta", value: "75.0 kg" },
+                    { key: "start", label: t("weightLossMockupStart"), value: "82.8 kg" },
+                    { key: "current", label: t("weightLossMockupCurrent"), value: "78.2 kg" },
+                    { key: "goal", label: t("weightLossMockupGoal"), value: "75.0 kg" },
                   ].map((m) => (
-                    <div key={m.label} className="rounded-lg bg-white/[0.03] border border-white/[0.04] p-3 text-center">
+                    <div key={m.key} className="rounded-lg bg-white/[0.03] border border-white/[0.04] p-3 text-center">
                       <p className="text-[10px] text-zinc-600">{m.label}</p>
                       <p className="text-sm font-bold text-zinc-200 mt-0.5">{m.value}</p>
                     </div>
@@ -626,7 +644,7 @@ export default function LandingPage() {
                 {/* Progress bar */}
                 <div>
                   <div className="flex justify-between text-[10px] text-zinc-500 mb-2">
-                    <span>Progreso hacia meta</span>
+                    <span>{t("weightLossMockupProgressLabel")}</span>
                     <span className="text-green-400 font-semibold">59%</span>
                   </div>
                   <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden">
@@ -641,30 +659,24 @@ export default function LandingPage() {
               <div className="reveal-on-scroll inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 mb-6">
                 <TrendingDown className="h-3 w-3 text-green-400" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-green-400">
-                  Pérdida de peso
+                  {t("weightLossBadge")}
                 </span>
               </div>
               <h2 className="reveal-on-scroll text-3xl lg:text-4xl font-heading font-bold text-white leading-tight">
-                Visualizá tu progreso
+                {t("weightLossTitle1")}
                 <br />
-                <span className="text-green-400">día a día</span>
+                <span className="text-green-400">{t("weightLossTitle2")}</span>
               </h2>
               <p className="reveal-on-scroll mt-4 text-sm text-zinc-400 leading-relaxed max-w-md">
-                Registra tu peso diariamente y observa cómo tu cuerpo va cambiando. Con gráficos de tendencia,
-                líneas de proyección y estadísticas detalladas, siempre sabés exactamente dónde estás y hacia dónde vas.
+                {t("weightLossDesc")}
               </p>
               <div className="reveal-on-scroll mt-8 space-y-4">
-                {[
-                  "Gráfico de tendencia con línea de regresión",
-                  "Cálculo automático de BMI y peso saludable",
-                  "Déficit calórico diario y semanal",
-                  "Proyección inteligente hacia tu meta",
-                ].map((item) => (
-                  <div key={item} className="flex items-center gap-3">
+                {weightLossBullets.map((item) => (
+                  <div key={item.key} className="flex items-center gap-3">
                     <div className="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center shrink-0">
                       <CheckCircle2 className="h-3 w-3 text-green-400" />
                     </div>
-                    <span className="text-sm text-zinc-400">{item}</span>
+                    <span className="text-sm text-zinc-400">{item.text}</span>
                   </div>
                 ))}
               </div>
@@ -684,25 +696,24 @@ export default function LandingPage() {
 
             <div className="relative px-6 py-16 sm:px-12 sm:py-20 text-center">
               <h2 className="text-3xl lg:text-4xl font-heading font-bold text-white">
-                Empezá hoy tu camino
+                {t("ctaTitle1")}
                 <br />
-                hacia una <span className="text-primary">vida más sana</span>
+                {t("ctaTitle2")}<span className="text-primary">{t("ctaTitle2Accent")}</span>
               </h2>
               <p className="mt-4 text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
-                Es gratuito, es privado, y tu futuro yo te lo va a agradecer.
-                Unite ahora y empezá a trackear tu bienestar.
+                {t("ctaSubtitle")}
               </p>
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <Link
                   href="/login"
                   className="group inline-flex items-center gap-2 px-10 py-4 rounded-lg bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
                 >
-                  Crear cuenta gratis
+                  {t("ctaButton")}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
               </div>
               <p className="mt-6 text-[11px] text-zinc-600">
-                Sin tarjeta de crédito · Sin spam · Cancelá cuando quieras
+                {t("ctaDisclaimer")}
               </p>
             </div>
           </div>
@@ -717,11 +728,11 @@ export default function LandingPage() {
               <Zap className="h-3 w-3 text-primary" />
             </div>
             <span className="text-sm font-heading font-bold text-zinc-500">
-              Fit<span className="text-zinc-400">Companion</span>
+              {tc("brandFit")}<span className="text-zinc-400">{tc("brandCompanion")}</span>
             </span>
           </div>
           <p className="text-[11px] text-zinc-600">
-            © {new Date().getFullYear()} FitCompanion. Todos los derechos reservados.
+            {t("footerCopyright", { year: new Date().getFullYear() })}
           </p>
         </div>
       </footer>

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
@@ -20,6 +21,8 @@ interface FittyDialogProps {
 }
 
 export function FittyDialog({ open, onOpenChange }: FittyDialogProps) {
+  const t = useTranslations("fitty")
+  const tc = useTranslations("common")
   const [question, setQuestion] = useState("")
   const [response, setResponse] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -55,13 +58,13 @@ export function FittyDialog({ open, onOpenChange }: FittyDialogProps) {
 
       const data = await res.json()
       if (res.ok) {
-        setResponse(data.response || "No response received")
+        setResponse(data.response || tc("noResponse"))
       } else {
-        setResponse(`Error: ${data.error || "Could not get AI response. Please try again."}`)
+        setResponse(data.error ? `Error: ${data.error}` : tc("aiError"))
       }
     } catch (error) {
       console.error("Error getting AI response:", error)
-      setResponse("Error: Could not get AI response. Please try again.")
+      setResponse(tc("connectionError"))
     } finally {
       setIsLoading(false)
     }
@@ -73,22 +76,22 @@ export function FittyDialog({ open, onOpenChange }: FittyDialogProps) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Talk with Fitty
+            {t("dialogTitle")}
           </DialogTitle>
           <DialogDescription>
-            Your AI fitness companion. Ask me anything about your weight loss journey, exercise, nutrition, or fitness goals.
+            {t("dialogDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="fitty-question">Your question</Label>
+              <Label htmlFor="fitty-question">{t("questionLabel")}</Label>
               <Textarea
                 id="fitty-question"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
-                placeholder="e.g., How can I improve my weight loss progress? What exercises should I do? How many calories should I eat?"
+                placeholder={t("questionPlaceholder")}
                 rows={4}
                 disabled={isLoading}
               />
@@ -100,17 +103,17 @@ export function FittyDialog({ open, onOpenChange }: FittyDialogProps) {
                 onClick={() => onOpenChange(false)}
                 disabled={isLoading}
               >
-                Close
+                {tc("close")}
               </Button>
               <Button type="submit" disabled={isLoading || !question.trim()}>
-                {isLoading ? "Thinking..." : "Ask Fitty"}
+                {isLoading ? tc("thinking") : t("askButton")}
               </Button>
             </div>
           </form>
 
           {response && (
             <div className="space-y-2">
-              <Label>Fitty&apos;s response</Label>
+              <Label>{t("responseLabel")}</Label>
               <div className="rounded-lg border p-4 bg-muted/50">
                 <MarkdownContent content={response} />
               </div>
@@ -121,4 +124,3 @@ export function FittyDialog({ open, onOpenChange }: FittyDialogProps) {
     </Dialog>
   )
 }
-

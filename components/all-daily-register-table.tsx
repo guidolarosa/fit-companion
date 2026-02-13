@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DailyData } from "@/lib/daily-data"
+import { useTranslations } from "next-intl"
 
 interface AllDailyRegisterTableProps {
   dailyData: DailyData[]
@@ -14,6 +15,8 @@ interface AllDailyRegisterTableProps {
 
 export function AllDailyRegisterTable({ dailyData, currentPage, totalPages }: AllDailyRegisterTableProps) {
   const searchParams = useSearchParams()
+  const t = useTranslations("report")
+  const tc = useTranslations("common")
 
   function createPageUrl(page: number) {
     const params = new URLSearchParams(searchParams.toString())
@@ -62,17 +65,17 @@ export function AllDailyRegisterTable({ dailyData, currentPage, totalPages }: Al
         <table className="w-full text-sm min-w-[900px]">
           <thead>
             <tr className="border-b">
-              <th className="text-left p-3 font-semibold">Date</th>
-              <th className="text-right p-3 font-semibold">BMR</th>
-              <th className="text-right p-3 font-semibold">TDEE</th>
-              <th className="text-right p-3 font-semibold">Consumed</th>
-              <th className="text-right p-3 font-semibold">Burnt</th>
-              <th className="text-right p-3 font-semibold">Net</th>
-              <th className="text-right p-3 font-semibold text-xs">Prot</th>
-              <th className="text-right p-3 font-semibold text-xs">Carbs</th>
-              <th className="text-right p-3 font-semibold text-xs">Fat</th>
-              <th className="text-right p-3 font-semibold text-xs">Fiber</th>
-              <th className="text-right p-3 font-semibold text-xs">Sugar</th>
+              <th className="text-left p-3 font-semibold">{t("colDate")}</th>
+              <th className="text-right p-3 font-semibold">{t("colBMR")}</th>
+              <th className="text-right p-3 font-semibold">{t("colTDEE")}</th>
+              <th className="text-right p-3 font-semibold">{t("colConsumed")}</th>
+              <th className="text-right p-3 font-semibold">{t("colBurnt")}</th>
+              <th className="text-right p-3 font-semibold">{t("colNet")}</th>
+              <th className="text-right p-3 font-semibold text-xs">{tc("protShort")}</th>
+              <th className="text-right p-3 font-semibold text-xs">{tc("carbsShort")}</th>
+              <th className="text-right p-3 font-semibold text-xs">{tc("fatShort")}</th>
+              <th className="text-right p-3 font-semibold text-xs">{tc("fiberShort")}</th>
+              <th className="text-right p-3 font-semibold text-xs">{tc("sugarShort")}</th>
             </tr>
           </thead>
           <tbody>
@@ -150,7 +153,7 @@ export function AllDailyRegisterTable({ dailyData, currentPage, totalPages }: Al
       {totalPages > 1 && (
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-muted-foreground">
-            Page {currentPage} of {totalPages}
+            {tc("pageOf", { current: currentPage, total: totalPages })}
           </div>
           <div className="flex items-center gap-2">
             <Link href={createPageUrl(currentPage - 1)}>

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditFoodDialog } from "@/components/edit-food-dialog"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 interface FoodEntry {
   id: string
@@ -30,6 +31,8 @@ interface FoodEntryListProps {
 
 export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListProps) {
   const router = useRouter()
+  const t = useTranslations("food")
+  const tc = useTranslations("common")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [entryToDelete, setEntryToDelete] = useState<FoodEntry | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -52,8 +55,8 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
               <Check className="w-4 h-4 text-deficit" />
             </div>
             <div>
-              <p className="font-medium">Entrada eliminada</p>
-              <p className="text-sm text-zinc-400">Registro de comida borrado</p>
+              <p className="font-medium">{t("deletedTitle")}</p>
+              <p className="text-sm text-zinc-400">{t("deletedDescription")}</p>
             </div>
           </div>
         )
@@ -61,11 +64,11 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
       } else {
         const errorData = await response.json()
         // Error message per guidelines - calm, solution-focused
-        toast.error(errorData.error || "No se pudo eliminar. Intenta de nuevo.")
+        toast.error(errorData.error || t("deleteFailedFallback"))
       }
     } catch (error) {
       console.error("Error deleting food entry:", error)
-      toast.error("Error de conexión. Verifica tu red.")
+      toast.error(t("deleteError"))
     } finally {
       setDeletingId(null)
     }
@@ -76,7 +79,7 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
       <div 
         className="w-full overflow-hidden rounded-lg"
         role="list"
-        aria-label="Lista de comidas registradas"
+        aria-label={t("listAria")}
       >
         {entries.map((entry, index) => (
           <div
@@ -119,11 +122,11 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
                 {(entry.protein != null || entry.carbs != null || entry.fat != null) && (
                   <div className="hidden sm:flex items-center gap-1.5 text-[10px] text-zinc-500">
                     <span className="text-zinc-600">|</span>
-                    {entry.protein != null && <span>P:{Math.round(entry.protein)}g</span>}
-                    {entry.carbs != null && <span>C:{Math.round(entry.carbs)}g</span>}
-                    {entry.fat != null && <span>F:{Math.round(entry.fat)}g</span>}
-                    {entry.fiber != null && <span>Fb:{Math.round(entry.fiber)}g</span>}
-                    {entry.sugar != null && <span>S:{Math.round(entry.sugar)}g</span>}
+                    {entry.protein != null && <span>{tc("protShort")}:{Math.round(entry.protein)}g</span>}
+                    {entry.carbs != null && <span>{tc("carbsShort")}:{Math.round(entry.carbs)}g</span>}
+                    {entry.fat != null && <span>{tc("fatShort")}:{Math.round(entry.fat)}g</span>}
+                    {entry.fiber != null && <span>{tc("fiberShort")}:{Math.round(entry.fiber)}g</span>}
+                    {entry.sugar != null && <span>{tc("sugarShort")}:{Math.round(entry.sugar)}g</span>}
                   </div>
                 )}
               </div>
@@ -136,7 +139,7 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
                   {Math.round(entry.calories).toLocaleString()}
                 </span>
                 <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500 ml-1">
-                  kcal
+                  {tc("kcal")}
                 </span>
               </div>
               
@@ -150,7 +153,7 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
                     setEditDialogOpen(true)
                   }}
                   className="h-9 w-9 hover:bg-white/10 text-zinc-400 hover:text-white"
-                  aria-label={`Editar ${entry.name}`}
+                  aria-label={`${tc("edit")} ${entry.name}`}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -162,7 +165,7 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
                     setDeleteDialogOpen(true)
                   }}
                   className="h-9 w-9 text-zinc-400 hover:text-destructive hover:bg-destructive/10"
-                  aria-label={`Eliminar ${entry.name}`}
+                  aria-label={`${tc("delete")} ${entry.name}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -176,7 +179,7 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
         <div className="mt-4 flex justify-center">
           <Link href="/food/all">
             <Button variant="outline" className="w-full">
-              Ver todo
+              {tc("viewAll")}
             </Button>
           </Link>
         </div>
@@ -197,11 +200,10 @@ export function FoodEntryList({ entries, showViewAll = false }: FoodEntryListPro
             setEntryToDelete(null)
           }
         }}
-        title="Eliminar entrada de comida"
-        description="¿Eliminar este registro? Esta acción no se puede deshacer."
+        title={t("deleteDialogTitle")}
+        description={t("deleteDialogDescription")}
         itemName={entryToDelete ? `${entryToDelete.name} - ${format(new Date(entryToDelete.date), "d MMM yyyy")}` : undefined}
       />
     </>
   )
 }
-

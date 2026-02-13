@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,6 +34,7 @@ export default async function FoodPage() {
   }
 
   const { foods, totalCount } = await getFoodEntries(user.id)
+  const t = await getTranslations("food")
 
   return (
     <div className="flex h-screen">
@@ -40,13 +42,13 @@ export default async function FoodPage() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
-          <PageHeader title="Food & Nutrition" />
+          <PageHeader title={t("pageTitle")} />
 
           <div className="grid gap-6 lg:grid-cols-1">
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Registrar Comida</CardTitle>
-                <CardDescription className="text-[11px] text-zinc-600">Registra tu consumo de alimentos y calorías</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">{t("formTitle")}</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">{t("formDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <FoodForm />
@@ -58,8 +60,8 @@ export default async function FoodPage() {
           <div className="mt-6 grid gap-6 lg:grid-cols-2">
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Lista de Productos Saludables</CardTitle>
-                <CardDescription className="text-[11px] text-zinc-600">Crea y exporta tu lista de compras</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">{t("healthyProductsTitle")}</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">{t("healthyProductsDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <HealthyProductsList />
@@ -70,13 +72,13 @@ export default async function FoodPage() {
               <CardHeader>
                 <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                   <UtensilsCrossed className="h-3.5 w-3.5" />
-                  Historial de Comida
+                  {t("historyTitle")}
                 </CardTitle>
-                <CardDescription className="text-[11px] text-zinc-600">Tus registros recientes</CardDescription>
+                <CardDescription className="text-[11px] text-zinc-600">{t("historyDescription")}</CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
                 {foods.length === 0 ? (
-                  <p className="text-xs text-zinc-600 italic">Aún no hay registros de comida</p>
+                  <p className="text-xs text-zinc-600 italic">{t("historyEmpty")}</p>
                 ) : (
                   <FoodEntryList entries={foods} showViewAll={totalCount > 5} />
                 )}

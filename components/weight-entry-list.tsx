@@ -8,6 +8,7 @@ import { Trash2, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditWeightDialog } from "@/components/edit-weight-dialog"
+import { useTranslations } from "next-intl"
 
 interface WeightEntry {
   id: string
@@ -21,6 +22,8 @@ interface WeightEntryListProps {
 
 export function WeightEntryList({ entries }: WeightEntryListProps) {
   const router = useRouter()
+  const t = useTranslations("weight")
+  const tc = useTranslations("common")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [entryToDelete, setEntryToDelete] = useState<WeightEntry | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -33,15 +36,15 @@ export function WeightEntryList({ entries }: WeightEntryListProps) {
       })
 
       if (response.ok) {
-        toast.success("Weight entry deleted successfully!")
+        toast.success(t("deletedSuccess"))
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "Failed to delete weight entry")
+        toast.error(errorData.error || t("deleteFailedFallback"))
       }
     } catch (error) {
       console.error("Error deleting weight entry:", error)
-      toast.error("An error occurred while deleting the weight entry")
+      toast.error(t("deleteError"))
     }
   }
 
@@ -57,8 +60,8 @@ export function WeightEntryList({ entries }: WeightEntryListProps) {
               className="flex items-center justify-between border p-2 sm:p-3 gap-2 rounded-none first:rounded-t-lg last:rounded-b-lg border-b-0 last:border-b w-full overflow-hidden"
             >
               <div className="min-w-0 flex-1">
-                <p className="font-semibold truncate" title={`${entry.weight} kg`}>
-                  {entry.weight} kg
+                <p className="font-semibold truncate" title={`${entry.weight} ${tc("kg")}`}>
+                  {entry.weight} {tc("kg")}
                 </p>
                 <p className="text-sm text-muted-foreground truncate">
                   {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
@@ -107,11 +110,10 @@ export function WeightEntryList({ entries }: WeightEntryListProps) {
             setEntryToDelete(null)
           }
         }}
-        title="Delete Weight Entry"
-        description="Are you sure you want to delete this weight entry? This action cannot be undone."
-        itemName={entryToDelete ? `${entryToDelete.weight} kg - ${format(new Date(entryToDelete.date), "MMM d, yyyy")}` : undefined}
+        title={t("deleteDialogTitle")}
+        description={t("deleteDialogDescription")}
+        itemName={entryToDelete ? `${entryToDelete.weight} ${tc("kg")} - ${format(new Date(entryToDelete.date), "MMM d, yyyy")}` : undefined}
       />
     </>
   )
 }
-

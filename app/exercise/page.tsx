@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -32,6 +33,7 @@ export default async function ExercisePage() {
   }
 
   const { exercises, totalCount } = await getExercises(user.id)
+  const t = await getTranslations("exercise")
 
   return (
     <div className="flex h-screen">
@@ -39,13 +41,13 @@ export default async function ExercisePage() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
-          <PageHeader title="Exercise & Calorie Burn" />
+          <PageHeader title={t("pageTitle")} />
 
           <div className="grid gap-6 lg:grid-cols-1">
             <Card className="glass-card">
               <CardHeader>
-                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">Registrar Ejercicio</CardTitle>
-                <CardDescription className="text-[11px] text-zinc-600">Registra tu actividad física y calorías quemadas</CardDescription>
+                <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">{t("formTitle")}</CardTitle>
+                <CardDescription className="text-[11px] text-zinc-600">{t("formDescription")}</CardDescription>
               </CardHeader>
               <CardContent>
                 <ExerciseForm />
@@ -57,13 +59,13 @@ export default async function ExercisePage() {
             <CardHeader>
               <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                 <Flame className="h-3.5 w-3.5" />
-                Historial de Ejercicio
+                {t("historyTitle")}
               </CardTitle>
-              <CardDescription className="text-[11px] text-zinc-600">Tus actividades recientes</CardDescription>
+              <CardDescription className="text-[11px] text-zinc-600">{t("historyDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="overflow-hidden">
               {exercises.length === 0 ? (
-                <p className="text-xs text-zinc-600 italic">Aún no hay ejercicios registrados</p>
+                <p className="text-xs text-zinc-600 italic">{t("historyEmpty")}</p>
               ) : (
                 <ExerciseEntryList entries={exercises} showViewAll={totalCount > 10} />
               )}

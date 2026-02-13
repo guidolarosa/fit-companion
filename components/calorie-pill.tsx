@@ -1,4 +1,7 @@
+"use client"
+
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 interface CaloriePillProps {
   calories: number
@@ -6,6 +9,7 @@ interface CaloriePillProps {
 }
 
 export function CaloriePill({ calories, className }: CaloriePillProps) {
+  const tc = useTranslations("common")
   const roundedCalories = Math.round(calories)
 
   return (
@@ -15,7 +19,7 @@ export function CaloriePill({ calories, className }: CaloriePillProps) {
         className
       )}
     >
-      {roundedCalories} kcal
+      {roundedCalories} {tc("kcal")}
     </span>
   )
 }

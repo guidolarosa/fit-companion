@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { Sidebar } from "@/components/sidebar";
 import { MobileSidebar } from "@/components/mobile-sidebar";
 import {
@@ -32,6 +33,7 @@ export default async function WeightPage() {
   }
 
   const weights = await getWeightData(user.id);
+  const t = await getTranslations("weight");
 
   // Prepare weight days for calendar
   const weightDays = weights.map((w) => ({
@@ -45,17 +47,17 @@ export default async function WeightPage() {
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
-          <PageHeader title="Weight Tracking" />
+          <PageHeader title={t("pageTitle")} />
 
           <div className="grid gap-6 lg:grid-cols-1">
             <div className="grid gap-6 lg:grid-cols-1">
               <Card className="glass-card">
                 <CardHeader>
                   <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                    Registrar Peso
+                    {t("formTitle")}
                   </CardTitle>
                   <CardDescription className="text-[11px] text-zinc-600">
-                    Registra tu peso actual en kilogramos
+                    {t("formDescription")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -70,10 +72,10 @@ export default async function WeightPage() {
                 <Card className=" glass-card">
                   <CardHeader>
                     <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                      Progreso de Peso
+                      {t("progressTitle")}
                     </CardTitle>
                     <CardDescription className="text-[11px] text-zinc-600">
-                      Seguimiento de tu peso a lo largo del tiempo
+                      {t("progressDescription")}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -85,10 +87,10 @@ export default async function WeightPage() {
               <Card className="glass-card">
                 <CardHeader>
                   <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                    Historial de Peso
+                    {t("historyTitle")}
                   </CardTitle>
                   <CardDescription className="text-[11px] text-zinc-600">
-                    Días con registros de peso
+                    {t("historyDescription")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -102,10 +104,10 @@ export default async function WeightPage() {
               <Card className="glass-card">
                 <CardHeader>
                   <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                    Todos los Registros
+                    {t("allEntriesTitle")}
                   </CardTitle>
                   <CardDescription className="text-[11px] text-zinc-600">
-                    Lista completa de tus registros de peso
+                    {t("allEntriesDescription")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="overflow-hidden">

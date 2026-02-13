@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,8 @@ export function DeleteConfirmDialog({
   description,
   itemName,
 }: DeleteConfirmDialogProps) {
+  const tc = useTranslations("common")
+
   const handleConfirm = () => {
     onConfirm()
     onOpenChange(false)
@@ -51,17 +54,16 @@ export function DeleteConfirmDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
           >
-            Cancel
+            {tc("cancel")}
           </Button>
           <Button
             variant="destructive"
             onClick={handleConfirm}
           >
-            Delete
+            {tc("delete")}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   )
 }
-

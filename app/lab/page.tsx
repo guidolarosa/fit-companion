@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
+import { useTranslations } from "next-intl"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { PageHeader } from "@/components/page-header"
@@ -40,6 +41,8 @@ interface ChatMessage {
 }
 
 export default function LabPage() {
+  const t = useTranslations("lab")
+  const tc = useTranslations("common")
   const [files, setFiles] = useState<LabFile[]>([])
   const [isUploading, setIsUploading] = useState(false)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -105,14 +108,14 @@ export default function LabPage() {
       const data = await res.json()
 
       if (res.ok) {
-        toast.success(`"${data.name}" subido correctamente`)
+        toast.success(t("uploadSuccess", { name: data.name }))
         fetchFiles()
       } else {
-        toast.error(data.error || "Error al subir archivo")
+        toast.error(data.error || t("uploadError"))
       }
     } catch (err) {
       console.error("Upload error:", err)
-      toast.error("Error de conexión al subir")
+      toast.error(t("uploadConnectionError"))
     } finally {
       setIsUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -134,10 +137,10 @@ export default function LabPage() {
           next.delete(id)
           return next
         })
-        toast.success("Archivo eliminado")
+        toast.success(t("deleteSuccess"))
       }
     } catch (err) {
-      toast.error("Error al eliminar")
+      toast.error(t("deleteError"))
     }
   }
 
@@ -163,12 +166,12 @@ export default function LabPage() {
       if (res.ok) {
         const updated = await res.json()
         setFiles((prev) => prev.map((f) => (f.id === id ? { ...f, name: updated.name } : f)))
-        toast.success("Nombre actualizado")
+        toast.success(t("renameSuccess"))
       } else {
-        toast.error("Error al renombrar")
+        toast.error(t("renameError"))
       }
     } catch {
-      toast.error("Error de conexión")
+      toast.error(t("connectionError"))
     } finally {
       setEditingFileId(null)
     }
@@ -209,8 +212,8 @@ export default function LabPage() {
       })
 
       if (!res.ok) {
-        const errData = await res.json().catch(() => ({ error: "Error desconocido" }))
-        toast.error(errData.error || "Error en el análisis")
+        const errData = await res.json().catch(() => ({ error: t("unknownError") }))
+        toast.error(errData.error || t("analysisError"))
         // Remove the empty placeholder
         setMessages((prev) => prev.slice(0, -1))
         return
@@ -218,7 +221,7 @@ export default function LabPage() {
 
       const reader = res.body?.getReader()
       if (!reader) {
-        toast.error("No se pudo leer la respuesta")
+        toast.error(t("readError"))
         return
       }
 
@@ -240,7 +243,7 @@ export default function LabPage() {
         })
       }
     } catch {
-      toast.error("Error de conexión")
+      toast.error(t("connectionError"))
     } finally {
       setLoading(false)
     }
@@ -248,7 +251,7 @@ export default function LabPage() {
 
   async function handleAnalyze() {
     if (selectedFileIds.size === 0) {
-      toast.error("Selecciona al menos un archivo para analizar")
+      toast.error(t("selectFileError"))
       return
     }
 
@@ -258,7 +261,7 @@ export default function LabPage() {
 
     setMessages((prev) => [
       ...prev,
-      { role: "user", content: "Analizar resultados de laboratorio", fileNames },
+      { role: "user", content: t("analyzeUserMessage"), fileNames },
     ])
 
     await streamResponse(
@@ -274,7 +277,7 @@ export default function LabPage() {
 
     const idsToSend = attachedFileIds.size > 0 ? attachedFileIds : selectedFileIds
     if (idsToSend.size === 0) {
-      toast.error("Adjunta o selecciona al menos un archivo como referencia")
+      toast.error(t("attachOrSelectError"))
       return
     }
 
@@ -300,8 +303,8 @@ export default function LabPage() {
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
           <PageHeader
-            title="Laboratorio"
-            description="Sube tus análisis y obtené insights con IA"
+            title={t("title")}
+            description={t("description")}
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6">
@@ -312,7 +315,7 @@ export default function LabPage() {
                   <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest flex items-center justify-between">
                     <span className="flex items-center gap-2">
                       <FlaskConical className="h-3.5 w-3.5" />
-                      Archivos ({files.length})
+                      {t("filesTitle")} ({files.length})
                     </span>
                     <Button
                       size="sm"
@@ -326,7 +329,7 @@ export default function LabPage() {
                       ) : (
                         <>
                           <Upload className="h-3 w-3 mr-1.5" />
-                          Subir
+                          {t("uploadButton")}
                         </>
                       )}
                     </Button>
@@ -346,9 +349,9 @@ export default function LabPage() {
                       <div className="w-12 h-12 mb-3 rounded-full bg-white/5 flex items-center justify-center">
                         <FileText className="w-6 h-6 text-zinc-600" />
                       </div>
-                      <p className="text-xs text-zinc-500 mb-1">Sin archivos aún</p>
+                      <p className="text-xs text-zinc-500 mb-1">{t("emptyTitle")}</p>
                       <p className="text-[10px] text-zinc-600 mb-4 max-w-[200px]">
-                        Sube PDFs, imágenes o archivos de texto con tus resultados de laboratorio
+                        {t("emptyDescription")}
                       </p>
                       <Button
                         size="sm"
@@ -357,7 +360,7 @@ export default function LabPage() {
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <Upload className="h-3 w-3 mr-1.5" />
-                        Subir archivo
+                        {t("uploadFileButton")}
                       </Button>
                     </div>
                   ) : (
@@ -477,10 +480,10 @@ export default function LabPage() {
                         ) : (
                           <Sparkles className="h-3.5 w-3.5" />
                         )}
-                        Analizar{selectedFileIds.size > 0 ? ` (${selectedFileIds.size})` : ""}
+                        {t("analyzeButton")}{selectedFileIds.size > 0 ? ` (${selectedFileIds.size})` : ""}
                       </Button>
                       <p className="text-[10px] text-zinc-600 text-center mt-2">
-                        Selecciona archivos y presiona para analizar
+                        {t("analyzeHint")}
                       </p>
                     </div>
                   )}
@@ -493,7 +496,7 @@ export default function LabPage() {
               <CardHeader className="pb-3 shrink-0">
                 <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest flex items-center gap-2">
                   <Sparkles className="h-3.5 w-3.5 text-primary" />
-                  Análisis e Insights
+                  {t("chatTitle")}
                 </CardTitle>
               </CardHeader>
 
@@ -505,11 +508,10 @@ export default function LabPage() {
                       <FlaskConical className="w-7 h-7 text-primary" />
                     </div>
                     <h3 className="text-xl font-semibold text-zinc-300 mb-1">
-                      Análisis de laboratorio
+                      {t("chatEmptyTitle")}
                     </h3>
                     <p className="text-xs text-zinc-600 max-w-xs leading-relaxed">
-                      Sube tus resultados, seleccionalos y presiona &ldquo;Analizar&rdquo; para obtener
-                      insights. También podes hacer preguntas específicas.
+                      {t("chatEmptyDescription")}
                     </p>
                   </div>
                 ) : (
@@ -556,7 +558,7 @@ export default function LabPage() {
                     <div className="bg-white/[0.03] border border-white/[0.05] rounded-lg px-4 py-3">
                       <div className="flex items-center gap-2 text-xs text-zinc-400">
                         <Loader2 className="h-3 w-3 animate-spin" />
-                        Analizando...
+                        {t("analyzing")}
                       </div>
                     </div>
                   </div>
@@ -599,7 +601,7 @@ export default function LabPage() {
                         attachedFileIds.size > 0 ? "text-primary" : "text-zinc-500"
                       )}
                       onClick={() => setShowFilePicker(!showFilePicker)}
-                      title="Adjuntar archivo como referencia"
+                      title={t("attachTitle")}
                     >
                       <Paperclip className="h-4 w-4" />
                     </Button>
@@ -608,7 +610,7 @@ export default function LabPage() {
                     {showFilePicker && files.length > 0 && (
                       <div className="absolute bottom-full left-0 mb-2 w-64 bg-popover border border-white/[0.06] rounded-md shadow-xl z-50 py-1 max-h-48 overflow-y-auto">
                         <p className="px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest text-zinc-600">
-                          Adjuntar como referencia
+                          {t("attachLabel")}
                         </p>
                         {files.map((f) => {
                           const isAttached = attachedFileIds.has(f.id)
@@ -640,7 +642,7 @@ export default function LabPage() {
                   <Input
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Preguntá sobre tus resultados..."
+                    placeholder={t("inputPlaceholder")}
                     className="flex-1 h-9 bg-white/[0.02] border-white/[0.05] text-sm placeholder:text-zinc-600"
                     disabled={isSending || isAnalyzing}
                   />

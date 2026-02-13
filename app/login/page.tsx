@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -16,27 +17,43 @@ import {
   FlaskConical,
   ChevronRight,
   Sparkles,
+  Globe,
 } from "lucide-react"
-
-const features = [
-  { icon: Weight, title: "Seguimiento de peso", desc: "Registra y visualiza tu progreso con tendencias" },
-  { icon: UtensilsCrossed, title: "Control nutricional", desc: "Calorías, proteínas, carbs, grasa, fibra y azúcar" },
-  { icon: Activity, title: "Registro de ejercicio", desc: "Lleva un historial de tu actividad física" },
-  { icon: BarChart3, title: "Reportes e insights", desc: "Análisis de tendencias y resúmenes con IA" },
-  { icon: Droplets, title: "Hidratación", desc: "Contador diario de vasos de agua con meta personalizada" },
-  { icon: FlaskConical, title: "Análisis de laboratorio", desc: "Sube tus estudios y obtené insights con IA" },
-  { icon: Brain, title: "Asistente con IA", desc: "Estimación de macros y asesoría nutricional inteligente" },
-  { icon: Sparkles, title: "100% gratuito", desc: "Todos tus datos privados y seguros, sin costos ocultos" },
-]
 
 export default function LoginPage() {
   const router = useRouter()
+  const t = useTranslations("login")
+  const tc = useTranslations("common")
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [currentLocale, setCurrentLocale] = useState("es")
+
+  useEffect(() => {
+    const cookie = document.cookie.split("; ").find(c => c.startsWith("locale="))
+    if (cookie) setCurrentLocale(cookie.split("=")[1])
+  }, [])
+
+  function toggleLocale() {
+    const next = currentLocale === "es" ? "en" : "es"
+    document.cookie = `locale=${next}; path=/; max-age=${60 * 60 * 24 * 365}`
+    setCurrentLocale(next)
+    router.refresh()
+  }
+
+  const features = [
+    { key: "weight", icon: Weight, title: t("featureWeight"), desc: t("featureWeightDesc") },
+    { key: "nutrition", icon: UtensilsCrossed, title: t("featureNutrition"), desc: t("featureNutritionDesc") },
+    { key: "exercise", icon: Activity, title: t("featureExercise"), desc: t("featureExerciseDesc") },
+    { key: "reports", icon: BarChart3, title: t("featureReports"), desc: t("featureReportsDesc") },
+    { key: "hydration", icon: Droplets, title: t("featureHydration"), desc: t("featureHydrationDesc") },
+    { key: "lab", icon: FlaskConical, title: t("featureLab"), desc: t("featureLabDesc") },
+    { key: "ai", icon: Brain, title: t("featureAI"), desc: t("featureAIDesc") },
+    { key: "free", icon: Sparkles, title: t("featureFree"), desc: t("featureFreeDesc") },
+  ]
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -52,7 +69,7 @@ export default function LoginPage() {
         })
 
         if (result?.error) {
-          setError("Email o contraseña inválidos")
+          setError(t("invalidCredentials"))
         } else {
           router.push("/")
           router.refresh()
@@ -67,7 +84,7 @@ export default function LoginPage() {
         const data = await response.json()
 
         if (!response.ok) {
-          setError(data.error || "Error al crear la cuenta")
+          setError(data.error || t("createAccountError"))
         } else {
           const result = await signIn("credentials", {
             email,
@@ -76,15 +93,15 @@ export default function LoginPage() {
           })
 
           if (result?.error) {
-            setError("Cuenta creada. Por favor, inicia sesión.")
+            setError(t("accountCreatedPleaseLogin"))
           } else {
-            router.push("/")
+            router.push("/onboarding")
             router.refresh()
           }
         }
       }
     } catch (error) {
-      setError("Ocurrió un error. Intenta de nuevo.")
+      setError(t("genericError"))
     } finally {
       setIsLoading(false)
     }
@@ -116,12 +133,22 @@ export default function LoginPage() {
           <div className="absolute bottom-[-10%] left-[20%] w-[50vw] h-[50vw] bg-orange-600/20 rounded-full blur-[90px]" />
           <div className="absolute top-[30%] left-[40%] w-[40vw] h-[40vw] bg-amber-500/10 rounded-full blur-[70px]" />
 
+          {/* Language toggle */}
+          <button
+            onClick={toggleLocale}
+            className="absolute top-4 right-4 z-20 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/10 transition-colors"
+            title={currentLocale === "es" ? "Switch to English" : "Cambiar a Español"}
+          >
+            <Globe className="h-3.5 w-3.5" />
+            <span className="uppercase">{currentLocale === "es" ? "EN" : "ES"}</span>
+          </button>
+
           {/* Logo centered on the hero */}
           <div className="relative z-10 flex flex-col items-center justify-center h-full pt-14 pb-20">
             <h1 className="text-4xl font-heading font-bold tracking-tight text-white">
-              Fit<span className="text-primary">Companion</span>
+              {tc("brandFit")}<span className="text-primary">{tc("brandCompanion")}</span>
             </h1>
-            <p className="mt-2 text-xs text-zinc-400 tracking-wide">Tu compañero de bienestar</p>
+            <p className="mt-2 text-xs text-zinc-400 tracking-wide">{t("tagline")}</p>
           </div>
 
           {/* Wave separator */}
@@ -143,7 +170,7 @@ export default function LoginPage() {
           {/* Title with accent underline */}
           <div className="mb-6">
             <h2 className="text-2xl font-heading font-bold text-white">
-              {isLogin ? "Iniciar sesión" : "Crear cuenta"}
+              {isLogin ? t("loginTitle") : t("registerTitle")}
             </h2>
             <div className="mt-2 h-[3px] w-10 rounded-full bg-primary" />
           </div>
@@ -151,39 +178,39 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5 flex-1">
             {!isLogin && (
               <div className="space-y-1.5">
-                <Label htmlFor="m-name" className="text-xs font-semibold text-zinc-400">Nombre (opcional)</Label>
+                <Label htmlFor="m-name" className="text-xs font-semibold text-zinc-400">{t("nameLabel")}</Label>
                 <Input
                   id="m-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Tu nombre"
+                  placeholder={t("namePlaceholder")}
                   className="h-12 bg-transparent border-0 border-b border-white/[0.08] rounded-none px-0 focus:border-primary placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:ring-offset-0"
                 />
               </div>
             )}
 
             <div className="space-y-1.5">
-              <Label htmlFor="m-email" className="text-xs font-semibold text-zinc-400">Email</Label>
+              <Label htmlFor="m-email" className="text-xs font-semibold text-zinc-400">{t("emailLabel")}</Label>
               <Input
                 id="m-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
+                placeholder={t("emailPlaceholder")}
                 required
                 className="h-12 bg-transparent border-0 border-b border-white/[0.08] rounded-none px-0 focus:border-primary placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:ring-offset-0"
               />
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="m-password" className="text-xs font-semibold text-zinc-400">Contraseña</Label>
+              <Label htmlFor="m-password" className="text-xs font-semibold text-zinc-400">{t("passwordLabel")}</Label>
               <Input
                 id="m-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
+                placeholder={t("passwordPlaceholder")}
                 required
                 minLength={6}
                 className="h-12 bg-transparent border-0 border-b border-white/[0.08] rounded-none px-0 focus:border-primary placeholder:text-zinc-600 focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -205,10 +232,10 @@ export default function LoginPage() {
                 {isLoading ? (
                   <span className="flex items-center gap-2">
                     <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    {isLogin ? "Iniciando..." : "Creando..."}
+                    {isLogin ? t("loggingIn") : t("registering")}
                   </span>
                 ) : (
-                  isLogin ? "Iniciar sesión" : "Crear cuenta"
+                  isLogin ? t("loginButton") : t("registerButton")
                 )}
               </Button>
             </div>
@@ -221,9 +248,9 @@ export default function LoginPage() {
               className="text-sm text-zinc-500"
             >
               {isLogin ? (
-                <>¿No tenés cuenta? <span className="text-primary font-semibold">Registrate</span></>
+                <>{t("noAccount")} <span className="text-primary font-semibold">{t("switchToRegister")}</span></>
               ) : (
-                <>¿Ya tenés cuenta? <span className="text-primary font-semibold">Iniciá sesión</span></>
+                <>{t("hasAccount")} <span className="text-primary font-semibold">{t("switchToLogin")}</span></>
               )}
             </button>
           </div>
@@ -235,56 +262,66 @@ export default function LoginPage() {
       {/* ═══════════════════════════════════════════ */}
 
       {/* Left Column - Form */}
-      <div className="hidden lg:flex flex-1 flex-col justify-center px-16 xl:px-24">
+      <div className="hidden lg:flex flex-1 flex-col justify-center px-16 xl:px-24 relative">
+        {/* Language toggle - desktop */}
+        <button
+          onClick={toggleLocale}
+          className="absolute top-6 right-6 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-colors"
+          title={currentLocale === "es" ? "Switch to English" : "Cambiar a Español"}
+        >
+          <Globe className="h-3.5 w-3.5" />
+          <span className="uppercase">{currentLocale === "es" ? "EN" : "ES"}</span>
+        </button>
+
         <div className="mx-auto w-full max-w-sm">
           {/* Logo */}
           <div className="mb-10">
             <h1 className="text-2xl font-heading font-bold tracking-tight text-white">
-              Fit<span className="text-primary">Companion</span>
+              {tc("brandFit")}<span className="text-primary">{tc("brandCompanion")}</span>
             </h1>
             <p className="mt-2 text-sm text-zinc-500">
               {isLogin
-                ? "Inicia sesión para continuar tu progreso"
-                : "Crea tu cuenta y comienza tu camino"}
+                ? t("subtitleLogin")
+                : t("subtitleRegister")}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="d-name" className="text-xs text-zinc-400">Nombre (opcional)</Label>
+                <Label htmlFor="d-name" className="text-xs text-zinc-400">{t("nameLabel")}</Label>
                 <Input
                   id="d-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Tu nombre"
+                  placeholder={t("namePlaceholder")}
                   className="h-11 bg-white/[0.03] border-white/[0.06] focus:border-primary/50 placeholder:text-zinc-600"
                 />
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="d-email" className="text-xs text-zinc-400">Email</Label>
+              <Label htmlFor="d-email" className="text-xs text-zinc-400">{t("emailLabel")}</Label>
               <Input
                 id="d-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
+                placeholder={t("emailPlaceholder")}
                 required
                 className="h-11 bg-white/[0.03] border-white/[0.06] focus:border-primary/50 placeholder:text-zinc-600"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="d-password" className="text-xs text-zinc-400">Contraseña</Label>
+              <Label htmlFor="d-password" className="text-xs text-zinc-400">{t("passwordLabel")}</Label>
               <Input
                 id="d-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Mínimo 6 caracteres"
+                placeholder={t("passwordPlaceholder")}
                 required
                 minLength={6}
                 className="h-11 bg-white/[0.03] border-white/[0.06] focus:border-primary/50 placeholder:text-zinc-600"
@@ -305,11 +342,11 @@ export default function LoginPage() {
               {isLoading ? (
                 <span className="flex items-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  {isLogin ? "Iniciando sesión..." : "Creando cuenta..."}
+                  {isLogin ? t("loggingInDesktop") : t("registeringDesktop")}
                 </span>
               ) : (
                 <span className="flex items-center gap-2">
-                  {isLogin ? "Iniciar sesión" : "Crear cuenta"}
+                  {isLogin ? t("loginButton") : t("registerButton")}
                   <ChevronRight className="h-4 w-4" />
                 </span>
               )}
@@ -322,7 +359,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-white/[0.05]" />
               </div>
               <div className="relative flex justify-center text-xs">
-                <span className="bg-background px-3 text-zinc-600">o</span>
+                <span className="bg-background px-3 text-zinc-600">{t("divider")}</span>
               </div>
             </div>
             <button
@@ -331,9 +368,9 @@ export default function LoginPage() {
               className="text-sm text-zinc-500 hover:text-white transition-colors"
             >
               {isLogin ? (
-                <>¿No tenés cuenta? <span className="text-primary font-medium">Registrate</span></>
+                <>{t("noAccount")} <span className="text-primary font-medium">{t("switchToRegister")}</span></>
               ) : (
-                <>¿Ya tenés cuenta? <span className="text-primary font-medium">Iniciá sesión</span></>
+                <>{t("hasAccount")} <span className="text-primary font-medium">{t("switchToLogin")}</span></>
               )}
             </button>
           </div>
@@ -362,15 +399,14 @@ export default function LoginPage() {
           <div className="mb-10">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
               <Sparkles className="h-3 w-3 text-primary" />
-              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Con inteligencia artificial</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-primary">{t("heroBadge")}</span>
             </div>
             <h2 className="text-3xl xl:text-4xl font-heading font-bold tracking-tight text-white leading-tight">
-              Tu compañero<br />
-              de <span className="text-primary">bienestar</span>
+              {t("heroTitle1")}<br />
+              {t("heroTitle2")}<span className="text-primary">{t("heroTitle3")}</span>
             </h2>
             <p className="mt-4 text-sm text-zinc-500 max-w-md leading-relaxed">
-              Registra tu alimentación, ejercicio y peso. Obtené insights personalizados
-              y reportes detallados para alcanzar tus objetivos.
+              {t("heroDescription")}
             </p>
           </div>
 
@@ -380,7 +416,7 @@ export default function LoginPage() {
               const Icon = f.icon
               return (
                 <div
-                  key={f.title}
+                  key={f.key}
                   className="group flex items-start gap-3 rounded-lg p-3 bg-white/[0.02] border border-white/[0.04] hover:border-white/[0.08] hover:bg-white/[0.04] transition-all"
                 >
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary/10">
@@ -405,7 +441,7 @@ export default function LoginPage() {
               ))}
             </div>
             <p className="text-[11px] text-zinc-500">
-              Seguimiento completo &middot; 100% gratuito &middot; Datos privados
+              {t("heroFooter")}
             </p>
           </div>
         </div>

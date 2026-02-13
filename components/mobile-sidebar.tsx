@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { signOut } from "next-auth/react"
+import { useTranslations } from "next-intl"
 import { 
   LayoutDashboard, 
   Weight, 
@@ -21,20 +22,22 @@ import {
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
-const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Weight", href: "/weight", icon: Weight },
-  { name: "Exercise", href: "/exercise", icon: Dumbbell },
-  { name: "Food", href: "/food", icon: UtensilsCrossed },
-  { name: "Assistant", href: "/agent", icon: MessageSquare },
-  { name: "Lab", href: "/lab", icon: FlaskConical },
-  { name: "Report", href: "/report", icon: FileText },
-  { name: "Settings", href: "/settings", icon: Settings },
+const navigationItems = [
+  { key: "dashboard", href: "/", icon: LayoutDashboard },
+  { key: "weight", href: "/weight", icon: Weight },
+  { key: "exercise", href: "/exercise", icon: Dumbbell },
+  { key: "food", href: "/food", icon: UtensilsCrossed },
+  { key: "assistant", href: "/agent", icon: MessageSquare },
+  { key: "lab", href: "/lab", icon: FlaskConical },
+  { key: "report", href: "/report", icon: FileText },
+  { key: "settings", href: "/settings", icon: Settings },
 ]
 
 export function MobileSidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const t = useTranslations("nav")
+  const tc = useTranslations("common")
   const [isOpen, setIsOpen] = useState(false)
 
   async function handleLogout() {
@@ -65,7 +68,7 @@ export function MobileSidebar() {
         size="icon"
         className="lg:hidden fixed top-4 right-4 z-50 bg-zinc-900 border border-white/[0.05] rounded-md h-10 w-10"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle menu"
+        aria-label={t("toggleMenu")}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </Button>
@@ -85,17 +88,18 @@ export function MobileSidebar() {
       >
         <div className="flex h-28 items-center px-6 border-b border-white/[0.05]">
           <h1 className="text-3xl font-heading font-bold tracking-tight text-white">
-            Fit<span className="text-primary">Companion</span>
+            {tc("brandFit")}<span className="text-primary">{tc("brandCompanion")}</span>
           </h1>
         </div>
 
         <nav className="flex-1 space-y-1 px-3 py-6 overflow-y-auto">
-          {navigation.map((item) => {
+          {navigationItems.map((item) => {
             const Icon = item.icon
             const isActive = pathname === item.href
+            const label = t(item.key)
             return (
               <Link
-                key={item.name}
+                key={item.key}
                 href={item.href}
                 className={cn(
                   "flex items-center gap-3 rounded-md px-3 py-2.5 text-xl font-medium transition-colors",
@@ -106,7 +110,7 @@ export function MobileSidebar() {
                 onClick={() => setIsOpen(false)}
               >
                 <Icon className="h-4 w-4" />
-                {item.name}
+                {label}
               </Link>
             )
           })}
@@ -119,7 +123,7 @@ export function MobileSidebar() {
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4 mr-2" />
-            Cerrar Sesión
+            {t("logout")}
           </Button>
         </div>
       </div>

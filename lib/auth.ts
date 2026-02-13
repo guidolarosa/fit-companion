@@ -38,6 +38,7 @@ export const authOptions: NextAuthConfig = {
           id: user.id,
           email: user.email,
           name: user.name,
+          profileComplete: user.height != null,
         }
       },
     }),
@@ -47,10 +48,19 @@ export const authOptions: NextAuthConfig = {
     signOut: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       if (user) {
-        token.id = user.id
-        token.email = user.email
+        token.id = user.id as string
+        token.email = user.email as string
+        token.profileComplete = user.profileComplete ?? false
+      }
+      // Allow updating the token when session is refreshed (e.g. after onboarding)
+      if (trigger === "update") {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { height: true },
+        })
+        token.profileComplete = dbUser?.height != null
       }
       return token
     },
@@ -58,6 +68,7 @@ export const authOptions: NextAuthConfig = {
       if (session.user) {
         session.user.id = token.id as string
         session.user.email = token.email as string
+        session.user.profileComplete = (token.profileComplete as boolean) ?? false
       }
       return session
     },

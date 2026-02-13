@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditExerciseDialog } from "@/components/edit-exercise-dialog"
 import { cn } from "@/lib/utils"
+import { useTranslations } from "next-intl"
 
 interface ExerciseEntry {
   id: string
@@ -26,6 +27,8 @@ interface ExerciseEntryListProps {
 
 export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntryListProps) {
   const router = useRouter()
+  const t = useTranslations("exercise")
+  const tc = useTranslations("common")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [entryToDelete, setEntryToDelete] = useState<ExerciseEntry | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
@@ -47,19 +50,19 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
               <Check className="w-4 h-4 text-deficit" />
             </div>
             <div>
-              <p className="font-medium">Entrada eliminada</p>
-              <p className="text-sm text-zinc-400">Registro de ejercicio borrado</p>
+              <p className="font-medium">{t("deletedTitle")}</p>
+              <p className="text-sm text-zinc-400">{t("deletedDescription")}</p>
             </div>
           </div>
         )
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "No se pudo eliminar. Intenta de nuevo.")
+        toast.error(errorData.error || t("deleteFailedFallback"))
       }
     } catch (error) {
       console.error("Error deleting exercise:", error)
-      toast.error("Error de conexión. Verifica tu red.")
+      toast.error(t("deleteError"))
     } finally {
       setDeletingId(null)
     }
@@ -70,7 +73,7 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
       <div 
         className="w-full overflow-hidden rounded-lg"
         role="list"
-        aria-label="Lista de ejercicios registrados"
+        aria-label={t("listAria")}
       >
         {entries.map((entry, index) => (
           <div
@@ -115,7 +118,7 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
                     <span className="text-zinc-600">•</span>
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" aria-hidden="true" />
-                      {entry.duration}min
+                      {entry.duration}{tc("min")}
                     </span>
                   </>
                 )}
@@ -129,7 +132,7 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
                   -{Math.round(entry.calories).toLocaleString()}
                 </span>
                 <span className="text-[10px] font-medium uppercase tracking-wider text-zinc-500 ml-1">
-                  kcal
+                  {tc("kcal")}
                 </span>
               </div>
               
@@ -143,7 +146,7 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
                     setEditDialogOpen(true)
                   }}
                   className="h-9 w-9 hover:bg-white/10 text-zinc-400 hover:text-white"
-                  aria-label={`Editar ${entry.name}`}
+                  aria-label={`${tc("edit")} ${entry.name}`}
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
@@ -155,7 +158,7 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
                     setDeleteDialogOpen(true)
                   }}
                   className="h-9 w-9 text-zinc-400 hover:text-destructive hover:bg-destructive/10"
-                  aria-label={`Eliminar ${entry.name}`}
+                  aria-label={`${tc("delete")} ${entry.name}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -169,7 +172,7 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
         <div className="mt-4 flex justify-center">
           <Link href="/exercise/all">
             <Button variant="outline" className="w-full">
-              Ver todo
+              {tc("viewAll")}
             </Button>
           </Link>
         </div>
@@ -190,11 +193,10 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
             setEntryToDelete(null)
           }
         }}
-        title="Eliminar entrada de ejercicio"
-        description="¿Eliminar este registro? Esta acción no se puede deshacer."
+        title={t("deleteDialogTitle")}
+        description={t("deleteDialogDescription")}
         itemName={entryToDelete ? `${entryToDelete.name} - ${format(new Date(entryToDelete.date), "d MMM yyyy")}` : undefined}
       />
     </>
   )
 }
-

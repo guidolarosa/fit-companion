@@ -24,6 +24,7 @@ model User {
   targetWeightMax Float? // target range upper bound (kg)
   milestoneStep   Float? // milestone delta in kg
   sustainabilityMode String? // strict | sustainable
+  locale         String          @default("es") // en | es
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   weightEntries  WeightEntry[]

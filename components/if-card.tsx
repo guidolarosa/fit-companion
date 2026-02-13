@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useTranslations } from "next-intl"
 
 interface IFCardProps {
   ifType: string | null
@@ -57,6 +58,7 @@ function getCurrentStatus(ifType: string | null, ifStartTime: string | null) {
 }
 
 export function IFCard({ ifType, ifStartTime }: IFCardProps) {
+  const t = useTranslations("dashboard")
   const [status, setStatus] = useState(getCurrentStatus(ifType, ifStartTime))
 
   useEffect(() => {
@@ -74,7 +76,7 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
       <Card className="glass-card h-full">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-            Ayuno Intermitente
+            {t("ifTitle")}
           </CardTitle>
           <Clock className="h-3.5 w-3.5 text-zinc-600" />
         </CardHeader>
@@ -83,12 +85,12 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
             <Clock className="w-5 h-5 text-zinc-600" />
           </div>
           <p className="text-xs text-zinc-500 mb-3">
-            Configura tu horario de ayuno
+            {t("ifEmpty")}
           </p>
           <Link href="/settings">
             <Button size="sm" variant="outline" className="h-8 text-xs">
               <Settings className="w-3 h-3 mr-1" />
-              Configurar
+              {t("ifConfigure")}
             </Button>
           </Link>
         </CardContent>
@@ -102,14 +104,14 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
 
   // Status text for accessibility
   const statusText = isEating 
-    ? `Ventana de comida activa. ${h} horas y ${m} minutos restantes.`
-    : `Período de ayuno activo. ${h} horas y ${m} minutos restantes.`
+    ? t("ifEatingStatus", { h, m })
+    : t("ifFastingStatus", { h, m })
 
   return (
     <Card className="glass-card h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4">
         <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-          Ayuno Intermitente
+          {t("ifTitle")}
         </CardTitle>
         <Clock className={cn(
           "h-3.5 w-3.5 transition-colors",
@@ -138,10 +140,10 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
               "text-sm font-bold leading-tight",
               isEating ? "text-deficit" : "text-white"
             )}>
-              {isEating ? "Ventana de comida" : "Ayunando"}
+              {isEating ? t("ifEatingWindow") : t("ifFasting")}
             </div>
             <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-tight">
-              Faltan {h}h {m}m
+              {t("ifRemaining", { h, m })}
             </div>
           </div>
         </div>
@@ -168,11 +170,11 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
         {/* Details - compact */}
         <div className="space-y-1 text-[10px] font-bold uppercase tracking-tight text-zinc-500">
           <div className="flex justify-between">
-            <span>Protocolo</span>
+            <span>{t("ifProtocol")}</span>
             <span className="text-surplus">{ifType}</span>
           </div>
           <div className="flex justify-between">
-            <span>Ventana</span>
+            <span>{t("ifWindow")}</span>
             <span className="text-zinc-300">{ifStartTime}</span>
           </div>
         </div>

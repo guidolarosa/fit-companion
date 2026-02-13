@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { SettingsForm } from "@/components/settings-form"
@@ -23,19 +24,21 @@ export default async function SettingsPage() {
     redirect("/login")
   }
 
+  const t = await getTranslations("settings")
+
   return (
     <div className="flex h-screen">
       <Sidebar />
       <MobileSidebar />
       <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-2xl">
-          <PageHeader title="Settings" showFittyButton={false} />
+          <PageHeader title={t("title")} showFittyButton={false} />
 
           <Card>
             <CardHeader>
-              <CardTitle>Profile Settings</CardTitle>
+              <CardTitle>{t("profileTitle")}</CardTitle>
               <CardDescription>
-                Configure your personal information and preferences
+                {t("profileDescription")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -51,9 +54,9 @@ export default async function SettingsPage() {
 
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Data Tools</CardTitle>
+              <CardTitle>{t("dataToolsTitle")}</CardTitle>
               <CardDescription>
-                Manage and enrich your existing data
+                {t("dataToolsDescription")}
               </CardDescription>
             </CardHeader>
             <CardContent>

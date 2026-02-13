@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -29,6 +30,8 @@ interface EditWeightDialogProps {
 
 export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialogProps) {
   const router = useRouter()
+  const t = useTranslations("weight")
+  const tc = useTranslations("common")
   const [weight, setWeight] = useState("")
   const [date, setDate] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -65,16 +68,16 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
       })
 
       if (response.ok) {
-        toast.success("Weight entry updated successfully!")
+        toast.success(t("updatedSuccess"))
         onOpenChange(false)
         router.refresh()
       } else {
         const errorData = await response.json()
-        toast.error(errorData.error || "Failed to update weight entry")
+        toast.error(errorData.error || t("updateFailedFallback"))
       }
     } catch (error) {
       console.error("Error updating weight entry:", error)
-      toast.error("An error occurred while updating the weight entry")
+      toast.error(t("updateError"))
     } finally {
       setIsSubmitting(false)
     }
@@ -84,14 +87,14 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Weight Entry</DialogTitle>
+          <DialogTitle>{t("editDialogTitle")}</DialogTitle>
           <DialogDescription>
-            Update your weight entry information
+            {t("editDialogDescription")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-weight">Weight (kg)</Label>
+            <Label htmlFor="edit-weight">{t("weightLabel")}</Label>
             <Input
               id="edit-weight"
               type="number"
@@ -99,12 +102,12 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
               min="0"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
-              placeholder="Enter your weight"
+              placeholder={t("weightPlaceholder")}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="edit-date">Date</Label>
+            <Label htmlFor="edit-date">{tc("date")}</Label>
             <Input
               id="edit-date"
               type="date"
@@ -120,10 +123,10 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {tc("cancel")}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Updating..." : "Update Entry"}
+              {isSubmitting ? tc("updating") : tc("updateEntry")}
             </Button>
           </DialogFooter>
         </form>
@@ -131,4 +134,3 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
     </Dialog>
   )
 }
-

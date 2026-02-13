@@ -19,11 +19,44 @@ export interface EnhancedStats {
   projectedWeightChange: number;
 }
 
+// Accept an optional translate function for i18n support
+type TranslateFn = (key: string, params?: Record<string, string | number>) => string;
+
+const defaultTranslate: TranslateFn = (key, params) => {
+  // Fallback Spanish strings when no translator is provided
+  const fallbacks: Record<string, string> = {
+    noData: "No hay datos disponibles.",
+    highIntake: "Consumo muy elevado respecto a tu promedio",
+    lowIntake: "Consumo muy bajo respecto a tu promedio",
+    alcoholDay: "Día con alcohol y consumo superior al promedio",
+    fallbackExercise: "actividad física",
+    trendDown: "descendente",
+    trendUp: "ascendente",
+    trendStable: "estable",
+    weightLost: "Durante este período bajaste {x} kg. ",
+    weightGained: "Durante este período subiste {x} kg. ",
+    weightMaintained: "Durante este período mantuviste {x} kg. ",
+    activityConstant: "Mantuviste actividad física constante, principalmente {exercise}. ",
+    outlierCount: "Se identificaron {n} días atípicos. ",
+    trendSustained: "La tendencia general es {trend} y sostenida.",
+    trendDeveloping: "La tendencia general es {trend} y en desarrollo.",
+  };
+  let result = fallbacks[key] || key;
+  if (params) {
+    Object.entries(params).forEach(([k, v]) => {
+      result = result.replace(`{${k}}`, String(v));
+    });
+  }
+  return result;
+};
+
 export function calculateEnhancedStats(
   dailyData: DailyData[],
   foods: any[],
-  exercises: any[]
+  exercises: any[],
+  t?: TranslateFn
 ): EnhancedStats {
+  const tr = t || defaultTranslate;
   const n = dailyData.length;
   if (n === 0) {
     return {
@@ -32,7 +65,7 @@ export function calculateEnhancedStats(
       outliers: [],
       classification: { deficit: 0, maintenance: 0, surplus: 0 },
       streaks: { current: 0, best: 0 },
-      narrative: "No data available.",
+      narrative: tr("noData"),
       avgDeficit: 0,
       avgIntake: 0,
       projectedWeightChange: 0,
@@ -70,11 +103,11 @@ export function calculateEnhancedStats(
     const hasAlcohol = dayFoods.some(f => alcoholKeywords.some(k => f.name.toLowerCase().includes(k)));
 
     if (day.caloriesConsumed > avgIntake + 2 * stdDevIntake) {
-      outliers.push({ date: dayKey, reason: "Consumo muy elevado respecto a tu promedio" });
+      outliers.push({ date: dayKey, reason: tr("highIntake") });
     } else if (day.caloriesConsumed < avgIntake - 2 * stdDevIntake && day.caloriesConsumed > 0) {
-      outliers.push({ date: dayKey, reason: "Consumo muy bajo respecto a tu promedio" });
+      outliers.push({ date: dayKey, reason: tr("lowIntake") });
     } else if (hasAlcohol && day.caloriesConsumed > avgIntake) {
-      outliers.push({ date: dayKey, reason: "Día con alcohol y consumo superior al promedio" });
+      outliers.push({ date: dayKey, reason: tr("alcoholDay") });
     }
   });
 
@@ -111,17 +144,13 @@ export function calculateEnhancedStats(
     }
   });
   
-  // Current streak needs to be calculated from the latest date backwards
   for (let i = dailyData.length - 1; i >= 0; i--) {
     const day = dailyData[i];
     const isComplete = day.caloriesConsumed > 0 && (day.weight !== null || day.caloriesBurnt > 0);
-    // If today is not complete, current streak might be 0, or we check if yesterday was the end of it
-    // For simplicity, let's just count from most recent
   }
-  currentStreak = tempStreak; // This is actually correct if the loop above is chronological
+  currentStreak = tempStreak;
 
   // 5. Narrative
-  // dailyData is ASC, so index 0 is start, length-1 is end
   const startWeight = dailyData[0].weight;
   const endWeight = dailyData[dailyData.length - 1].weight;
   const weightChange = (startWeight !== null && endWeight !== null) ? endWeight - startWeight : 0;
@@ -134,16 +163,27 @@ export function calculateEnhancedStats(
     : null;
   const topExercise = dominantExercise 
     ? Object.keys(dominantExercise).reduce((a, b) => (dominantExercise[a] || 0) > (dominantExercise[b] || 0) ? a : b)
-    : "actividad física";
+    : tr("fallbackExercise");
 
-  const trend = weightChange < 0 ? "descendente" : weightChange > 0 ? "ascendente" : "estable";
+  const trend = weightChange < 0 
+    ? tr("trendDown") 
+    : weightChange > 0 
+      ? tr("trendUp") 
+      : tr("trendStable");
   
-  let narrative = `Durante este período ${weightChange < 0 ? 'bajaste' : weightChange > 0 ? 'subiste' : 'mantuviste'} ${Math.abs(weightChange).toFixed(1)} kg. `;
-  narrative += `Mantuviste actividad física constante, principalmente ${topExercise}. `;
+  const absChange = Math.abs(weightChange).toFixed(1);
+  let narrative = weightChange < 0 
+    ? tr("weightLost", { x: absChange })
+    : weightChange > 0 
+      ? tr("weightGained", { x: absChange })
+      : tr("weightMaintained", { x: absChange });
+  narrative += tr("activityConstant", { exercise: topExercise });
   if (outliers.length > 0) {
-    narrative += `Se identificaron ${outliers.length} días atípicos. `;
+    narrative += tr("outlierCount", { n: outliers.length });
   }
-  narrative += `La tendencia general es ${trend} y ${bestStreak > 5 ? 'sostenida' : 'en desarrollo'}.`;
+  narrative += bestStreak > 5 
+    ? tr("trendSustained", { trend }) 
+    : tr("trendDeveloping", { trend });
 
   const avgDeficit = dailyData.reduce((sum, d) => sum + d.netCalories, 0) / n;
   const projectedWeightChange = (avgDeficit * 7) / 7700;
