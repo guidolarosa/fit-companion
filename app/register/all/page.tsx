@@ -12,7 +12,7 @@ import { AllDailyRegisterTable } from "@/components/all-daily-register-table";
 export default async function AllDailyRegisterPage({
   searchParams,
 }: {
-  searchParams: { page?: string };
+  searchParams: Promise<{ page?: string }>;
 }) {
   const user = await getCurrentUser();
 
@@ -20,7 +20,8 @@ export default async function AllDailyRegisterPage({
     redirect("/login");
   }
 
-  const currentPage = parseInt(searchParams.page || "1");
+  const resolvedParams = await searchParams;
+  const currentPage = parseInt(resolvedParams.page || "1");
   const pageSize = 15;
 
   const [dbUser, allExercises, allFoods, allWeights] = await Promise.all([

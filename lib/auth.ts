@@ -55,7 +55,8 @@ export const authOptions: NextAuthConfig = {
         token.profileComplete = user.profileComplete ?? false
       }
       // Allow updating the token when session is refreshed (e.g. after onboarding)
-      if (trigger === "update") {
+      // Also handles old tokens that don't have profileComplete set yet
+      if (trigger === "update" || token.profileComplete === undefined) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
           select: { height: true },

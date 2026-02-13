@@ -11,7 +11,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 interface PageProps {
-  searchParams: { page?: string }
+  searchParams: Promise<{ page?: string }>
 }
 
 async function getAllExerciseEntries(userId: string, page: number = 1) {
@@ -42,7 +42,8 @@ export default async function AllExerciseEntriesPage({ searchParams }: PageProps
     redirect("/login")
   }
 
-  const page = Math.max(1, parseInt(searchParams.page || "1", 10))
+  const resolvedParams = await searchParams
+  const page = Math.max(1, parseInt(resolvedParams.page || "1", 10))
   const { exercises, totalCount, totalPages, currentPage } = await getAllExerciseEntries(user.id, page)
   const t = await getTranslations("exercise")
 

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 
 interface PageProps {
-  searchParams: { page?: string }
+  searchParams: Promise<{ page?: string }>
 }
 
 async function getAllFoodEntries(userId: string, page: number = 1) {
@@ -43,7 +43,8 @@ export default async function AllFoodEntriesPage({ searchParams }: PageProps) {
     redirect("/login")
   }
 
-  const page = Math.max(1, parseInt(searchParams.page || "1", 10))
+  const resolvedParams = await searchParams
+  const page = Math.max(1, parseInt(resolvedParams.page || "1", 10))
   const { foods, totalCount, totalPages, currentPage } = await getAllFoodEntries(user.id, page)
   const t = await getTranslations("food")
   
