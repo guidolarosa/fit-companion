@@ -335,9 +335,19 @@ export default function LandingPage() {
                         strokeWidth="1"
                       />
                     ))}
-                    {/* Data line */}
+                    {/* Trend line (dashed) */}
+                    <line
+                      x1="0"
+                      y1="25"
+                      x2="600"
+                      y2="90"
+                      stroke="rgba(255,255,255,0.15)"
+                      strokeWidth="1.5"
+                      strokeDasharray="6 4"
+                    />
+                    {/* Data line - descending weight */}
                     <polyline
-                      points="0,80 40,82 80,78 120,75 160,77 200,70 240,65 280,68 320,60 360,55 400,58 440,50 480,45 520,42 560,38 600,35"
+                      points="0,22 40,25 80,28 120,24 160,32 200,35 240,38 280,42 320,48 360,45 400,55 440,60 480,65 520,70 560,78 600,85"
                       fill="none"
                       stroke="hsl(25, 95%, 53%)"
                       strokeWidth="2.5"
@@ -352,19 +362,10 @@ export default function LandingPage() {
                       </linearGradient>
                     </defs>
                     <polygon
-                      points="0,80 40,82 80,78 120,75 160,77 200,70 240,65 280,68 320,60 360,55 400,58 440,50 480,45 520,42 560,38 600,35 600,120 0,120"
+                      points="0,22 40,25 80,28 120,24 160,32 200,35 240,38 280,42 320,48 360,45 400,55 440,60 480,65 520,70 560,78 600,85 600,120 0,120"
                       fill="url(#chartGrad)"
                     />
-                    {/* Trend line */}
-                    <line
-                      x1="0"
-                      y1="82"
-                      x2="600"
-                      y2="33"
-                      stroke="rgba(255,255,255,0.15)"
-                      strokeWidth="1"
-                      strokeDasharray="6,4"
-                    />
+                    
                   </svg>
                 </div>
 
