@@ -44,3 +44,31 @@ export async function getAIResponse(
   }
 }
 
+/**
+ * Returns an OpenAI streaming response (async iterable of chunks).
+ */
+export function getAIStreamResponse(
+  prompt: string,
+  systemPrompt: string,
+  userContext?: string
+) {
+  if (!openai) {
+    throw new Error("OpenAI API key is not configured. Please set OPENAI_API_KEY in your .env.local file.")
+  }
+
+  const fullPrompt = userContext
+    ? `${userContext}\n\nUSER QUESTION: ${prompt}\n\nPlease provide personalized advice based on the user's data above.`
+    : prompt
+
+  return openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: fullPrompt },
+    ],
+    temperature: 0.7,
+    max_tokens: 1500,
+    stream: true,
+  })
+}
+

@@ -616,7 +616,14 @@
     "foodLabel": "Ask about food",
     "foodPlaceholder": "e.g., What are some low-calorie snacks I can eat?",
     "weightLossLabel": "Ask about weight loss",
-    "weightLossPlaceholder": "e.g., How can I create a sustainable weight loss plan?"
+    "weightLossPlaceholder": "e.g., How can I create a sustainable weight loss plan?",
+    "chatPlaceholder": "Ask Fitty anything about your health journey...",
+    "chatDisclaimer": "Fitty can make mistakes. Always consult a healthcare professional.",
+    "chatWelcomeTitle": "Hey! I'm Fitty",
+    "chatWelcomeDesc": "Your AI fitness companion. Ask me anything about nutrition, exercise, weight loss, or your health data.",
+    "suggestion1": "How am I doing with my weight loss goals?",
+    "suggestion2": "What should I eat today to stay within my calorie target?",
+    "suggestion3": "Suggest a workout routine for burning fat"
   },
   "fitty": {
     "dialogTitle": "Talk to Fitty",

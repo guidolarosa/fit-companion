@@ -616,7 +616,14 @@
     "foodLabel": "Pregunta sobre comida",
     "foodPlaceholder": "ej., ¿Cuáles son algunos snacks bajos en calorías que puedo comer?",
     "weightLossLabel": "Pregunta sobre pérdida de peso",
-    "weightLossPlaceholder": "ej., ¿Cómo puedo crear un plan de pérdida de peso sostenible?"
+    "weightLossPlaceholder": "ej., ¿Cómo puedo crear un plan de pérdida de peso sostenible?",
+    "chatPlaceholder": "Preguntale a Fitty lo que necesites sobre tu salud...",
+    "chatDisclaimer": "Fitty puede cometer errores. Consultá siempre a un profesional de la salud.",
+    "chatWelcomeTitle": "¡Hola! Soy Fitty",
+    "chatWelcomeDesc": "Tu compañero fitness con IA. Preguntame lo que quieras sobre nutrición, ejercicio, pérdida de peso o tus datos de salud.",
+    "suggestion1": "¿Cómo voy con mis objetivos de pérdida de peso?",
+    "suggestion2": "¿Qué debería comer hoy para mantenerme dentro de mi objetivo calórico?",
+    "suggestion3": "Sugerime una rutina de ejercicios para quemar grasa"
   },
   "fitty": {
     "dialogTitle": "Habla con Fitty",

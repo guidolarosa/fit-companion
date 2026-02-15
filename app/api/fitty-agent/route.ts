@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { getAIResponse } from "@/lib/openai"
+import { getAIStreamResponse } from "@/lib/openai"
 import { getUserContext } from "@/lib/user-context"
 import { requireApiUser } from "@/lib/get-api-user"
 
@@ -43,9 +43,33 @@ Format your responses using markdown:
 - Use ## for section headings
 - Use code formatting for numbers, dates, and measurements`
 
-    const response = await getAIResponse(question, systemPrompt, userContext)
+    const stream = await getAIStreamResponse(question, systemPrompt, userContext)
 
-    return NextResponse.json({ response }, { status: 200 })
+    // Create a ReadableStream that forwards OpenAI chunks as text
+    const encoder = new TextEncoder()
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            const text = chunk.choices[0]?.delta?.content
+            if (text) {
+              controller.enqueue(encoder.encode(text))
+            }
+          }
+          controller.close()
+        } catch (err) {
+          controller.error(err)
+        }
+      },
+    })
+
+    return new Response(readable, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "Transfer-Encoding": "chunked",
+      },
+    })
   } catch (error) {
     console.error("Error in Fitty agent:", error)
     return NextResponse.json(
@@ -54,4 +78,3 @@ Format your responses using markdown:
     )
   }
 }
-
