@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { Zap, ArrowRight, Globe } from "lucide-react"
+import { useSession } from "next-auth/react"
+import { Zap, ArrowRight, Globe, LayoutDashboard } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface LandingNavProps {
@@ -14,6 +15,8 @@ interface LandingNavProps {
 export function LandingNav({ currentLocale, onToggleLocale }: LandingNavProps) {
   const t = useTranslations("landing")
   const tc = useTranslations("common")
+  const { data: session } = useSession()
+  const isLoggedIn = !!session?.user
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -47,17 +50,28 @@ export function LandingNav({ currentLocale, onToggleLocale }: LandingNavProps) {
           <Globe className="h-3.5 w-3.5" />
           <span className="uppercase">{currentLocale === "es" ? "EN" : "ES"}</span>
         </Button>
-        <Button asChild variant="ghost" size="sm" className="text-sm text-zinc-400 hover:text-white hover:bg-transparent min-h-0 h-auto px-0 hidden sm:inline-flex">
-          <Link href="/login">
-            {t("navLogin")}
-          </Link>
-        </Button>
-        <Button asChild size="sm" className="gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold min-h-0 h-auto">
-          <Link href="/login">
-            {t("navCta")}
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </Button>
+        {isLoggedIn ? (
+          <Button asChild size="sm" className="gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold min-h-0 h-auto">
+            <Link href="/dashboard">
+              <LayoutDashboard className="h-3.5 w-3.5" />
+              {t("navDashboard")}
+            </Link>
+          </Button>
+        ) : (
+          <>
+            <Button asChild variant="ghost" size="sm" className="text-sm text-zinc-400 hover:text-white hover:bg-transparent min-h-0 h-auto px-0 hidden sm:inline-flex">
+              <Link href="/login">
+                {t("navLogin")}
+              </Link>
+            </Button>
+            <Button asChild size="sm" className="gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold min-h-0 h-auto">
+              <Link href="/login">
+                {t("navCta")}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </Button>
+          </>
+        )}
       </div>
     </div>
   )
