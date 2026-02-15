@@ -81,7 +81,7 @@ export function IFCard({ ifType, ifStartTime }: IFCardProps) {
           <Clock className="h-3.5 w-3.5 text-zinc-600" />
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center h-[120px] text-center">
-          <div className="w-10 h-10 mb-2 rounded-full bg-white/5 flex items-center justify-center">
+          <div className="w-10 h-10 mb-2 rounded-full bg-white/5 aspect-square flex items-center justify-center">
             <Clock className="w-5 h-5 text-zinc-600" />
           </div>
           <p className="text-xs text-zinc-500 mb-3">

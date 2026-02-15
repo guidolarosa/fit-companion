@@ -1,15 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { format } from "date-fns"
-import { Trash2, Edit, ChevronLeft, ChevronRight } from "lucide-react"
+import { Trash2, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditFoodDialog } from "@/components/edit-food-dialog"
 import { CaloriePill } from "@/components/calorie-pill"
+import { PaginationControls } from "@/components/pagination-controls"
 import { useTranslations } from "next-intl"
 
 interface FoodEntry {
@@ -32,7 +32,6 @@ interface AllFoodEntriesTableProps {
 
 export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoodEntriesTableProps) {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const t = useTranslations("food")
   const tc = useTranslations("common")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -57,47 +56,6 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
       console.error("Error deleting food entry:", error)
       toast.error(t("allDeleteError"))
     }
-  }
-
-  function createPageUrl(page: number) {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set("page", page.toString())
-    return `/food/all?${params.toString()}`
-  }
-
-  function getPageNumbers() {
-    const pages: (number | string)[] = []
-    const maxVisible = 5
-
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i)
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) {
-          pages.push(i)
-        }
-        pages.push("...")
-        pages.push(totalPages)
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1)
-        pages.push("...")
-        for (let i = totalPages - 3; i <= totalPages; i++) {
-          pages.push(i)
-        }
-      } else {
-        pages.push(1)
-        pages.push("...")
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i)
-        }
-        pages.push("...")
-        pages.push(totalPages)
-      }
-    }
-
-    return pages
   }
 
   return (
@@ -240,61 +198,7 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
         </div>
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-sm text-muted-foreground">
-            {tc("pageOf", { current: currentPage, total: totalPages })}
-          </div>
-          <div className="flex items-center gap-2">
-            <Link href={createPageUrl(currentPage - 1)}>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage === 1}
-                className="h-9 w-9 p-0"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            
-            <div className="flex items-center gap-1">
-              {getPageNumbers().map((page, index) => {
-                if (page === "...") {
-                  return (
-                    <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
-                      ...
-                    </span>
-                  )
-                }
-                const pageNum = page as number
-                return (
-                  <Link key={pageNum} href={createPageUrl(pageNum)}>
-                    <Button
-                      variant={currentPage === pageNum ? "default" : "outline"}
-                      size="sm"
-                      className="h-9 w-9 p-0"
-                    >
-                      {pageNum}
-                    </Button>
-                  </Link>
-                )
-              })}
-            </div>
-
-            <Link href={createPageUrl(currentPage + 1)}>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={currentPage === totalPages}
-                className="h-9 w-9 p-0"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      )}
+      <PaginationControls currentPage={currentPage} totalPages={totalPages} basePath="/food/all" />
 
       <EditFoodDialog
         open={editDialogOpen}

@@ -1,165 +1,51 @@
-import { prisma } from "@/lib/prisma"
-import { format, startOfDay } from "date-fns"
-import { calculateBMR, calculateTDEE, getWeightForDate } from "@/lib/calories"
+import {
+  fetchUserProfile,
+  fetchWeightEntries,
+  fetchExerciseEntries,
+  fetchFoodEntries,
+  calculateWeightMetrics,
+  buildDailyDataMap,
+  enrichDailyData,
+  calculateTrends,
+} from "@/lib/user-context-helpers"
 
 export async function getUserContext(userId: string) {
   // Get user profile
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-  })
+  const user = await fetchUserProfile(userId)
 
   if (!user) {
     return "No user data available"
   }
 
-  // Get weight data
-  const weightEntries = await prisma.weightEntry.findMany({
-    where: { userId },
-    orderBy: { date: "desc" },
-    take: 20, // Last 20 entries for trend
-  })
+  // Fetch all data in parallel
+  const [weightEntries, exerciseData, foodData] = await Promise.all([
+    fetchWeightEntries(userId),
+    fetchExerciseEntries(userId),
+    fetchFoodEntries(userId),
+  ])
 
-  const latestWeight = weightEntries[0] || null
-  // Get the oldest weight from the recent entries for trend calculation
-  const oldestRecentWeight = weightEntries.length > 1 ? weightEntries[weightEntries.length - 1] : null
-  const weightChange = latestWeight && oldestRecentWeight && weightEntries.length > 1
-    ? latestWeight.weight - oldestRecentWeight.weight
-    : null
+  const { recentExercises, allExercises, totalCaloriesBurnt } = exerciseData
+  const { recentFoods, allFoods, totalCaloriesConsumed } = foodData
 
-  // Calculate BMI
-  let bmi: number | null = null
-  if (latestWeight && user?.height) {
-    const heightInMeters = user.height / 100
-    bmi = latestWeight.weight / (heightInMeters * heightInMeters)
-  }
+  // Compute weight metrics
+  const { latestWeight, weightChange, bmi } = calculateWeightMetrics(
+    weightEntries,
+    user?.height ?? null
+  )
 
-  // Get exercise data
-  const recentExercises = await prisma.exercise.findMany({
-    where: { userId },
-    orderBy: { date: "desc" },
-    take: 10,
-  })
-
-  const allExercises = await prisma.exercise.findMany({
-    where: { userId },
-    orderBy: { date: "desc" },
-  })
-
-  const totalCaloriesBurnt = await prisma.exercise.aggregate({
-    where: { userId },
-    _sum: { calories: true },
-  })
-
-  const totalCaloriesBurntValue = totalCaloriesBurnt._sum.calories || 0
-
-  // Get food data
-  const recentFoods = await prisma.foodEntry.findMany({
-    where: { userId },
-    orderBy: { date: "desc" },
-    take: 10,
-  })
-
-  const allFoods = await prisma.foodEntry.findMany({
-    where: { userId },
-    orderBy: { date: "desc" },
-  })
-
-  const totalCaloriesConsumed = await prisma.foodEntry.aggregate({
-    where: { userId },
-    _sum: { calories: true },
-  })
-
-  const totalCaloriesConsumedValue = totalCaloriesConsumed._sum.calories || 0
-
-  // Calculate net calories (consumed - burnt)
-  const netCalories = totalCaloriesConsumedValue - totalCaloriesBurntValue
+  // Net calories (consumed - burnt)
+  const netCalories = totalCaloriesConsumed - totalCaloriesBurnt
 
   // Build daily view for trends (last 30 days)
-  const dailyDataMap = new Map<
-    string,
-    { caloriesConsumed: number; caloriesBurnt: number; protein: number; date: Date }
-  >()
+  const dailyDataMap = buildDailyDataMap(allExercises, allFoods)
+  const dailyData = enrichDailyData(dailyDataMap, weightEntries, user)
 
-  allExercises.forEach((exercise) => {
-    const key = exercise.date.toISOString().split("T")[0]
-    const existing = dailyDataMap.get(key)
-    if (existing) {
-      existing.caloriesBurnt += exercise.calories
-    } else {
-      const [y, m, d] = key.split("-").map(Number)
-      dailyDataMap.set(key, {
-        caloriesBurnt: exercise.calories,
-        caloriesConsumed: 0,
-        protein: 0,
-        date: new Date(Date.UTC(y, m - 1, d)),
-      })
-    }
-  })
-
-  allFoods.forEach((food) => {
-    const protein = (food as any).protein || 0
-    const key = food.date.toISOString().split("T")[0]
-    const existing = dailyDataMap.get(key)
-    if (existing) {
-      existing.caloriesConsumed += food.calories
-      existing.protein += protein
-    } else {
-      const [y, m, d] = key.split("-").map(Number)
-      dailyDataMap.set(key, {
-        caloriesBurnt: 0,
-        caloriesConsumed: food.calories,
-        protein,
-        date: new Date(Date.UTC(y, m - 1, d)),
-      })
-    }
-  })
-
-  const dailyData = Array.from(dailyDataMap.values())
-    .map((day) => {
-      const weight = getWeightForDate(day.date, weightEntries)
-      let bmr = 0
-      let tdee = 0
-      if (weight && user?.height && user?.age) {
-        bmr = calculateBMR(weight, user.height, user.age)
-        tdee = calculateTDEE(bmr, user.lifestyle)
-      }
-      const net = day.caloriesConsumed - (tdee + day.caloriesBurnt)
-      return {
-        ...day,
-        bmr,
-        tdee,
-        netCalories: net,
-        ratioToTdee: tdee > 0 ? day.caloriesConsumed / tdee : null,
-      }
-    })
-    .sort((a, b) => b.date.getTime() - a.date.getTime())
-    .slice(0, 30)
-
-  const last7 = dailyData.slice(0, 7)
-  const avgDeficit = last7.length
-    ? last7.reduce((sum, day) => sum + day.netCalories, 0) / last7.length
-    : null
-  const projectedKgPerWeek = avgDeficit !== null ? (avgDeficit * 7) / 7700 : null
-
+  // Trend analysis
   const sustainabilityMode = (user as any)?.sustainabilityMode ?? "sustainable"
-  const aggressiveThreshold = sustainabilityMode === "strict" ? 0.5 : 0.6
+  const trends = calculateTrends(dailyData, weightEntries, sustainabilityMode)
 
-  let extremeDeficitStreak = 0
-  for (const day of dailyData) {
-    if (day.ratioToTdee !== null && day.ratioToTdee < aggressiveThreshold) {
-      extremeDeficitStreak += 1
-    } else {
-      break
-    }
-  }
+  // ── Format context string ──────────────────────────────────────────
 
-  let plateauDetected = false
-  if (weightEntries.length >= 3 && avgDeficit !== null && avgDeficit < -150) {
-    const recent = weightEntries.slice(0, 3).map((w) => w.weight)
-    plateauDetected = Math.max(...recent) - Math.min(...recent) < 0.2
-  }
-
-  // Format context string
   let context = "USER PROFILE AND FITNESS DATA:\n\n"
 
   // User profile
@@ -180,7 +66,7 @@ export async function getUserContext(userId: string) {
   // Weight information
   context += "WEIGHT TRACKING:\n"
   if (latestWeight) {
-    const latestWeightDateStr = latestWeight.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
+    const latestWeightDateStr = new Date(latestWeight.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
     context += `- Current Weight: ${latestWeight.weight} kg (recorded on ${latestWeightDateStr})\n`
     if (weightChange !== null && weightEntries.length > 1) {
       const changeText = weightChange > 0 ? `+${weightChange.toFixed(1)}` : weightChange.toFixed(1)
@@ -202,7 +88,7 @@ export async function getUserContext(userId: string) {
   // Exercise information
   context += "EXERCISE ACTIVITY:\n"
   if (recentExercises.length > 0) {
-    context += `- Total Calories Burnt (all time): ${Math.round(totalCaloriesBurntValue)} kcal\n`
+    context += `- Total Calories Burnt (all time): ${Math.round(totalCaloriesBurnt)} kcal\n`
     context += `- Recent Exercises (last 10):\n`
     recentExercises.slice(0, 5).forEach((ex) => {
       const exDateStr = ex.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
@@ -218,7 +104,7 @@ export async function getUserContext(userId: string) {
   // Food information
   context += "FOOD CONSUMPTION:\n"
   if (recentFoods.length > 0) {
-    context += `- Total Calories Consumed (all time): ${Math.round(totalCaloriesConsumedValue)} kcal\n`
+    context += `- Total Calories Consumed (all time): ${Math.round(totalCaloriesConsumed)} kcal\n`
     context += `- Recent Food Entries (last 10):\n`
     recentFoods.slice(0, 5).forEach((food) => {
       const foodDateStr = food.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
@@ -230,36 +116,32 @@ export async function getUserContext(userId: string) {
   context += "\n"
 
   // Net calories
-  if (totalCaloriesConsumedValue > 0 || totalCaloriesBurntValue > 0) {
+  if (totalCaloriesConsumed > 0 || totalCaloriesBurnt > 0) {
     context += "CALORIE BALANCE:\n"
     context += `- Net Calories: ${netCalories > 0 ? "+" : ""}${Math.round(netCalories)} kcal (consumed - burnt)\n`
     context += "\n"
   }
 
   // Trends and patterns
+  const aggressiveThreshold = sustainabilityMode === "strict" ? 0.5 : 0.6
   context += "TRENDS (last 7 days):\n"
-  if (avgDeficit !== null) context += `- Avg deficit: ${Math.round(avgDeficit)} kcal/day\n`
-  if (projectedKgPerWeek !== null) {
+  if (trends.avgDeficit !== null) context += `- Avg deficit: ${Math.round(trends.avgDeficit)} kcal/day\n`
+  if (trends.projectedKgPerWeek !== null) {
     context += `- Projected pace: ${
-      projectedKgPerWeek < 0
-        ? `${Math.abs(projectedKgPerWeek).toFixed(2)} kg/week loss`
-        : `${projectedKgPerWeek.toFixed(2)} kg/week gain`
+      trends.projectedKgPerWeek < 0
+        ? `${Math.abs(trends.projectedKgPerWeek).toFixed(2)} kg/week loss`
+        : `${trends.projectedKgPerWeek.toFixed(2)} kg/week gain`
     }\n`
   }
-  context += `- Extreme deficit streak: ${extremeDeficitStreak} days (threshold ${
+  context += `- Extreme deficit streak: ${trends.extremeDeficitStreak} days (threshold ${
     aggressiveThreshold * 100
   }% of TDEE)\n`
-  if (plateauDetected) {
+  if (trends.plateauDetected) {
     context += "- Pattern: Weight plateau despite deficit (recent weights stable)\n"
   }
-  const proteinTrackedDays = last7.filter((d) => d.protein > 0).length
-  const highProteinDays = last7.filter(
-    (d) => d.caloriesConsumed > 0 && d.protein * 4 / d.caloriesConsumed >= 0.25
-  ).length
-  context += `- Protein tracked: ${proteinTrackedDays}/7 days\n`
-  context += `- High-protein days (>=25% kcal): ${highProteinDays}/7\n`
+  context += `- Protein tracked: ${trends.proteinTrackedDays}/7 days\n`
+  context += `- High-protein days (>=25% kcal): ${trends.highProteinDays}/7\n`
   context += "\n"
 
   return context
 }
-

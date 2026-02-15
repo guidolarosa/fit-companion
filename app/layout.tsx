@@ -19,10 +19,79 @@ const barlowCondensed = Barlow_Condensed({
 });
 
 export const metadata: Metadata = {
-  title: "Fit Companion - Weight Loss Tracker",
-  description: "Track your weight loss progress with AI assistance",
+  metadataBase: new URL("https://fitcompanion.app"),
+  title: {
+    default: "FitCompanion – Tracker de Peso, Nutrición y Ejercicio con IA",
+    template: "%s | FitCompanion",
+  },
+  description:
+    "Registra tu alimentación, ejercicio y peso. Obtené insights personalizados con Inteligencia Artificial para alcanzar tus objetivos de salud y bienestar. 100% gratuito.",
+  keywords: [
+    "fitness tracker",
+    "weight loss tracker",
+    "nutrition tracker",
+    "AI health app",
+    "calorie counter",
+    "macro tracker",
+    "exercise log",
+    "weight tracker",
+    "health app",
+    "wellness app",
+    "seguimiento de peso",
+    "contador de calorías",
+    "tracker de nutrición",
+    "registro de ejercicio",
+    "pérdida de peso",
+    "macronutrientes",
+    "inteligencia artificial salud",
+    "app de salud gratuita",
+    "fitcompanion",
+  ],
+  authors: [{ name: "FitCompanion" }],
+  creator: "FitCompanion",
+  publisher: "FitCompanion",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    alternateLocale: "en_US",
+    url: "https://fitcompanion.app",
+    siteName: "FitCompanion",
+    title: "FitCompanion – Tu Compañero de Salud con IA",
+    description:
+      "Registra tu alimentación, ejercicio y peso. Obtené insights personalizados con IA para alcanzar tus objetivos de salud y bienestar.",
+    images: [
+      {
+        url: "/img/thumbnail.png",
+        width: 1200,
+        height: 630,
+        alt: "FitCompanion – Tu camino hacia una vida más sana",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "FitCompanion – Tu Compañero de Salud con IA",
+    description:
+      "Registra tu alimentación, ejercicio y peso. Obtené insights personalizados con IA para alcanzar tus objetivos.",
+    images: ["/img/thumbnail.png"],
+  },
   icons: {
     icon: "/favicon.ico",
+  },
+  alternates: {
+    canonical: "https://fitcompanion.app",
   },
 };
 
