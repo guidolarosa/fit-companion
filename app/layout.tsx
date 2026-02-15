@@ -18,8 +18,15 @@ const barlowCondensed = Barlow_Condensed({
   variable: "--font-barlow-condensed"
 });
 
+// Resolve the base URL dynamically: Vercel production → Vercel preview → localhost
+const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://fitcompanion.app"),
+  metadataBase: new URL(baseUrl),
   title: {
     default: "FitCompanion – Tracker de Peso, Nutrición y Ejercicio con IA",
     template: "%s | FitCompanion",
@@ -65,7 +72,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_AR",
     alternateLocale: "en_US",
-    url: "https://fitcompanion.app",
+    url: baseUrl,
     siteName: "FitCompanion",
     title: "FitCompanion – Tu Compañero de Salud con IA",
     description:
@@ -91,7 +98,7 @@ export const metadata: Metadata = {
     icon: "/favicon.ico",
   },
   alternates: {
-    canonical: "https://fitcompanion.app",
+    canonical: baseUrl,
   },
 };
 

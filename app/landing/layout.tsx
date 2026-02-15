@@ -1,6 +1,12 @@
 import type { Metadata } from "next"
 import Script from "next/script"
 
+const baseUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000"
+
 export const metadata: Metadata = {
   title: "FitCompanion – Tracker de Peso, Nutrición y Ejercicio con IA",
   description:
@@ -22,13 +28,13 @@ export const metadata: Metadata = {
     "health tracker",
   ],
   alternates: {
-    canonical: "https://fitcompanion.app/landing",
+    canonical: `${baseUrl}/landing`,
   },
   openGraph: {
     title: "FitCompanion – Tu Camino Hacia una Vida Más Sana",
     description:
       "Registra tu alimentación, ejercicio y peso. Obtené insights personalizados con IA. 100% gratuito y privado.",
-    url: "https://fitcompanion.app/landing",
+    url: `${baseUrl}/landing`,
     images: [
       {
         url: "/img/thumbnail.png",
@@ -53,12 +59,12 @@ const jsonLdWebsite = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "FitCompanion",
-  url: "https://fitcompanion.app",
+  url: baseUrl,
   description:
     "Tu compañero inteligente para perder peso y vivir más sano. Registra comida, ejercicio y peso con estimación automática de calorías y macros por IA.",
   potentialAction: {
     "@type": "SearchAction",
-    target: "https://fitcompanion.app/landing",
+    target: `${baseUrl}/landing`,
   },
 }
 
@@ -68,7 +74,7 @@ const jsonLdSoftwareApp = {
   name: "FitCompanion",
   applicationCategory: "HealthApplication",
   operatingSystem: "Web",
-  url: "https://fitcompanion.app",
+  url: baseUrl,
   description:
     "App gratuita para registro de alimentación, ejercicio y peso con inteligencia artificial. Tracker de calorías, macronutrientes, hidratación y análisis de laboratorio.",
   offers: {
@@ -85,15 +91,15 @@ const jsonLdSoftwareApp = {
     "Análisis de laboratorio con IA",
     "Reportes exportables en PDF",
   ],
-  screenshot: "https://fitcompanion.app/img/thumbnail.png",
+  screenshot: `${baseUrl}/img/thumbnail.png`,
 }
 
 const jsonLdOrganization = {
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "FitCompanion",
-  url: "https://fitcompanion.app",
-  logo: "https://fitcompanion.app/favicon.ico",
+  url: baseUrl,
+  logo: `${baseUrl}/favicon.ico`,
   sameAs: [],
 }
 
