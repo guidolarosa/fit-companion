@@ -4,6 +4,7 @@ import Link from "next/link"
 import dynamic from "next/dynamic"
 import { useTranslations } from "next-intl"
 import { Sparkles, ArrowRight, Shield, Brain } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { DashboardMockup } from "./DashboardMockup"
 
 const Aurora = dynamic(() => import("@/components/aurora"), { ssr: false })
@@ -55,19 +56,17 @@ export function HeroSection() {
           </p>
 
           <div className="reveal-on-scroll mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/login"
-              className="group inline-flex items-center gap-2 px-8 py-3.5 rounded-lg bg-primary text-white font-semibold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
-            >
-              {t("heroCtaPrimary")}
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
-            <a
-              href="#features"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg bg-white/[0.04] border border-white/[0.08] text-zinc-300 font-semibold text-sm hover:bg-white/[0.08] hover:border-white/[0.12] transition-all"
-            >
-              {t("heroCtaSecondary")}
-            </a>
+            <Button asChild size="lg" className="group gap-2 px-8 py-3.5 rounded-lg font-semibold text-sm shadow-lg shadow-primary/25 hover:shadow-primary/40">
+              <Link href="/login">
+                {t("heroCtaPrimary")}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="lg" className="gap-2 px-8 py-3.5 rounded-lg bg-white/[0.04] border-white/[0.08] text-zinc-300 font-semibold text-sm hover:bg-white/[0.08] hover:border-white/[0.12]">
+              <a href="#features">
+                {t("heroCtaSecondary")}
+              </a>
+            </Button>
           </div>
 
           <div className="reveal-on-scroll mt-12 flex items-center justify-center gap-6 text-zinc-600 text-xs">

@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { Brain, CheckCircle2, ChevronRight, Sparkles } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export function AIHighlightSection() {
   const t = useTranslations("landing")
@@ -55,13 +56,12 @@ export function AIHighlightSection() {
               ))}
             </ul>
             <div className="reveal-on-scroll mt-8">
-              <Link
-                href="/login"
-                className="group inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
-              >
-                {t("aiCta")}
-                <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
+              <Button asChild variant="link" className="group gap-2 px-0 text-sm font-semibold min-h-0 h-auto">
+                <Link href="/login">
+                  {t("aiCta")}
+                  <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </Button>
             </div>
           </div>
 

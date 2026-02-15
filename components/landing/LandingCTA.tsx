@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export function LandingCTA() {
   const t = useTranslations("landing")
@@ -25,13 +26,12 @@ export function LandingCTA() {
               {t("ctaSubtitle")}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/login"
-                className="group inline-flex items-center gap-2 px-10 py-4 rounded-lg bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-all shadow-lg shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5"
-              >
-                {t("ctaButton")}
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
+              <Button asChild size="lg" className="group gap-2 px-10 py-4 rounded-lg font-bold text-sm shadow-lg shadow-primary/25 hover:shadow-primary/40">
+                <Link href="/login">
+                  {t("ctaButton")}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </Button>
             </div>
             <p className="mt-6 text-[11px] text-zinc-600">
               {t("ctaDisclaimer")}

@@ -139,7 +139,7 @@ export function useOnboarding() {
       document.cookie = "onboarding_complete=1; path=/; max-age=60"
 
       // Hard navigation to pick up the fresh cookie
-      window.location.href = "/"
+      window.location.href = "/dashboard"
     } catch (err) {
       console.error("Onboarding error:", err)
       toast.error(t("connectionError"))

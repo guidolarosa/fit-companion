@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { Zap, ArrowRight, Globe } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface LandingNavProps {
   currentLocale: string
@@ -27,7 +28,7 @@ export function LandingNav({ currentLocale, onToggleLocale }: LandingNavProps) {
 
   const navInner = (
     <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-      <Link href="/landing" className="flex items-center gap-2">
+      <Link href="/" className="flex items-center gap-2">
         <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
           <Zap className="h-4 w-4 text-primary" />
         </div>
@@ -36,27 +37,27 @@ export function LandingNav({ currentLocale, onToggleLocale }: LandingNavProps) {
         </span>
       </Link>
       <div className="flex items-center gap-3">
-        <button
+        <Button
           onClick={onToggleLocale}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.05] transition-colors"
+          variant="ghost"
+          size="sm"
+          className="gap-1.5 text-xs font-medium text-zinc-400 hover:text-white hover:bg-white/[0.05] min-h-0 h-auto px-2.5 py-1.5 rounded-lg"
           title={currentLocale === "es" ? "Switch to English" : "Cambiar a Español"}
         >
           <Globe className="h-3.5 w-3.5" />
           <span className="uppercase">{currentLocale === "es" ? "EN" : "ES"}</span>
-        </button>
-        <Link
-          href="/login"
-          className="text-sm text-zinc-400 hover:text-white transition-colors hidden sm:inline-flex"
-        >
-          {t("navLogin")}
-        </Link>
-        <Link
-          href="/login"
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-colors"
-        >
-          {t("navCta")}
-          <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        </Button>
+        <Button asChild variant="ghost" size="sm" className="text-sm text-zinc-400 hover:text-white hover:bg-transparent min-h-0 h-auto px-0 hidden sm:inline-flex">
+          <Link href="/login">
+            {t("navLogin")}
+          </Link>
+        </Button>
+        <Button asChild size="sm" className="gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold min-h-0 h-auto">
+          <Link href="/login">
+            {t("navCta")}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </Button>
       </div>
     </div>
   )

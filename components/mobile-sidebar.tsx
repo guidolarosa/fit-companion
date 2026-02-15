@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 const navigationItems = [
-  { key: "dashboard", href: "/", icon: LayoutDashboard },
+  { key: "dashboard", href: "/dashboard", icon: LayoutDashboard },
   { key: "weight", href: "/weight", icon: Weight },
   { key: "exercise", href: "/exercise", icon: Dumbbell },
   { key: "food", href: "/food", icon: UtensilsCrossed },

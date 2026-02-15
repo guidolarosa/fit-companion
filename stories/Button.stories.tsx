@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, Loader2, Trash2 } from "lucide-react"
+import { ArrowRight, ExternalLink, Loader2, Trash2 } from "lucide-react"
 
 const meta: Meta<typeof Button> = {
   title: "UI/Button",
@@ -80,6 +80,39 @@ export const Loading: Story = {
 
 export const Disabled: Story = {
   args: { children: "Disabled", disabled: true },
+}
+
+export const AsChildLink: Story = {
+  render: () => (
+    <Button asChild>
+      <a href="https://example.com">
+        Visit site
+        <ExternalLink className="ml-2 h-4 w-4" />
+      </a>
+    </Button>
+  ),
+}
+
+export const AsChildVariants: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-3">
+      <Button asChild>
+        <a href="#">Default link</a>
+      </Button>
+      <Button asChild variant="outline">
+        <a href="#">Outline link</a>
+      </Button>
+      <Button asChild variant="ghost">
+        <a href="#">Ghost link</a>
+      </Button>
+      <Button asChild variant="link">
+        <a href="#">Text link</a>
+      </Button>
+      <Button asChild variant="secondary">
+        <a href="#">Secondary link</a>
+      </Button>
+    </div>
+  ),
 }
 
 export const AllVariants: Story = {

@@ -5,13 +5,14 @@ import { auth } from "@/lib/auth"
 export async function middleware(request: NextRequest) {
   const session = await auth()
 
-  // Allow access to auth routes, login page, landing page, and static assets
+  // Allow access to: root landing page, auth routes, login page, and static assets
   if (
+    request.nextUrl.pathname === "/" ||
     request.nextUrl.pathname.startsWith("/api/auth") ||
     request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/landing") ||
     request.nextUrl.pathname.startsWith("/_next") ||
-    request.nextUrl.pathname === "/favicon.ico"
+    request.nextUrl.pathname === "/favicon.ico" ||
+    request.nextUrl.pathname.startsWith("/img/")
   ) {
     return NextResponse.next()
   }
@@ -49,11 +50,11 @@ export const config = {
      * Match all request paths except for the ones starting with:
      * - api/auth (authentication routes)
      * - login (login page)
-     * - landing (landing page)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - img/ (public images like OG thumbnail)
      */
-    "/((?!api/auth|login|landing|_next/static|_next/image|favicon.ico).*)",
+    "/((?!api/auth|login|_next/static|_next/image|favicon.ico|img/).*)",
   ],
 }
