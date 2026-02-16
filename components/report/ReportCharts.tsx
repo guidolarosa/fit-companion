@@ -187,6 +187,7 @@ export function ReportCharts({ reportData }: ReportChartsProps) {
                 value: macroAverages.protein,
                 unit: tc("g"),
                 color: "text-blue-400",
+                gradientColor: "96, 165, 250",
               },
               {
                 key: "carbs",
@@ -194,6 +195,7 @@ export function ReportCharts({ reportData }: ReportChartsProps) {
                 value: macroAverages.carbs,
                 unit: tc("g"),
                 color: "text-amber-400",
+                gradientColor: "251, 191, 36",
               },
               {
                 key: "fat",
@@ -201,6 +203,7 @@ export function ReportCharts({ reportData }: ReportChartsProps) {
                 value: macroAverages.fat,
                 unit: tc("g"),
                 color: "text-rose-400",
+                gradientColor: "251, 113, 133",
               },
               {
                 key: "fiber",
@@ -208,6 +211,7 @@ export function ReportCharts({ reportData }: ReportChartsProps) {
                 value: macroAverages.fiber,
                 unit: tc("g"),
                 color: "text-emerald-400",
+                gradientColor: "52, 211, 153",
               },
               {
                 key: "sugar",
@@ -215,9 +219,16 @@ export function ReportCharts({ reportData }: ReportChartsProps) {
                 value: macroAverages.sugar,
                 unit: tc("g"),
                 color: "text-purple-400",
+                gradientColor: "167, 139, 250",
               },
             ].map((m) => (
-              <Card key={m.key} className="glass-card">
+              <Card
+                key={m.key}
+                className="glass-card"
+                style={{
+                  background: `linear-gradient(135deg, rgba(${m.gradientColor}, 0.15) 0%, rgba(${m.gradientColor}, 0.05) 50%, rgba(255, 255, 255, 0.02) 100%)`,
+                }}
+              >
                 <CardContent className="pt-4 pb-3 px-4">
                   <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-500">
                     {m.label}
