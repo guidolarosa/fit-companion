@@ -9,6 +9,7 @@ import { FeaturesGrid } from "@/components/landing/FeaturesGrid"
 import { AIHighlightSection } from "@/components/landing/AIHighlightSection"
 import { HowItWorks } from "@/components/landing/HowItWorks"
 import { WeightLossFocus } from "@/components/landing/WeightLossFocus"
+import { LandingTestimonials } from "@/components/landing/LandingTestimonials"
 import { LandingCTA } from "@/components/landing/LandingCTA"
 import { LandingFooter } from "@/components/landing/LandingFooter"
 import { LandingJsonLd } from "@/components/landing/LandingJsonLd"
@@ -72,6 +73,7 @@ export default function LandingPage() {
         <AIHighlightSection />
         <HowItWorks />
         <WeightLossFocus />
+        <LandingTestimonials />
         <LandingCTA />
       </main>
       <LandingFooter />

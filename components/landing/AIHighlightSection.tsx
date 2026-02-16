@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { Brain, CheckCircle2, ChevronRight, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 
 export function AIHighlightSection() {
   const t = useTranslations("landing")
@@ -68,8 +69,8 @@ export function AIHighlightSection() {
           {/* Right - AI Demo Card */}
           <div className="reveal-on-scroll relative">
             <div className="absolute inset-0 bg-primary/5 rounded-2xl blur-[40px] scale-95" />
-            <div className="relative rounded-xl border border-white/[0.08] bg-white/[0.02] overflow-hidden">
-              <div className="p-5 space-y-4">
+            <Card className="relative border-white/[0.08] bg-white/[0.02] overflow-hidden">
+              <CardContent className="p-5 space-y-4">
                 <div className="flex items-center gap-2 mb-4">
                   <div className="w-6 h-6 rounded-md bg-primary/20 flex items-center justify-center">
                     <Sparkles className="h-3 w-3 text-primary" />
@@ -103,8 +104,8 @@ export function AIHighlightSection() {
                   <div className="w-1.5 h-1.5 rounded-full bg-zinc-600 animate-pulse" style={{ animationDelay: "300ms" }} />
                   <span className="text-[10px] text-zinc-600 ml-1">{t("aiDemoAutoRegistered")}</span>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

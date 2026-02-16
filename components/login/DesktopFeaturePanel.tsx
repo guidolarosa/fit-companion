@@ -90,7 +90,7 @@ export function DesktopFeaturePanel() {
             {t("heroTitle2")}
             <span className="text-primary">{t("heroTitle3")}</span>
           </h2>
-          <p className="mt-4 text-sm text-zinc-500 max-w-md leading-relaxed">
+          <p className="mt-4 text-sm text-zinc-300 max-w-md leading-relaxed">
             {t("heroDescription")}
           </p>
         </div>
@@ -109,7 +109,7 @@ export function DesktopFeaturePanel() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-xs font-semibold text-zinc-200">{f.title}</p>
-                  <p className="text-[10px] text-zinc-600 leading-relaxed mt-0.5">{f.desc}</p>
+                  <p className="text-[10px] text-zinc-400 leading-relaxed mt-0.5">{f.desc}</p>
                 </div>
               </div>
             )

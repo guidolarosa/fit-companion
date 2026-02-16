@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl"
 import { Weight, UtensilsCrossed, Activity, BarChart3, Droplets, FlaskConical, Target } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
 
 export function FeaturesGrid() {
   const t = useTranslations("landing")
@@ -39,12 +40,13 @@ export function FeaturesGrid() {
           {features.map((feature) => {
             const Icon = feature.icon
             return (
-              <div
+
+              <Card
                 key={feature.key}
-                className="reveal-on-scroll group relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 hover:border-white/[0.1] hover:bg-white/[0.04] transition-all duration-300"
+                className="reveal-on-scroll group relative border-white/[0.06] bg-white/[0.02] hover:border-white/[0.1] hover:bg-white/[0.04] transition-all duration-300 overflow-hidden"
               >
-                <div className={`absolute inset-0 rounded-xl bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
-                <div className="relative">
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                <CardContent className="relative p-6">
                   <div className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-4 group-hover:border-white/[0.1] transition-colors">
                     <Icon className={`h-5 w-5 ${feature.iconColor}`} />
                   </div>
@@ -52,9 +54,10 @@ export function FeaturesGrid() {
                   <p className="text-xs text-zinc-500 leading-relaxed group-hover:text-zinc-400 transition-colors">
                     {feature.desc}
                   </p>
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             )
+
           })}
         </div>
       </div>
