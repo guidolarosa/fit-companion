@@ -3,8 +3,9 @@
 import { useTranslations } from "next-intl"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { DatePicker } from "@/components/ui/date-picker"
 import { Calendar, Loader2, Activity } from "lucide-react"
+import { parse, format } from "date-fns"
 import { cn } from "@/lib/utils"
 
 interface ReportDatePickerProps {
@@ -67,18 +68,14 @@ export function ReportDatePicker({
 
           {rangeType === "period" && (
             <div className="flex items-center gap-2">
-              <Input
-                type="date"
-                value={startDate}
-                onChange={(e) => onStartDateChange(e.target.value)}
-                className="h-9 bg-white/[0.02] border-white/[0.05] text-xs text-zinc-300"
+              <DatePicker
+                value={startDate ? parse(startDate, "yyyy-MM-dd", new Date()) : undefined}
+                onChange={(d) => onStartDateChange(d ? format(d, "yyyy-MM-dd") : "")}
               />
               <span className="text-zinc-600">—</span>
-              <Input
-                type="date"
-                value={endDate}
-                onChange={(e) => onEndDateChange(e.target.value)}
-                className="h-9 bg-white/[0.02] border-white/[0.05] text-xs text-zinc-300"
+              <DatePicker
+                value={endDate ? parse(endDate, "yyyy-MM-dd", new Date()) : undefined}
+                onChange={(d) => onEndDateChange(d ? format(d, "yyyy-MM-dd") : "")}
               />
             </div>
           )}

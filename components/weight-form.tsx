@@ -7,6 +7,8 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { DatePicker } from "@/components/ui/date-picker"
+import { parse, format } from "date-fns"
 
 export function WeightForm() {
   const router = useRouter()
@@ -50,8 +52,11 @@ export function WeightForm() {
         <Input id="weight" type="number" step="0.1" min="0" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder={t("weightPlaceholder")} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="date">{tc("date")}</Label>
-        <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
+        <Label>{tc("date")}</Label>
+        <DatePicker
+          value={date ? parse(date, "yyyy-MM-dd", new Date()) : undefined}
+          onChange={(d) => setDate(d ? format(d, "yyyy-MM-dd") : getLocalDateString())}
+        />
       </div>
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? tc("submitting") : t("addEntry")}

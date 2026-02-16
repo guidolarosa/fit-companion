@@ -104,14 +104,14 @@ export default async function WeightPage() {
               <Card className="glass-card">
                 <CardHeader>
                   <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                    {t("allEntriesTitle")}
+                    {t("recentEntriesTitle")}
                   </CardTitle>
                   <CardDescription className="text-[11px] text-zinc-600">
-                    {t("allEntriesDescription")}
+                    {t("recentEntriesDescription")}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="overflow-hidden">
-                  <WeightEntryList entries={weights} />
+                  <WeightEntryList entries={weights} limit={7} showAllHref="/weight/all" />
                 </CardContent>
               </Card>
             )}

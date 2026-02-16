@@ -7,6 +7,9 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { DatePicker } from "@/components/ui/date-picker"
+import { TimePicker } from "@/components/ui/time-picker"
+import { parse, format } from "date-fns"
 import {
   Dialog,
   DialogContent,
@@ -215,26 +218,15 @@ export function EditFoodDialog({ open, onOpenChange, entry }: EditFoodDialogProp
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-food-date">{tc("date")}</Label>
-              <Input
-                id="edit-food-date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-                className="min-w-0"
+              <Label>{tc("date")}</Label>
+              <DatePicker
+                value={date ? parse(date, "yyyy-MM-dd", new Date()) : undefined}
+                onChange={(d) => setDate(d ? format(d, "yyyy-MM-dd") : "")}
               />
             </div>
             <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-food-time">{tc("time")}</Label>
-              <Input
-                id="edit-food-time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                required
-                className="min-w-0"
-              />
+              <Label>{tc("time")}</Label>
+              <TimePicker value={time} onChange={(t) => setTime(t)} minuteStep={1} />
             </div>
           </div>
           <DialogFooter>

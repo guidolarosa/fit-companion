@@ -7,6 +7,8 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { DatePicker } from "@/components/ui/date-picker"
+import { parse, format } from "date-fns"
 import {
   Dialog,
   DialogContent,
@@ -107,13 +109,10 @@ export function EditWeightDialog({ open, onOpenChange, entry }: EditWeightDialog
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="edit-date">{tc("date")}</Label>
-            <Input
-              id="edit-date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              required
+            <Label>{tc("date")}</Label>
+            <DatePicker
+              value={date ? parse(date, "yyyy-MM-dd", new Date()) : undefined}
+              onChange={(d) => setDate(d ? format(d, "yyyy-MM-dd") : "")}
             />
           </div>
           <DialogFooter>

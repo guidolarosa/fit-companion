@@ -7,7 +7,14 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select } from "@/components/ui/select"
+import { TimePicker } from "@/components/ui/time-picker"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
 
 interface User {
   id: string
@@ -100,14 +107,15 @@ export function SettingsForm({ user }: SettingsFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="locale">{t("languageLabel")}</Label>
-          <Select
-            id="locale"
-            value={locale}
-            onChange={(e) => setLocale(e.target.value)}
-          >
-            <option value="es">{t("languageEs")}</option>
-            <option value="en">{t("languageEn")}</option>
+          <Label>{t("languageLabel")}</Label>
+          <Select value={locale} onValueChange={setLocale}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="es">{t("languageEs")}</SelectItem>
+              <SelectItem value="en">{t("languageEn")}</SelectItem>
+            </SelectContent>
           </Select>
         </div>
       </div>
@@ -143,16 +151,16 @@ export function SettingsForm({ user }: SettingsFormProps) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="lifestyle">{t("lifestyleLabel")}</Label>
-        <Select
-          id="lifestyle"
-          value={lifestyle}
-          onChange={(e) => setLifestyle(e.target.value)}
-        >
-          <option value="">{t("lifestyleSelect")}</option>
-          <option value="sedentary">{t("lifestyleSedentary")}</option>
-          <option value="moderate">{t("lifestyleModerate")}</option>
-          <option value="active">{t("lifestyleActive")}</option>
+        <Label>{t("lifestyleLabel")}</Label>
+        <Select value={lifestyle} onValueChange={setLifestyle}>
+          <SelectTrigger>
+            <SelectValue placeholder={t("lifestyleSelect")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="sedentary">{t("lifestyleSedentary")}</SelectItem>
+            <SelectItem value="moderate">{t("lifestyleModerate")}</SelectItem>
+            <SelectItem value="active">{t("lifestyleActive")}</SelectItem>
+          </SelectContent>
         </Select>
       </div>
 
@@ -205,14 +213,15 @@ export function SettingsForm({ user }: SettingsFormProps) {
         </div>
 
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="sustainabilityMode">{t("sustainabilityLabel")}</Label>
-          <Select
-            id="sustainabilityMode"
-            value={sustainabilityMode}
-            onChange={(e) => setSustainabilityMode(e.target.value)}
-          >
-            <option value="strict">{t("sustainabilityStrict")}</option>
-            <option value="sustainable">{t("sustainabilitySustainable")}</option>
+          <Label>{t("sustainabilityLabel")}</Label>
+          <Select value={sustainabilityMode} onValueChange={setSustainabilityMode}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="strict">{t("sustainabilityStrict")}</SelectItem>
+              <SelectItem value="sustainable">{t("sustainabilitySustainable")}</SelectItem>
+            </SelectContent>
           </Select>
           <p className="text-xs text-muted-foreground">
             {t("sustainabilityHelp")}
@@ -222,31 +231,28 @@ export function SettingsForm({ user }: SettingsFormProps) {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="ifType">{t("ifTypeLabel")}</Label>
-          <Select
-            id="ifType"
-            value={ifType}
-            onChange={(e) => setIfType(e.target.value)}
-            className="min-w-0"
-          >
-            <option value="">{t("ifTypeNone")}</option>
-            <option value="16:8">{t("ifType168")}</option>
-            <option value="18:6">{t("ifType186")}</option>
-            <option value="20:4">{t("ifType204")}</option>
-            <option value="OMAD">{t("ifTypeOmad")}</option>
+          <Label>{t("ifTypeLabel")}</Label>
+          <Select value={ifType || "none"} onValueChange={(v) => setIfType(v === "none" ? "" : v)}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">{t("ifTypeNone")}</SelectItem>
+              <SelectItem value="16:8">{t("ifType168")}</SelectItem>
+              <SelectItem value="18:6">{t("ifType186")}</SelectItem>
+              <SelectItem value="20:4">{t("ifType204")}</SelectItem>
+              <SelectItem value="OMAD">{t("ifTypeOmad")}</SelectItem>
+            </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2 min-w-0">
-          <Label htmlFor="ifStartTime">{t("ifStartLabel")}</Label>
-          <Input
-            id="ifStartTime"
-            type="time"
+          <Label>{t("ifStartLabel")}</Label>
+          <TimePicker
             value={ifStartTime}
-            onChange={(e) => setIfStartTime(e.target.value)}
-            required={!!ifType}
+            onChange={setIfStartTime}
             disabled={!ifType}
-            className="min-w-0"
+            minuteStep={15}
           />
           <p className="text-xs text-muted-foreground">
             {t("ifStartHelp")}

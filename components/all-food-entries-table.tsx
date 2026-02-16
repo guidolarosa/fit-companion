@@ -4,12 +4,19 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { format } from "date-fns"
-import { Trash2, Edit } from "lucide-react"
+import { Trash2, Edit, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditFoodDialog } from "@/components/edit-food-dialog"
 import { CaloriePill } from "@/components/calorie-pill"
 import { PaginationControls } from "@/components/pagination-controls"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { useTranslations } from "next-intl"
 
 interface FoodEntry {
@@ -72,7 +79,7 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
             <div className="text-right">{tc("fatShort")}</div>
             <div className="text-right">{tc("fiberShort")}</div>
             <div className="text-right">{tc("sugarShort")}</div>
-            <div className="text-right w-20">{tc("actions")}</div>
+            <div className="text-right w-10" />
           </div>
 
           {/* Mobile header */}
@@ -80,7 +87,7 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
             <div className="col-span-5">{t("tableNameHeader")}</div>
             <div className="col-span-3">{t("tableDateHeader")}</div>
             <div className="col-span-2 text-right">{t("tableKcalHeader")}</div>
-            <div className="col-span-2 text-right">{tc("actions")}</div>
+            <div className="col-span-2 text-right" />
           </div>
 
           {/* Table rows */}
@@ -118,29 +125,34 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
                 <div className="text-right text-xs text-muted-foreground">
                   {entry.sugar != null ? `${Math.round(entry.sugar)}g` : '-'}
                 </div>
-                <div className="flex items-center justify-end gap-1 w-20">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setEntryToEdit(entry)
-                      setEditDialogOpen(true)
-                    }}
-                    className="hover:bg-muted h-8 w-8"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setEntryToDelete(entry)
-                      setDeleteDialogOpen(true)
-                    }}
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div className="flex items-center justify-end w-10">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setEntryToEdit(entry)
+                          setEditDialogOpen(true)
+                        }}
+                      >
+                        <Edit /> {tc("edit")}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        destructive
+                        onClick={() => {
+                          setEntryToDelete(entry)
+                          setDeleteDialogOpen(true)
+                        }}
+                      >
+                        <Trash2 /> {tc("delete")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
 
@@ -168,29 +180,34 @@ export function AllFoodEntriesTable({ entries, currentPage, totalPages }: AllFoo
                 <div className="col-span-2 text-right">
                   <CaloriePill calories={entry.calories} />
                 </div>
-                <div className="col-span-2 flex items-center justify-end gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setEntryToEdit(entry)
-                      setEditDialogOpen(true)
-                    }}
-                    className="hover:bg-muted h-8 w-8"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      setEntryToDelete(entry)
-                      setDeleteDialogOpen(true)
-                    }}
-                    className="text-destructive hover:text-destructive hover:bg-destructive/10 h-8 w-8"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                <div className="col-span-2 flex items-center justify-end">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem
+                        onClick={() => {
+                          setEntryToEdit(entry)
+                          setEditDialogOpen(true)
+                        }}
+                      >
+                        <Edit /> {tc("edit")}
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        destructive
+                        onClick={() => {
+                          setEntryToDelete(entry)
+                          setDeleteDialogOpen(true)
+                        }}
+                      >
+                        <Trash2 /> {tc("delete")}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
               </div>
             </div>

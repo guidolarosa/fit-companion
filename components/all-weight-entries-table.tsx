@@ -7,8 +7,7 @@ import { format } from "date-fns"
 import { Trash2, Edit, MoreVertical } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
-import { EditExerciseDialog } from "@/components/edit-exercise-dialog"
-import { CaloriePill } from "@/components/calorie-pill"
+import { EditWeightDialog } from "@/components/edit-weight-dialog"
 import { PaginationControls } from "@/components/pagination-controls"
 import {
   DropdownMenu,
@@ -19,32 +18,30 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useTranslations } from "next-intl"
 
-interface ExerciseEntry {
+interface WeightEntry {
   id: string
-  name: string
-  calories: number
-  duration: number | null
+  weight: number
   date: Date | string
 }
 
-interface AllExerciseEntriesTableProps {
-  entries: ExerciseEntry[]
+interface AllWeightEntriesTableProps {
+  entries: WeightEntry[]
   currentPage: number
   totalPages: number
 }
 
-export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: AllExerciseEntriesTableProps) {
+export function AllWeightEntriesTable({ entries, currentPage, totalPages }: AllWeightEntriesTableProps) {
   const router = useRouter()
-  const t = useTranslations("exercise")
+  const t = useTranslations("weight")
   const tc = useTranslations("common")
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
-  const [entryToDelete, setEntryToDelete] = useState<ExerciseEntry | null>(null)
+  const [entryToDelete, setEntryToDelete] = useState<WeightEntry | null>(null)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
-  const [entryToEdit, setEntryToEdit] = useState<ExerciseEntry | null>(null)
+  const [entryToEdit, setEntryToEdit] = useState<WeightEntry | null>(null)
 
   async function handleDelete(id: string) {
     try {
-      const response = await fetch(`/api/exercise?id=${id}`, {
+      const response = await fetch(`/api/weight?id=${id}`, {
         method: "DELETE",
       })
 
@@ -56,7 +53,7 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
         toast.error(errorData.error || t("allDeleteFailedFallback"))
       }
     } catch (error) {
-      console.error("Error deleting exercise entry:", error)
+      console.error("Error deleting weight entry:", error)
       toast.error(t("allDeleteError"))
     }
   }
@@ -67,10 +64,8 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
         <div className="min-w-full">
           {/* Table header */}
           <div className="grid grid-cols-12 gap-4 p-3 border-b font-semibold text-sm text-muted-foreground">
-            <div className="col-span-4 sm:col-span-4">{t("tableExerciseHeader")}</div>
-            <div className="col-span-3 sm:col-span-3">{t("tableDateHeader")}</div>
-            <div className="col-span-3 sm:col-span-2 text-right">{t("tableCaloriesHeader")}</div>
-            <div className="hidden sm:block sm:col-span-1 text-right">{t("tableMinsHeader")}</div>
+            <div className="col-span-5 sm:col-span-5">{t("tableWeightHeader")}</div>
+            <div className="col-span-5 sm:col-span-5">{t("tableDateHeader")}</div>
             <div className="col-span-2 sm:col-span-2 text-right" />
           </div>
 
@@ -80,24 +75,21 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
               key={entry.id}
               className="grid grid-cols-12 gap-4 p-3 border-b last:border-b-0 items-center hover:bg-muted/50 transition-colors"
             >
-              <div className="col-span-4 sm:col-span-4 min-w-0">
-                <p className="font-semibold truncate" title={entry.name}>
-                  {entry.name}
+              <div className="col-span-5 sm:col-span-5 min-w-0">
+                <p className="font-semibold truncate" title={`${entry.weight} ${tc("kg")}`}>
+                  {entry.weight} {tc("kg")}
                 </p>
               </div>
-              <div className="col-span-3 sm:col-span-3">
+              <div className="col-span-5 sm:col-span-5">
                 <p className="text-sm text-muted-foreground">
-                  {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })}
+                  {new Date(entry.date).toLocaleDateString('es-ES', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    timeZone: 'UTC',
+                  })}
                 </p>
-                <p className="text-xs text-muted-foreground sm:hidden">
-                  {new Date(entry.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' })}
-                </p>
-              </div>
-              <div className="col-span-3 sm:col-span-2 text-right">
-                <CaloriePill calories={entry.calories} />
-              </div>
-              <div className="hidden sm:block sm:col-span-1 text-right">
-                <p className="text-sm text-muted-foreground">{entry.duration ?? "—"}</p>
               </div>
               <div className="col-span-2 sm:col-span-2 flex items-center justify-end">
                 <DropdownMenu>
@@ -133,9 +125,9 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
         </div>
       </div>
 
-      <PaginationControls currentPage={currentPage} totalPages={totalPages} basePath="/exercise/all" />
+      <PaginationControls currentPage={currentPage} totalPages={totalPages} basePath="/weight/all" />
 
-      <EditExerciseDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} entry={entryToEdit} />
+      <EditWeightDialog open={editDialogOpen} onOpenChange={setEditDialogOpen} entry={entryToEdit} />
 
       <DeleteConfirmDialog
         open={deleteDialogOpen}
@@ -149,7 +141,7 @@ export function AllExerciseEntriesTable({ entries, currentPage, totalPages }: Al
         title={t("allDeleteDialogTitle")}
         description={t("allDeleteDialogDescription")}
         itemName={
-          entryToDelete ? `${entryToDelete.name} - ${format(new Date(entryToDelete.date), "MMM d, yyyy")}` : undefined
+          entryToDelete ? `${entryToDelete.weight} ${tc("kg")} - ${format(new Date(entryToDelete.date), "MMM d, yyyy")}` : undefined
         }
       />
     </>

@@ -1,9 +1,15 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select } from "@/components/ui/select"
+import { TimePicker } from "@/components/ui/time-picker"
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"
 
 interface Step4IntermittentFastingProps {
   ifType: string
@@ -26,29 +32,28 @@ export function Step4IntermittentFasting({
         <Label className="text-xs text-zinc-400">
           {t("ifType")}
         </Label>
-        <Select
-          value={ifType}
-          onChange={(e) => setIfType(e.target.value)}
-          className="h-11 bg-white/[0.03] border-white/[0.06]"
-        >
-          <option value="none">{t("ifNone")}</option>
-          <option value="16:8">{t("if168")}</option>
-          <option value="18:6">{t("if186")}</option>
-          <option value="20:4">{t("if204")}</option>
-          <option value="OMAD">{t("ifOmad")}</option>
+        <Select value={ifType || "none"} onValueChange={setIfType}>
+          <SelectTrigger className="h-11 bg-white/[0.03] border-white/[0.06]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">{t("ifNone")}</SelectItem>
+            <SelectItem value="16:8">{t("if168")}</SelectItem>
+            <SelectItem value="18:6">{t("if186")}</SelectItem>
+            <SelectItem value="20:4">{t("if204")}</SelectItem>
+            <SelectItem value="OMAD">{t("ifOmad")}</SelectItem>
+          </SelectContent>
         </Select>
       </div>
       {ifType && ifType !== "none" && (
         <div className="space-y-2">
-          <Label htmlFor="ifStart" className="text-xs text-zinc-400">
+          <Label className="text-xs text-zinc-400">
             {t("ifStartTime")}
           </Label>
-          <Input
-            id="ifStart"
-            type="time"
+          <TimePicker
             value={ifStartTime}
-            onChange={(e) => setIfStartTime(e.target.value)}
-            className="h-11 bg-white/[0.03] border-white/[0.06] focus:border-primary/50"
+            onChange={setIfStartTime}
+            minuteStep={15}
           />
         </div>
       )}

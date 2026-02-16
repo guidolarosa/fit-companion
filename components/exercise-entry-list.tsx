@@ -5,10 +5,17 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
 import { format } from "date-fns"
-import { Trash2, Edit, Activity, Check, Clock } from "lucide-react"
+import { Trash2, Edit, Activity, MoreVertical, Check, Clock, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DeleteConfirmDialog } from "@/components/delete-confirm-dialog"
 import { EditExerciseDialog } from "@/components/edit-exercise-dialog"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 import { useTranslations } from "next-intl"
 
@@ -136,46 +143,54 @@ export function ExerciseEntryList({ entries, showViewAll = false }: ExerciseEntr
                 </span>
               </div>
               
-              {/* Action buttons with proper touch targets */}
-              <div className="hidden sm:flex items-center gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setEntryToEdit(entry)
-                    setEditDialogOpen(true)
-                  }}
-                  className="h-9 w-9 hover:bg-white/10 text-zinc-400 hover:text-white"
-                  aria-label={`${tc("edit")} ${entry.name}`}
-                >
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => {
-                    setEntryToDelete(entry)
-                    setDeleteDialogOpen(true)
-                  }}
-                  className="h-9 w-9 text-zinc-400 hover:text-destructive hover:bg-destructive/10"
-                  aria-label={`${tc("delete")} ${entry.name}`}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
+              {/* Kebab action menu */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-zinc-500 hover:text-white shrink-0"
+                    aria-label={`${tc("actions")} ${entry.name}`}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setEntryToEdit(entry)
+                      setEditDialogOpen(true)
+                    }}
+                  >
+                    <Edit /> {tc("edit")}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    destructive
+                    onClick={() => {
+                      setEntryToDelete(entry)
+                      setDeleteDialogOpen(true)
+                    }}
+                  >
+                    <Trash2 /> {tc("delete")}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         ))}
       </div>
 
       {showViewAll && (
-        <div className="mt-4 flex justify-center">
-          <Link href="/exercise/all">
-            <Button variant="outline" className="w-full">
-              {tc("viewAll")}
-            </Button>
-          </Link>
-        </div>
+        <Link href="/exercise/all">
+          <Button
+            variant="ghost"
+            className="w-full mt-2 text-zinc-400 hover:text-white border border-white/5 hover:border-white/10"
+          >
+            {tc("viewAll")}
+            <ChevronRight className="ml-1 h-4 w-4" />
+          </Button>
+        </Link>
       )}
 
       <EditExerciseDialog

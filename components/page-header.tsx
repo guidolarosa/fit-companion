@@ -17,7 +17,7 @@ export function PageHeader({
   title,
   description,
   showBackButton = false,
-  showFittyButton = true,
+  showFittyButton = false,
 }: PageHeaderProps) {
   const router = useRouter();
   const t = useTranslations("nav");
