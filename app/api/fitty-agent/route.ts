@@ -41,7 +41,9 @@ Format your responses using markdown:
 - Use **bold** for important points and key terms
 - Use bullet points (-) or numbered lists (1.) for structured information
 - Use ## for section headings
-- Use code formatting for numbers, dates, and measurements`
+- Use code formatting for numbers, dates, and measurements
+
+IMPORTANT: ALWAYS reply in the same language as the user's question. If the user asks in Spanish, reply in Spanish. If they ask in English, reply in English.`
 
     const stream = await getAIStreamResponse(question, systemPrompt, userContext)
 

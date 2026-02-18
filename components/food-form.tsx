@@ -41,6 +41,7 @@ export function FoodForm() {
     return `${hours}:${minutes}`;
   };
 
+  const [mode, setMode] = useState<"initial" | "manual" | "review">("initial")
   const [name, setName] = useState("")
   const [calories, setCalories] = useState("")
   const [protein, setProtein] = useState("")
@@ -88,6 +89,7 @@ export function FoodForm() {
     setSugar(suggestion.sugar != null ? suggestion.sugar.toString() : "")
     setSuggestions([])
     setShowSuggestions(false)
+    setMode("review") // Switch to review mode after selection
   }
 
   async function handleEstimateCalories() {
@@ -99,11 +101,12 @@ export function FoodForm() {
         const data = await response.json()
         if (data.calories > 0) {
           setCalories(data.calories.toString())
-          if (data.protein != null) setProtein(data.protein.toString())
-          if (data.carbs != null) setCarbs(data.carbs.toString())
-          if (data.fat != null) setFat(data.fat.toString())
-          if (data.fiber != null) setFiber(data.fiber.toString())
-          if (data.sugar != null) setSugar(data.sugar.toString())
+          setProtein(data.protein != null ? data.protein.toString() : "")
+          setCarbs(data.carbs != null ? data.carbs.toString() : "")
+          setFat(data.fat != null ? data.fat.toString() : "")
+          setFiber(data.fiber != null ? data.fiber.toString() : "")
+          setSugar(data.sugar != null ? data.sugar.toString() : "")
+          setMode("review") // Switch to review mode after estimation
           toast.success(t("estimatedKcalMacros", { calories: data.calories }))
         } else { toast.error(t("estimateFailed")) }
       } else {
@@ -126,8 +129,10 @@ export function FoodForm() {
         body: JSON.stringify({ name, calories: parseFloat(calories), protein: protein ? parseFloat(protein) : null, carbs: carbs ? parseFloat(carbs) : null, fat: fat ? parseFloat(fat) : null, fiber: fiber ? parseFloat(fiber) : null, sugar: sugar ? parseFloat(sugar) : null, date: dateTimeStr }),
       })
       if (response.ok) {
+        // Reset form
         setName(""); setCalories(""); setProtein(""); setCarbs(""); setFat(""); setFiber(""); setSugar("")
         setDate(getLocalDateString()); setTime(getLocalTimeString())
+        setMode("initial") // Reset mode
         toast.success(t("createdSuccess")); router.refresh()
       } else {
         const errorData = await response.json()
@@ -139,72 +144,167 @@ export function FoodForm() {
     } finally { setIsSubmitting(false) }
   }
 
+  // Helper component for macro cards
+  const MacroCard = ({ label, value, colorClass, borderClass, bgClass }: { label: string, value: string, colorClass: string, borderClass: string, bgClass: string }) => (
+    <div className={`flex flex-col items-center justify-center p-2 rounded-lg border ${borderClass} ${bgClass} min-w-[70px]`}>
+      <span className={`text-lg font-bold ${colorClass}`}>{value || "0"}</span>
+      <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{label}</span>
+    </div>
+  )
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">{t("nameLabel")}</Label>
-        <div className="relative">
-          <Input ref={inputRef} id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} onFocus={() => setShowSuggestions(true)} placeholder={t("namePlaceholder")} required autoComplete="off" />
-          {showSuggestions && suggestions.length > 0 && (
-            <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-48 overflow-y-auto">
-              {suggestions.map((suggestion, index) => (
-                <button key={index} type="button" className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex justify-between items-center" onClick={() => handleSelectSuggestion(suggestion)}>
-                  <span className="truncate">{suggestion.name}</span>
-                  <span className="text-muted-foreground ml-2 shrink-0">{Math.round(suggestion.calories)} {tc("kcal")}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="calories">{t("caloriesLabel")}</Label>
-        <div className="flex gap-2">
-          <Input id="calories" type="number" step="0.1" min="0" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder={t("caloriesPlaceholder")} required className="flex-1" />
-          <Button type="button" variant="outline" size="icon" onClick={handleEstimateCalories} disabled={isEstimating || !name.trim()} title={tc("estimateAI")}>
-            <Sparkles className={`h-4 w-4 ${isEstimating ? "animate-pulse" : ""}`} />
-          </Button>
-        </div>
-        <p className="text-xs text-muted-foreground">{tc("estimateAIHelp")}</p>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <div className="space-y-1">
-          <Label htmlFor="protein" className="text-xs">{t("proteinLabel")}</Label>
-          <Input id="protein" type="number" step="0.1" min="0" value={protein} onChange={(e) => setProtein(e.target.value)} placeholder="0" className="h-9" />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="carbs" className="text-xs">{t("carbsLabel")}</Label>
-          <Input id="carbs" type="number" step="0.1" min="0" value={carbs} onChange={(e) => setCarbs(e.target.value)} placeholder="0" className="h-9" />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="fat" className="text-xs">{t("fatLabel")}</Label>
-          <Input id="fat" type="number" step="0.1" min="0" value={fat} onChange={(e) => setFat(e.target.value)} placeholder="0" className="h-9" />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="fiber" className="text-xs">{t("fiberLabel")}</Label>
-          <Input id="fiber" type="number" step="0.1" min="0" value={fiber} onChange={(e) => setFiber(e.target.value)} placeholder="0" className="h-9" />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="sugar" className="text-xs">{t("sugarLabel")}</Label>
-          <Input id="sugar" type="number" step="0.1" min="0" value={sugar} onChange={(e) => setSugar(e.target.value)} placeholder="0" className="h-9" />
-        </div>
-      </div>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* 1. Date and Time (Always visible at top) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2 min-w-0">
-          <Label>{tc("date")}</Label>
+          <Label className="text-xs text-muted-foreground">{tc("date")}</Label>
           <DatePicker
             value={date ? parse(date, "yyyy-MM-dd", new Date()) : undefined}
             onChange={(d) => setDate(d ? format(d, "yyyy-MM-dd") : getLocalDateString())}
           />
         </div>
         <div className="space-y-2 min-w-0">
-          <Label>{tc("time")}</Label>
+          <Label className="text-xs text-muted-foreground">{tc("time")}</Label>
           <TimePicker value={time} onChange={(t) => setTime(t)} minuteStep={1} />
         </div>
       </div>
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? tc("submitting") : t("addEntry")}
-      </Button>
+
+      {/* 2. Food Name + AI Button Group */}
+      <div className="space-y-2">
+        <Label htmlFor="name">{t("nameLabel")}</Label>
+        <div className="flex gap-2 relative">
+          <div className="relative flex-1">
+            <Input 
+              ref={inputRef} 
+              id="name" 
+              type="text" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              onFocus={() => setShowSuggestions(true)} 
+              placeholder={t("namePlaceholder")} 
+              required 
+              autoComplete="off" 
+            />
+            {showSuggestions && suggestions.length > 0 && (
+              <div ref={suggestionsRef} className="absolute z-50 w-full mt-1 bg-popover border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                {suggestions.map((suggestion, index) => (
+                  <button key={index} type="button" className="w-full px-3 py-2 text-left text-sm hover:bg-muted flex justify-between items-center" onClick={() => handleSelectSuggestion(suggestion)}>
+                    <span className="truncate">{suggestion.name}</span>
+                    <span className="text-muted-foreground ml-2 shrink-0">{Math.round(suggestion.calories)} {tc("kcal")}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+          <Button 
+            type="button" 
+            variant="default" // Changed to default to stand out
+            size="icon" 
+            onClick={handleEstimateCalories} 
+            disabled={isEstimating || !name.trim()} 
+            title={tc("estimateAI")}
+            className="shrink-0 bg-primary/20 text-primary hover:bg-primary/30 border-primary/20"
+          >
+            <Sparkles className={`h-4 w-4 ${isEstimating ? "animate-pulse" : ""}`} />
+          </Button>
+        </div>
+      </div>
+
+      {/* 3. Dynamic Content based on Mode */}
+      
+      {/* INITIAL MODE */}
+      {mode === "initial" && (
+        <div className="flex justify-center pt-2">
+           <Button type="button" variant="ghost" size="sm" onClick={() => setMode("manual")} className="text-muted-foreground hover:text-foreground">
+             {tc("inputManually")}
+           </Button>
+        </div>
+      )}
+
+      {/* REVIEW MODE (Macro Cards) */}
+      {mode === "review" && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+           {/* Kcal Main Display */}
+           <div className="flex items-center justify-between bg-muted/30 p-4 rounded-xl border border-border/40">
+              <div>
+                <p className="text-sm text-muted-foreground">{tc("calories")}</p>
+                <p className="text-3xl font-bold">{calories || "0"} <span className="text-sm font-normal text-muted-foreground">kcal</span></p>
+              </div>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setMode("manual")} className="h-8 text-xs">
+                {tc("editManually")}
+              </Button>
+           </div>
+
+           {/* Macro Cards Row */}
+           {/* Mobile: 2 rows (2 cols then 3 cols) -> grid-cols-6 pattern */}
+           {/* Row 1: 2 items (span 3 each) */}
+           {/* Row 2: 3 items (span 2 each) */}
+           {/* Desktop: 1 row (5 items) -> sm:grid-cols-5 */}
+           <div className="grid grid-cols-6 sm:grid-cols-5 gap-2">
+              <div className="col-span-3 sm:col-span-1">
+                <MacroCard label={tc("protShort")} value={protein} colorClass="text-blue-500" borderClass="border-blue-500/20" bgClass="bg-blue-500/5" />
+              </div>
+              <div className="col-span-3 sm:col-span-1">
+                <MacroCard label={tc("carbsShort")} value={carbs} colorClass="text-emerald-500" borderClass="border-emerald-500/20" bgClass="bg-emerald-500/5" />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <MacroCard label={tc("fatShort")} value={fat} colorClass="text-amber-500" borderClass="border-amber-500/20" bgClass="bg-amber-500/5" />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <MacroCard label={tc("fiberShort")} value={fiber} colorClass="text-cyan-500" borderClass="border-cyan-500/20" bgClass="bg-cyan-500/5" />
+              </div>
+              <div className="col-span-2 sm:col-span-1">
+                <MacroCard label={tc("sugarShort")} value={sugar} colorClass="text-rose-500" borderClass="border-rose-500/20" bgClass="bg-rose-500/5" />
+              </div>
+           </div>
+           
+           <Button type="submit" disabled={isSubmitting} className="w-full">
+            {isSubmitting ? tc("submitting") : t("addEntry")}
+          </Button>
+        </div>
+      )}
+
+      {/* MANUAL MODE */}
+      {mode === "manual" && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+          <div className="space-y-2">
+            <Label htmlFor="calories">{t("caloriesLabel")}</Label>
+            <Input id="calories" type="number" step="0.1" min="0" value={calories} onChange={(e) => setCalories(e.target.value)} placeholder={t("caloriesPlaceholder")} required />
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="protein" className="text-xs">{t("proteinLabel")}</Label>
+              <Input id="protein" type="number" step="0.1" min="0" value={protein} onChange={(e) => setProtein(e.target.value)} placeholder="0" className="h-9" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="carbs" className="text-xs">{t("carbsLabel")}</Label>
+              <Input id="carbs" type="number" step="0.1" min="0" value={carbs} onChange={(e) => setCarbs(e.target.value)} placeholder="0" className="h-9" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="fat" className="text-xs">{t("fatLabel")}</Label>
+              <Input id="fat" type="number" step="0.1" min="0" value={fat} onChange={(e) => setFat(e.target.value)} placeholder="0" className="h-9" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="fiber" className="text-xs">{t("fiberLabel")}</Label>
+              <Input id="fiber" type="number" step="0.1" min="0" value={fiber} onChange={(e) => setFiber(e.target.value)} placeholder="0" className="h-9" />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="sugar" className="text-xs">{t("sugarLabel")}</Label>
+              <Input id="sugar" type="number" step="0.1" min="0" value={sugar} onChange={(e) => setSugar(e.target.value)} placeholder="0" className="h-9" />
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-2">
+            <Button type="button" variant="outline" className="flex-1" onClick={() => setMode("initial")}>
+              {tc("cancel")}
+            </Button>
+            <Button type="submit" disabled={isSubmitting} className="flex-1">
+              {isSubmitting ? tc("submitting") : t("addEntry")}
+            </Button>
+          </div>
+        </div>
+      )}
     </form>
   )
 }

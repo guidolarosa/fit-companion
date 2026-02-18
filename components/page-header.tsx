@@ -25,7 +25,7 @@ export function PageHeader({
   return (
     <header 
       id="main-content"
-      className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2 sm:mb-10"
+      className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-2 sm:mb-10 min-h-14 justify-center"
       role="banner"
     >
       <div className="flex items-center gap-4">
