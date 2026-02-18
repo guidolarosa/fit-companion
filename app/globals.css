@@ -132,6 +132,42 @@
   right: -100px;
 }
 
+/* Water wave: alternate direction = smooth back-and-forth, no jump */
+@keyframes water-wave {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-33.333%, 0);
+  }
+}
+
+/* Second layer moves opposite direction for organic cross-flow */
+@keyframes water-wave-reverse {
+  0% {
+    transform: translate(-33.333%, 0);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.animate-water-wave {
+  animation: water-wave 6s linear infinite alternate;
+}
+
+.animate-water-wave-reverse {
+  animation: water-wave-reverse 7s linear infinite alternate;
+}
+
+.animation-delay-500 {
+  animation-delay: 1.5s;
+}
+
+.animation-delay-1000 {
+  animation-delay: 3s;
+}
+
 /* Glass Card Pattern - Following guidelines */
 .glass-card {
   background: var(--surface-1);

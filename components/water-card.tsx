@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Droplets, Plus, Minus } from "lucide-react"
@@ -19,6 +19,8 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
   const t = useTranslations("dashboard")
   const [glasses, setGlasses] = useState(initialGlasses)
   const [isSaving, setIsSaving] = useState(false)
+  const wasCompleteRef = useRef(false)
+  const hasUserAddedWaterRef = useRef(false)
 
   // Fetch today's water on mount
   useEffect(() => {
@@ -38,6 +40,7 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
 
   async function updateGlasses(newCount: number) {
     const prev = glasses
+    if (newCount > prev) hasUserAddedWaterRef.current = true
     setGlasses(newCount)
     setIsSaving(true)
     try {
@@ -63,9 +66,71 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
   const targetMl = targetGlasses * ML_PER_GLASS
   const isComplete = glasses >= targetGlasses
 
+  // Confetti when user reaches target by adding water (not on initial load)
+  useEffect(() => {
+    if (isComplete && !wasCompleteRef.current && hasUserAddedWaterRef.current && targetGlasses > 0) {
+      wasCompleteRef.current = true
+      void import("canvas-confetti").then(({ default: confetti }) => {
+        confetti({
+          particleCount: 80,
+          spread: 70,
+          origin: { y: 0.8 },
+          colors: ["#38bdf8", "#0ea5e9", "#0284c7", "#7dd3fc"],
+        })
+      })
+    }
+    if (!isComplete) {
+      wasCompleteRef.current = false
+    }
+  }, [isComplete, targetGlasses])
+
   return (
-    <Card className="glass-card h-full">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <Card className="glass-card h-full relative overflow-hidden">
+      {/* Wavy water background - level animates with glasses */}
+      <div
+        className="absolute inset-x-0 bottom-0 overflow-hidden transition-[height] duration-500 ease-out opacity-40"
+        style={{ height: `${percentage}%` }}
+      >
+        {/* Waves extend well beyond edges—250% width, -75% left = 75% overflow each side */}
+        <svg
+          className="absolute bottom-0 left-[-75%] h-full w-[250%] min-w-[500%]"
+          preserveAspectRatio="none"
+          viewBox="0 0 600 100"
+        >
+          <defs>
+            <linearGradient id="waterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="rgb(56, 189, 248)" stopOpacity="0.5" />
+              <stop offset="100%" stopColor="rgb(37, 99, 235)" stopOpacity="0.7" />
+            </linearGradient>
+            <linearGradient id="waterGradientDeep" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="rgb(37, 99, 235)" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="rgb(30, 64, 175)" stopOpacity="0.6" />
+            </linearGradient>
+          </defs>
+          {/* All paths tile every 200 units for seamless 33.333% loop */}
+          <path
+            fill="url(#waterGradient)"
+            className="animate-water-wave"
+            d="M0 50 Q50 35 100 50 T200 50 T400 50 T600 50 L600 100 L0 100 Z"
+          />
+          <path
+            fill="url(#waterGradient)"
+            className="animate-water-wave-reverse animation-delay-500"
+            opacity="0.8"
+            d="M0 55 Q100 38 200 55 T400 55 T600 55 L600 100 L0 100 Z"
+          />
+          {/* All paths use 200-unit period (0/200/400/600) for seamless loop */}
+          <path
+            fill="url(#waterGradientDeep)"
+            className="animate-water-wave animation-delay-1000"
+            opacity="0.6"
+            d="M0 60 Q50 42 100 60 T200 60 T400 60 T600 60 L600 100 L0 100 Z"
+          />
+        </svg>
+      </div>
+
+      <div className="relative z-10">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
           {t("waterTitle")}
         </CardTitle>
@@ -146,6 +211,7 @@ export function WaterCard({ targetGlasses, initialGlasses = 0 }: WaterCardProps)
           </p>
         )}
       </CardContent>
+      </div>
     </Card>
   )
 }
