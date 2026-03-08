@@ -1,16 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
-import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { toast } from "sonner"
 import { LocaleToggle } from "@/components/locale-toggle"
 import { LoginForm } from "@/components/login/LoginForm"
 import { MobileLoginHero } from "@/components/login/MobileLoginHero"
 import { DesktopFeaturePanel } from "@/components/login/DesktopFeaturePanel"
+import { loginAction, registerAction } from "./actions"
 
 export default function LoginPage() {
-  const router = useRouter()
   const t = useTranslations("login")
   const tc = useTranslations("common")
   const [isLogin, setIsLogin] = useState(true)
@@ -27,47 +26,34 @@ export default function LoginPage() {
 
     try {
       if (isLogin) {
-        const result = await signIn("credentials", {
-          email,
-          password,
-          redirect: false,
-        })
+        const result = await loginAction(email, password)
 
         if (result?.error) {
           setError(t("invalidCredentials"))
-        } else {
-          router.push("/dashboard")
-          router.refresh()
+          setIsLoading(false)
         }
       } else {
-        const response = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, name }),
-        })
+        const result = await registerAction(email, password, name)
 
-        const data = await response.json()
-
-        if (!response.ok) {
-          setError(data.error || t("createAccountError"))
+        if (result?.error === "user_exists") {
+          setError(t("userExists"))
+          setIsLoading(false)
+        } else if (result?.error === "missing_fields") {
+          setError(t("createAccountError"))
+          setIsLoading(false)
+        } else if (result?.error === "auth_failed") {
+          setError(t("accountCreatedPleaseLogin"))
+          setIsLoading(false)
         } else {
-          const result = await signIn("credentials", {
-            email,
-            password,
-            redirect: false,
-          })
-
-          if (result?.error) {
-            setError(t("accountCreatedPleaseLogin"))
-          } else {
-            router.push("/onboarding")
-            router.refresh()
-          }
+          toast.success(t("registerSuccess"))
         }
       }
-    } catch (error) {
+    } catch (err: unknown) {
+      const digest = (err as { digest?: string })?.digest
+      if (typeof digest === "string" && digest.startsWith("NEXT_REDIRECT")) {
+        return
+      }
       setError(t("genericError"))
-    } finally {
       setIsLoading(false)
     }
   }

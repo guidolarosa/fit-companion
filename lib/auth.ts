@@ -48,21 +48,17 @@ export const authOptions: NextAuthConfig = {
     signOut: "/login",
   },
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id as string
         token.email = user.email as string
         token.profileComplete = user.profileComplete ?? false
       }
-      // Re-check the DB whenever profileComplete is falsy (false, undefined, null)
-      // so that after onboarding completes, the next request picks up the change.
-      // Once true, it stays cached — no more DB queries.
-      if (trigger === "update" || !token.profileComplete) {
-        const dbUser = await prisma.user.findUnique({
-          where: { id: token.id as string },
-          select: { height: true },
-        })
-        token.profileComplete = dbUser?.height != null
+      // Accept profileComplete from explicit session updates (e.g. after onboarding).
+      // We avoid querying Prisma here because this callback also runs in
+      // Edge Runtime (middleware), where Prisma is not available.
+      if (trigger === "update" && session?.profileComplete !== undefined) {
+        token.profileComplete = session.profileComplete as boolean
       }
       return token
     },

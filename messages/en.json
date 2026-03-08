@@ -303,7 +303,16 @@
     "allDeleteDialogTitle": "Delete weight entry",
     "allDeleteDialogDescription": "Are you sure you want to delete this weight entry? This action cannot be undone.",
     "tableWeightHeader": "Weight",
-    "tableDateHeader": "Date"
+    "tableDateHeader": "Date",
+    "noDataChart": "No weight data available. Add your first entry to see the chart.",
+    "noDataRange": "No weight entries in this date range.",
+    "chartFrom": "From",
+    "chartTo": "To",
+    "chartFromPlaceholder": "Start date",
+    "chartToPlaceholder": "End date",
+    "yAxisLabel": "Weight (kg)",
+    "tooltipWeight": "Weight",
+    "tooltipTrend": "Trend"
   },
   "settings": {
     "title": "Settings",
@@ -426,8 +435,10 @@
     "subtitleLogin": "Sign in to continue your progress",
     "subtitleRegister": "Create your account and start your journey",
     "invalidCredentials": "Invalid email or password",
+    "userExists": "An account with this email already exists",
     "createAccountError": "Error creating account",
     "accountCreatedPleaseLogin": "Account created. Please sign in.",
+    "registerSuccess": "Account created successfully!",
     "genericError": "An error occurred. Please try again.",
     "heroBadge": "Powered by artificial intelligence",
     "heroTitle1": "Your",

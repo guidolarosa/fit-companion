@@ -303,7 +303,16 @@
     "allDeleteDialogTitle": "Eliminar registro de peso",
     "allDeleteDialogDescription": "¿Estás seguro de que deseas eliminar este registro de peso? Esta acción no se puede deshacer.",
     "tableWeightHeader": "Peso",
-    "tableDateHeader": "Fecha"
+    "tableDateHeader": "Fecha",
+    "noDataChart": "No hay datos de peso disponibles. Agrega tu primer registro para ver el gráfico.",
+    "noDataRange": "No hay registros de peso en este rango de fechas.",
+    "chartFrom": "Desde",
+    "chartTo": "Hasta",
+    "chartFromPlaceholder": "Fecha inicio",
+    "chartToPlaceholder": "Fecha fin",
+    "yAxisLabel": "Peso (kg)",
+    "tooltipWeight": "Peso",
+    "tooltipTrend": "Tendencia"
   },
   "settings": {
     "title": "Configuración",
@@ -426,8 +435,10 @@
     "subtitleLogin": "Inicia sesión para continuar tu progreso",
     "subtitleRegister": "Crea tu cuenta y comienza tu camino",
     "invalidCredentials": "Email o contraseña inválidos",
+    "userExists": "Ya existe una cuenta con este email",
     "createAccountError": "Error al crear la cuenta",
     "accountCreatedPleaseLogin": "Cuenta creada. Por favor, inicia sesión.",
+    "registerSuccess": "¡Cuenta creada exitosamente!",
     "genericError": "Ocurrió un error. Intenta de nuevo.",
     "heroBadge": "Con inteligencia artificial",
     "heroTitle1": "Tu compañero",

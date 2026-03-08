@@ -131,9 +131,7 @@ export function useOnboarding() {
 
       toast.success(t("success"))
 
-      // Update the session token (triggers JWT callback with trigger="update")
-      // This refreshes profileComplete in the JWT
-      await updateSession()
+      await updateSession({ profileComplete: true })
 
       // Set a temporary cookie as a fallback signal for the middleware
       document.cookie = "onboarding_complete=1; path=/; max-age=60"
