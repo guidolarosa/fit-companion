@@ -152,7 +152,7 @@ export function enrichDailyData(
         bmr = calculateBMR(weight, user.height, user.age)
         tdee = calculateTDEE(bmr, user.lifestyle ?? null)
       }
-      const net = day.caloriesConsumed - (tdee + day.caloriesBurnt)
+      const net = day.caloriesConsumed - tdee
       return {
         ...day,
         bmr,

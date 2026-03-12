@@ -133,7 +133,7 @@ export function FoodCalendar({ foodDays }: FoodCalendarProps) {
                         {dayData.netCalories < 0 ? "Deficit" : "Surplus"}: {Math.round(Math.abs(dayData.netCalories))} kcal
                       </div>
                       <div className="text-[10px] text-muted-foreground mt-0.5">
-                        Consumed: {Math.round(dayData.caloriesConsumed)} | Burnt: {Math.round(dayData.caloriesBurnt + dayData.tdee)}
+                        Consumed: {Math.round(dayData.caloriesConsumed)} | TDEE: {Math.round(dayData.tdee)}
                       </div>
                       <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
                         <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-popover"></div>

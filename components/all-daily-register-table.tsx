@@ -35,8 +35,7 @@ export function AllDailyRegisterTable({ dailyData, currentPage, totalPages }: Al
           </thead>
           <tbody>
             {dailyData.map((day, index) => {
-              const totalBurnt = day.tdee + day.caloriesBurnt;
-              const netCalories = day.caloriesConsumed - totalBurnt;
+              const netCalories = day.caloriesConsumed - day.tdee;
               const netBadgeClass =
                 netCalories < 0
                   ? "text-green-400 bg-green-400/10"

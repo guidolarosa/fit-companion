@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Weight, Activity, UtensilsCrossed } from "lucide-react";
+import { Activity, UtensilsCrossed, Weight } from "lucide-react";
 import { WeightChart } from "@/components/weight-chart";
 import { ExerciseCalendar } from "@/components/exercise-calendar";
 import { FoodCalendar } from "@/components/food-calendar";
@@ -24,17 +24,13 @@ export async function ChartsSection({ data, weights }: ChartsSectionProps) {
     <>
       <div className="mt-6 grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {/* Weight Progress - Hidden on mobile, full width */}
-        <Card className="hidden sm:block sm:col-span-2 lg:col-span-3 glass-card">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 mb-1">
-            <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-              {t("weightProgress")}
-            </CardTitle>
-            <Weight className="h-3.5 w-3.5 text-zinc-600" />
-          </CardHeader>
-          <CardContent>
-            <WeightChart weights={weights} chartHeight={200} />
-          </CardContent>
-        </Card>
+        <WeightChart
+          weights={weights}
+          chartHeight={200}
+          title={t("weightProgress")}
+          icon={<Weight className="h-3.5 w-3.5 text-zinc-600" />}
+          cardClassName="hidden sm:block sm:col-span-2 lg:col-span-3 glass-card"
+        />
       </div>
 
       {/* Calendars and Quality - Hidden on mobile */}

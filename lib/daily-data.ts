@@ -109,7 +109,7 @@ export function aggregateDailyData(
         tdee = calculateTDEE(bmr, user.lifestyle);
       }
 
-      const netCalories = day.caloriesConsumed - (tdee + day.caloriesBurnt);
+      const netCalories = day.caloriesConsumed - tdee;
       const ratioToTdee = tdee > 0 ? day.caloriesConsumed / tdee : null;
 
       return {

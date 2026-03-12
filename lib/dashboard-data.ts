@@ -79,11 +79,13 @@ export async function getDashboardData(userId: string) {
   const dailyData = allDailyData.slice(0, 30); // Last 30 days for dashboard logic
 
   // Calculate total net calories from all registered days
-  const totalNetCalories = allDailyData.reduce((sum, day) => {
-    const totalBurnt = day.tdee + day.caloriesBurnt;
-    const netCalories = day.caloriesConsumed - totalBurnt;
-    return sum + netCalories;
-  }, 0);
+  // TDEE already accounts for exercise via the activity factor
+  const totalNetCalories = allDailyData.reduce(
+    (sum, day) => sum + day.caloriesConsumed - day.tdee,
+    0
+  );
+
+  const totalTdee = allDailyData.reduce((sum, day) => sum + day.tdee, 0);
 
   // Group exercises by day for calendar
   const exerciseDaysMap = new Map<string, number>();
@@ -204,6 +206,7 @@ export async function getDashboardData(userId: string) {
     sustainabilityMode,
     totalCaloriesBurnt: caloriesBurnt,
     totalCaloriesConsumed: caloriesConsumed,
+    totalTdee,
     netCalories: totalNetCalories,
     recentExercises,
     recentFoods,

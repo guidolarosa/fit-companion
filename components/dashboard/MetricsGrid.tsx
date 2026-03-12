@@ -92,7 +92,7 @@ export async function MetricsGrid({ data }: MetricsGridProps) {
               </div>
               <div className="flex flex-col">
                 <span>{t("spentLabel")}</span>
-                <span className="text-zinc-300">{Math.round(data.totalCaloriesBurnt)}</span>
+                <span className="text-zinc-300">{Math.round(data.totalTdee)}</span>
               </div>
             </div>
           </CardContent>

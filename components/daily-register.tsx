@@ -84,8 +84,7 @@ export function DailyRegister({ dailyData }: DailyRegisterProps) {
             </thead>
             <tbody className="divide-y divide-white/[0.02]">
               {dailyData.map((day, index) => {
-                const totalBurnt = day.tdee + day.caloriesBurnt;
-                const netCalories = day.caloriesConsumed - totalBurnt;
+                const netCalories = day.caloriesConsumed - day.tdee;
                 const isDeficit = netCalories < 0;
                 
                 const dateStr = day.date.toLocaleDateString('es-ES', { 

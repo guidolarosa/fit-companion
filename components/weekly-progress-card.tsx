@@ -20,9 +20,8 @@ export function WeeklyProgressCard({ weekData }: WeeklyProgressCardProps) {
   const t = useTranslations("dashboard")
 
   const totalConsumed = weekData.reduce((s, d) => s + d.consumed, 0)
-  const totalBurnt = weekData.reduce((s, d) => s + d.burnt, 0)
   const totalTdee = weekData.reduce((s, d) => s + d.tdee, 0)
-  const totalExpenditure = totalTdee + totalBurnt
+  const totalExpenditure = totalTdee
   const netBalance = totalConsumed - totalExpenditure
   const avgDaily = weekData.length > 0 ? totalConsumed / weekData.length : 0
   const daysTracked = weekData.length

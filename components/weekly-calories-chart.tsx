@@ -25,7 +25,7 @@ export function WeeklyCaloriesChart({ weekData }: WeeklyCaloriesChartProps) {
     return {
       name: label,
       consumed: Math.round(d.consumed),
-      burned: Math.round(d.burnt + d.tdee),
+      burned: Math.round(d.tdee),
     }
   })
 

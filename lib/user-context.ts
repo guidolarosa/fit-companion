@@ -33,9 +33,6 @@ export async function getUserContext(userId: string) {
     user?.height ?? null
   )
 
-  // Net calories (consumed - burnt)
-  const netCalories = totalCaloriesConsumed - totalCaloriesBurnt
-
   // Build daily view for trends (last 30 days)
   const dailyDataMap = buildDailyDataMap(allExercises, allFoods)
   const dailyData = enrichDailyData(dailyDataMap, weightEntries, user)
@@ -115,10 +112,12 @@ export async function getUserContext(userId: string) {
   }
   context += "\n"
 
-  // Net calories
-  if (totalCaloriesConsumed > 0 || totalCaloriesBurnt > 0) {
-    context += "CALORIE BALANCE:\n"
-    context += `- Net Calories: ${netCalories > 0 ? "+" : ""}${Math.round(netCalories)} kcal (consumed - burnt)\n`
+  // Calorie balance (TDEE-based, from daily data)
+  if (dailyData.length > 0) {
+    const totalNet = dailyData.reduce((sum, d) => sum + d.netCalories, 0)
+    context += "CALORIE BALANCE (TDEE-based):\n"
+    context += `- Net Calories (last 30 days): ${totalNet > 0 ? "+" : ""}${Math.round(totalNet)} kcal (consumed - TDEE)\n`
+    context += `- Note: TDEE already includes exercise via activity factor, so exercise calories are NOT subtracted separately.\n`
     context += "\n"
   }
 

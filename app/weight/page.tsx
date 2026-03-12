@@ -69,19 +69,12 @@ export default async function WeightPage() {
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Second row: Weight Progress Chart */}
               {weights.length > 0 && (
-                <Card className=" glass-card">
-                  <CardHeader>
-                    <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                      {t("progressTitle")}
-                    </CardTitle>
-                    <CardDescription className="text-[11px] text-zinc-600">
-                      {t("progressDescription")}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <WeightChart weights={weights} />
-                  </CardContent>
-                </Card>
+                <WeightChart
+                  weights={weights}
+                  title={t("progressTitle")}
+                  description={t("progressDescription")}
+                  cardClassName="glass-card"
+                />
               )}
 
               <Card className="glass-card">
