@@ -2,15 +2,51 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { DatePicker } from "@/components/ui/date-picker"
 import { TimePicker } from "@/components/ui/time-picker"
-import { Sparkles } from "lucide-react"
+import { Sparkles, Camera } from "lucide-react"
 import { parse, format } from "date-fns"
+
+const MAX_PHOTO_DIMENSION = 1024
+const PHOTO_JPEG_QUALITY = 0.85
+
+function resizeImageToJpeg(file: File): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const objectUrl = URL.createObjectURL(file)
+    img.onload = () => {
+      let { width, height } = img
+      if (width > MAX_PHOTO_DIMENSION || height > MAX_PHOTO_DIMENSION) {
+        if (width > height) {
+          height = Math.round((height * MAX_PHOTO_DIMENSION) / width)
+          width = MAX_PHOTO_DIMENSION
+        } else {
+          width = Math.round((width * MAX_PHOTO_DIMENSION) / height)
+          height = MAX_PHOTO_DIMENSION
+        }
+      }
+      const canvas = document.createElement("canvas")
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext("2d")
+      URL.revokeObjectURL(objectUrl)
+      if (!ctx) { reject(new Error("Canvas not supported")); return }
+      ctx.drawImage(img, 0, 0, width, height)
+      canvas.toBlob(
+        (blob) => (blob ? resolve(blob) : reject(new Error("Failed to encode image"))),
+        "image/jpeg",
+        PHOTO_JPEG_QUALITY
+      )
+    }
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); reject(new Error("Failed to load image")) }
+    img.src = objectUrl
+  })
+}
 
 interface FoodSuggestion {
   name: string
@@ -26,6 +62,7 @@ export function FoodForm() {
   const router = useRouter()
   const t = useTranslations("food")
   const tc = useTranslations("common")
+  const locale = useLocale()
   const getLocalDateString = () => {
     const now = new Date();
     const year = now.getFullYear();
@@ -53,10 +90,12 @@ export function FoodForm() {
   const [time, setTime] = useState(getLocalTimeString())
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isEstimating, setIsEstimating] = useState(false)
+  const [isAnalyzingPhoto, setIsAnalyzingPhoto] = useState(false)
   const [suggestions, setSuggestions] = useState<FoodSuggestion[]>([])
   const [showSuggestions, setShowSuggestions] = useState(false)
   const suggestionsRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const photoInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -117,6 +156,42 @@ export function FoodForm() {
       console.error("Error estimating calories:", error)
       toast.error(t("estimateError"))
     } finally { setIsEstimating(false) }
+  }
+
+  async function handlePhotoSelected(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = ""
+    if (!file) return
+
+    setIsAnalyzingPhoto(true)
+    try {
+      const resized = await resizeImageToJpeg(file)
+      const formData = new FormData()
+      formData.append("image", resized, "photo.jpg")
+      formData.append("locale", locale)
+
+      const response = await fetch("/api/estimate-calories-image", { method: "POST", body: formData })
+      if (response.ok) {
+        const data = await response.json()
+        if (data.calories > 0) {
+          setName(data.name || name)
+          setCalories(data.calories.toString())
+          setProtein(data.protein != null ? data.protein.toString() : "")
+          setCarbs(data.carbs != null ? data.carbs.toString() : "")
+          setFat(data.fat != null ? data.fat.toString() : "")
+          setFiber(data.fiber != null ? data.fiber.toString() : "")
+          setSugar(data.sugar != null ? data.sugar.toString() : "")
+          setMode("review")
+          toast.success(t("estimatedKcalMacros", { calories: data.calories }))
+        } else { toast.error(t("estimatePhotoFailed")) }
+      } else {
+        const errorData = await response.json()
+        toast.error(errorData.error || t("estimatePhotoErrorFallback"))
+      }
+    } catch (error) {
+      console.error("Error analyzing photo:", error)
+      toast.error(t("estimatePhotoError"))
+    } finally { setIsAnalyzingPhoto(false) }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -196,17 +271,36 @@ export function FoodForm() {
               </div>
             )}
           </div>
-          <Button 
-            type="button" 
+          <Button
+            type="button"
             variant="default" // Changed to default to stand out
-            size="icon" 
-            onClick={handleEstimateCalories} 
-            disabled={isEstimating || !name.trim()} 
+            size="icon"
+            onClick={handleEstimateCalories}
+            disabled={isEstimating || isAnalyzingPhoto || !name.trim()}
             title={tc("estimateAI")}
             className="shrink-0 bg-primary/20 text-primary hover:bg-primary/30 border-primary/20"
           >
             <Sparkles className={`h-4 w-4 ${isEstimating ? "animate-pulse" : ""}`} />
           </Button>
+          <Button
+            type="button"
+            variant="default"
+            size="icon"
+            onClick={() => photoInputRef.current?.click()}
+            disabled={isEstimating || isAnalyzingPhoto}
+            title={tc("estimatePhotoAI")}
+            className="shrink-0 bg-primary/20 text-primary hover:bg-primary/30 border-primary/20"
+          >
+            <Camera className={`h-4 w-4 ${isAnalyzingPhoto ? "animate-pulse" : ""}`} />
+          </Button>
+          <input
+            ref={photoInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={handlePhotoSelected}
+            className="hidden"
+          />
         </div>
       </div>
 
