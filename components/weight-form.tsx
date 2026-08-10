@@ -10,7 +10,11 @@ import { Label } from "@/components/ui/label"
 import { DatePicker } from "@/components/ui/date-picker"
 import { parse, format } from "date-fns"
 
-export function WeightForm() {
+interface WeightFormProps {
+  onSuccess?: () => void
+}
+
+export function WeightForm({ onSuccess }: WeightFormProps) {
   const router = useRouter()
   const t = useTranslations("weight")
   const tc = useTranslations("common")
@@ -35,6 +39,7 @@ export function WeightForm() {
       if (response.ok) {
         setWeight(""); setDate(getLocalDateString())
         toast.success(t("createdSuccess")); router.refresh()
+        onSuccess?.()
       } else {
         const errorData = await response.json()
         toast.error(errorData.error || t("createFailedFallback"))

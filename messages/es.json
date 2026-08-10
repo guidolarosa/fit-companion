@@ -154,7 +154,17 @@
     "waterGlassTitle": "Vaso {n}",
     "waterGoalReached": "Meta alcanzada",
     "waterSaveError": "Error al guardar",
-    "waterConnectionError": "Error de conexión"
+    "waterConnectionError": "Error de conexión",
+    "customizeButton": "Personalizar",
+    "customizeDone": "Listo",
+    "manageWidgets": "Gestionar widgets",
+    "manageWidgetsTitle": "Widgets del panel",
+    "manageWidgetsDesc": "Elige qué widgets mostrar",
+    "resetToDefault": "Restablecer por defecto",
+    "dragHandleLabel": "Arrastrar para reordenar",
+    "widgetsEmptyTitle": "No hay widgets visibles",
+    "widgetsEmptyDesc": "Personaliza tu panel para mostrar widgets aquí",
+    "layoutSaveError": "No se pudo guardar la disposición del panel"
   },
   "food": {
     "title": "Alimentación",

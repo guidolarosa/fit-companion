@@ -1,11 +1,19 @@
 "use client"
 
+import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Flame, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 import { useTranslations } from "next-intl"
+import { FoodForm } from "@/components/food-form"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
 interface DailyTargetRingCardProps {
   date: Date | null
@@ -93,29 +101,55 @@ export function DailyTargetRingCard({
   currentWeight,
 }: DailyTargetRingCardProps) {
   const t = useTranslations("dashboard")
+  const tf = useTranslations("food")
+  const [quickAddOpen, setQuickAddOpen] = useState(false)
+
+  const quickAddDialog = (
+    <Dialog open={quickAddOpen} onOpenChange={setQuickAddOpen}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{tf("formTitle")}</DialogTitle>
+          <DialogDescription>{tf("formDescription")}</DialogDescription>
+        </DialogHeader>
+        <FoodForm onSuccess={() => setQuickAddOpen(false)} />
+      </DialogContent>
+    </Dialog>
+  )
 
   if (!caloriesConsumed || !dailyTarget || dailyTarget <= 0) {
     return (
-      <Card className="glass-card h-full">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
-            {t("consumptionTitle")}
-          </CardTitle>
-          <Flame className="h-3.5 w-3.5 text-zinc-600" />
-        </CardHeader>
-        <CardContent className="flex flex-col items-center justify-center h-[120px] text-center">
-          <div className="w-10 h-10 mb-2 rounded-full aspect-square bg-white/5 flex items-center justify-center">
-            <Flame className="w-5 h-5 text-zinc-600" />
-          </div>
-          <p className="text-xs text-zinc-500 mb-3">{t("consumptionEmpty")}</p>
-          <Link href="/food">
-            <Button size="sm" variant="outline" className="h-8 text-xs">
+      <>
+        <Card className="glass-card h-full">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
+              {t("consumptionTitle")}
+            </CardTitle>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 text-zinc-500 hover:text-white"
+                aria-label={tf("addEntry")}
+                onClick={() => setQuickAddOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </Button>
+              <Flame className="h-3.5 w-3.5 text-zinc-600" />
+            </div>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center h-[120px] text-center">
+            <div className="w-10 h-10 mb-2 rounded-full aspect-square bg-white/5 flex items-center justify-center">
+              <Flame className="w-5 h-5 text-zinc-600" />
+            </div>
+            <p className="text-xs text-zinc-500 mb-3">{t("consumptionEmpty")}</p>
+            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setQuickAddOpen(true)}>
               <Plus className="w-3 h-3 mr-1" />
               {t("consumptionRegister")}
             </Button>
-          </Link>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+        {quickAddDialog}
+      </>
     )
   }
 
@@ -129,12 +163,24 @@ export function DailyTargetRingCard({
   const targets = getMacroTargets(currentWeight)
 
   return (
+    <>
     <Card className="glass-card h-full flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 px-4 pt-4">
         <CardTitle className="text-[10px] font-medium text-zinc-500 uppercase tracking-widest">
           {t("consumptionTitle")}
         </CardTitle>
-        <Flame className="h-3.5 w-3.5 text-zinc-600" />
+        <div className="flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 text-zinc-500 hover:text-white"
+            aria-label={tf("addEntry")}
+            onClick={() => setQuickAddOpen(true)}
+          >
+            <Plus className="h-3.5 w-3.5" />
+          </Button>
+          <Flame className="h-3.5 w-3.5 text-zinc-600" />
+        </div>
       </CardHeader>
       <CardContent className="pt-0 px-4 pb-4 flex-1 flex flex-col justify-center">
         {/* Main calorie ring + macro gauges */}
@@ -220,5 +266,7 @@ export function DailyTargetRingCard({
         </div>
       </CardContent>
     </Card>
+    {quickAddDialog}
+    </>
   )
 }

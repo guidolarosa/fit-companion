@@ -25,6 +25,7 @@ model User {
   milestoneStep   Float? // milestone delta in kg
   sustainabilityMode String? // strict | sustainable
   locale         String          @default("es") // en | es
+  dashboardLayout Json? // saved widget order + visibility, see lib/dashboard-layout.ts
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   weightEntries  WeightEntry[]

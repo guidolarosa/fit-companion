@@ -6,10 +6,10 @@ import { MobileQuickActions } from "@/components/mobile-quick-actions";
 import { getCurrentUser } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 import { getDashboardData, getWeightData } from "@/lib/dashboard-data";
-import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
-import { WeeklyOverview } from "@/components/dashboard/WeeklyOverview";
+import { WidgetGrid } from "@/components/dashboard/WidgetGrid";
 import { ChartsSection } from "@/components/dashboard/ChartsSection";
 import { RecentEntries } from "@/components/dashboard/RecentEntries";
+import { normalizeDashboardLayout } from "@/lib/dashboard-layout";
 
 export default async function Dashboard() {
   const user = await getCurrentUser();
@@ -39,13 +39,7 @@ export default async function Dashboard() {
           {/* Mobile Quick Actions */}
           <MobileQuickActions />
 
-          <MetricsGrid data={data} />
-
-          {/* Weekly overview + Water */}
-          <WeeklyOverview
-            weekDayData={data.weekDayData}
-            waterTargetGlasses={data.waterTargetGlasses}
-          />
+          <WidgetGrid data={data} initialLayout={normalizeDashboardLayout(data.user?.dashboardLayout)} />
 
           <ChartsSection data={data} weights={weights} />
 

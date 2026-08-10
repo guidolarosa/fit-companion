@@ -154,7 +154,17 @@
     "waterGlassTitle": "Glass {n}",
     "waterGoalReached": "Goal reached",
     "waterSaveError": "Error saving",
-    "waterConnectionError": "Connection error"
+    "waterConnectionError": "Connection error",
+    "customizeButton": "Customize",
+    "customizeDone": "Done",
+    "manageWidgets": "Manage widgets",
+    "manageWidgetsTitle": "Dashboard widgets",
+    "manageWidgetsDesc": "Choose which widgets to show",
+    "resetToDefault": "Reset to default",
+    "dragHandleLabel": "Drag to reorder",
+    "widgetsEmptyTitle": "No widgets shown",
+    "widgetsEmptyDesc": "Customize your dashboard to show widgets here",
+    "layoutSaveError": "Could not save dashboard layout"
   },
   "food": {
     "title": "Food",

@@ -58,7 +58,11 @@ interface FoodSuggestion {
   sugar?: number | null
 }
 
-export function FoodForm() {
+interface FoodFormProps {
+  onSuccess?: () => void
+}
+
+export function FoodForm({ onSuccess }: FoodFormProps) {
   const router = useRouter()
   const t = useTranslations("food")
   const tc = useTranslations("common")
@@ -209,6 +213,7 @@ export function FoodForm() {
         setDate(getLocalDateString()); setTime(getLocalTimeString())
         setMode("initial") // Reset mode
         toast.success(t("createdSuccess")); router.refresh()
+        onSuccess?.()
       } else {
         const errorData = await response.json()
         toast.error(errorData.error || t("createFailedFallback"))
