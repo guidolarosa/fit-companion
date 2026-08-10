@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
@@ -8,19 +9,32 @@ import { PageHeader } from "@/components/page-header"
 import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
 import { prisma } from "@/lib/prisma"
+import { SettingsFormSkeleton } from "@/components/skeletons"
 
-export default async function SettingsPage() {
-  const currentUser = await getCurrentUser()
-  
-  if (!currentUser) {
-    redirect("/login")
-  }
-
+async function SettingsFormSection({ userId }: { userId: string }) {
   const user = await prisma.user.findUnique({
-    where: { id: currentUser.id },
+    where: { id: userId },
   })
 
   if (!user) {
+    redirect("/login")
+  }
+
+  return (
+    <SettingsForm user={{
+      ...user,
+      targetWeightMin: (user as any).targetWeightMin ?? null,
+      targetWeightMax: (user as any).targetWeightMax ?? null,
+      milestoneStep: (user as any).milestoneStep ?? null,
+      sustainabilityMode: (user as any).sustainabilityMode ?? null,
+    }} />
+  )
+}
+
+export default async function SettingsPage() {
+  const currentUser = await getCurrentUser()
+
+  if (!currentUser) {
     redirect("/login")
   }
 
@@ -42,13 +56,9 @@ export default async function SettingsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SettingsForm user={{
-                ...user,
-                targetWeightMin: (user as any).targetWeightMin ?? null,
-                targetWeightMax: (user as any).targetWeightMax ?? null,
-                milestoneStep: (user as any).milestoneStep ?? null,
-                sustainabilityMode: (user as any).sustainabilityMode ?? null,
-              }} />
+              <Suspense fallback={<SettingsFormSkeleton />}>
+                <SettingsFormSection userId={currentUser.id} />
+              </Suspense>
             </CardContent>
           </Card>
 

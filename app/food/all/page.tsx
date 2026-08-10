@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
@@ -10,6 +11,7 @@ import { AllFoodEntriesTable } from "@/components/all-food-entries-table"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
+import { TableCardSkeleton } from "@/components/skeletons"
 
 interface PageProps {
   searchParams: Promise<{ page?: string }>
@@ -36,22 +38,49 @@ async function getAllFoodEntries(userId: string, page: number = 1) {
   return { foods, totalCount, totalPages, currentPage: page }
 }
 
+async function FoodTableSection({ userId, page }: { userId: string; page: number }) {
+  const { foods, totalCount, totalPages, currentPage } = await getAllFoodEntries(userId, page)
+  const t = await getTranslations("food")
+
+  // Redirect if page is out of bounds (only if there are entries)
+  if (totalCount > 0 && currentPage > totalPages) {
+    redirect("/food/all?page=1")
+  }
+
+  return (
+    <>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <UtensilsCrossed className="h-5 w-5" />
+          {t("allCardTitle")} ({totalCount})
+        </CardTitle>
+        <CardDescription>{t("allCardDescription")}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {foods.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("allEmpty")}</p>
+        ) : (
+          <AllFoodEntriesTable
+            entries={foods}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
+        )}
+      </CardContent>
+    </>
+  )
+}
+
 export default async function AllFoodEntriesPage({ searchParams }: PageProps) {
   const user = await getCurrentUser()
-  
+
   if (!user) {
     redirect("/login")
   }
 
   const resolvedParams = await searchParams
   const page = Math.max(1, parseInt(resolvedParams.page || "1", 10))
-  const { foods, totalCount, totalPages, currentPage } = await getAllFoodEntries(user.id, page)
   const t = await getTranslations("food")
-  
-  // Redirect if page is out of bounds (only if there are entries)
-  if (totalCount > 0 && currentPage > totalPages) {
-    redirect("/food/all?page=1")
-  }
 
   return (
     <div className="flex h-screen">
@@ -71,24 +100,9 @@ export default async function AllFoodEntriesPage({ searchParams }: PageProps) {
           </div>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <UtensilsCrossed className="h-5 w-5" />
-                {t("allCardTitle")} ({totalCount})
-              </CardTitle>
-              <CardDescription>{t("allCardDescription")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {foods.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("allEmpty")}</p>
-              ) : (
-                <AllFoodEntriesTable 
-                  entries={foods} 
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                />
-              )}
-            </CardContent>
+            <Suspense key={page} fallback={<TableCardSkeleton />}>
+              <FoodTableSection userId={user.id} page={page} />
+            </Suspense>
           </Card>
         </div>
       </main>

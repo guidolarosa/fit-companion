@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
@@ -9,6 +10,7 @@ import { Weight, ArrowLeft } from "lucide-react"
 import { AllWeightEntriesTable } from "@/components/all-weight-entries-table"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { TableCardSkeleton } from "@/components/skeletons"
 
 interface PageProps {
   searchParams: Promise<{ page?: string }>
@@ -35,6 +37,35 @@ async function getAllWeightEntries(userId: string, page: number = 1) {
   return { weights, totalCount, totalPages, currentPage: page }
 }
 
+async function WeightTableSection({ userId, page }: { userId: string; page: number }) {
+  const { weights, totalCount, totalPages, currentPage } = await getAllWeightEntries(userId, page)
+  const t = await getTranslations("weight")
+
+  // Redirect if page is out of bounds (only if there are entries)
+  if (totalCount > 0 && currentPage > totalPages) {
+    redirect("/weight/all?page=1")
+  }
+
+  return (
+    <>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Weight className="h-5 w-5" />
+          {t("allCardTitle")} ({totalCount})
+        </CardTitle>
+        <CardDescription>{t("allCardDescription")}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {weights.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("allEmpty")}</p>
+        ) : (
+          <AllWeightEntriesTable entries={weights} currentPage={currentPage} totalPages={totalPages} />
+        )}
+      </CardContent>
+    </>
+  )
+}
+
 export default async function AllWeightEntriesPage({ searchParams }: PageProps) {
   const user = await getCurrentUser()
 
@@ -44,13 +75,7 @@ export default async function AllWeightEntriesPage({ searchParams }: PageProps) 
 
   const resolvedParams = await searchParams
   const page = Math.max(1, parseInt(resolvedParams.page || "1", 10))
-  const { weights, totalCount, totalPages, currentPage } = await getAllWeightEntries(user.id, page)
   const t = await getTranslations("weight")
-
-  // Redirect if page is out of bounds (only if there are entries)
-  if (totalCount > 0 && currentPage > totalPages) {
-    redirect("/weight/all?page=1")
-  }
 
   return (
     <div className="flex h-screen">
@@ -70,20 +95,9 @@ export default async function AllWeightEntriesPage({ searchParams }: PageProps) 
           </div>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Weight className="h-5 w-5" />
-                {t("allCardTitle")} ({totalCount})
-              </CardTitle>
-              <CardDescription>{t("allCardDescription")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {weights.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("allEmpty")}</p>
-              ) : (
-                <AllWeightEntriesTable entries={weights} currentPage={currentPage} totalPages={totalPages} />
-              )}
-            </CardContent>
+            <Suspense key={page} fallback={<TableCardSkeleton />}>
+              <WeightTableSection userId={user.id} page={page} />
+            </Suspense>
           </Card>
         </div>
       </main>

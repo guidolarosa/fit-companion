@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
@@ -9,6 +10,7 @@ import { Flame, ArrowLeft } from "lucide-react"
 import { AllExerciseEntriesTable } from "@/components/all-exercise-entries-table"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { TableCardSkeleton } from "@/components/skeletons"
 
 interface PageProps {
   searchParams: Promise<{ page?: string }>
@@ -35,6 +37,35 @@ async function getAllExerciseEntries(userId: string, page: number = 1) {
   return { exercises, totalCount, totalPages, currentPage: page }
 }
 
+async function ExerciseTableSection({ userId, page }: { userId: string; page: number }) {
+  const { exercises, totalCount, totalPages, currentPage } = await getAllExerciseEntries(userId, page)
+  const t = await getTranslations("exercise")
+
+  // Redirect if page is out of bounds (only if there are entries)
+  if (totalCount > 0 && currentPage > totalPages) {
+    redirect("/exercise/all?page=1")
+  }
+
+  return (
+    <>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Flame className="h-5 w-5" />
+          {t("allCardTitle")} ({totalCount})
+        </CardTitle>
+        <CardDescription>{t("allCardDescription")}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {exercises.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{t("allEmpty")}</p>
+        ) : (
+          <AllExerciseEntriesTable entries={exercises} currentPage={currentPage} totalPages={totalPages} />
+        )}
+      </CardContent>
+    </>
+  )
+}
+
 export default async function AllExerciseEntriesPage({ searchParams }: PageProps) {
   const user = await getCurrentUser()
 
@@ -44,13 +75,7 @@ export default async function AllExerciseEntriesPage({ searchParams }: PageProps
 
   const resolvedParams = await searchParams
   const page = Math.max(1, parseInt(resolvedParams.page || "1", 10))
-  const { exercises, totalCount, totalPages, currentPage } = await getAllExerciseEntries(user.id, page)
   const t = await getTranslations("exercise")
-
-  // Redirect if page is out of bounds (only if there are entries)
-  if (totalCount > 0 && currentPage > totalPages) {
-    redirect("/exercise/all?page=1")
-  }
 
   return (
     <div className="flex h-screen">
@@ -70,20 +95,9 @@ export default async function AllExerciseEntriesPage({ searchParams }: PageProps
           </div>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Flame className="h-5 w-5" />
-                {t("allCardTitle")} ({totalCount})
-              </CardTitle>
-              <CardDescription>{t("allCardDescription")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {exercises.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("allEmpty")}</p>
-              ) : (
-                <AllExerciseEntriesTable entries={exercises} currentPage={currentPage} totalPages={totalPages} />
-              )}
-            </CardContent>
+            <Suspense key={page} fallback={<TableCardSkeleton />}>
+              <ExerciseTableSection userId={user.id} page={page} />
+            </Suspense>
           </Card>
         </div>
       </main>

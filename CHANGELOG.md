@@ -23,3 +23,11 @@
   - Hiding all widgets is allowed; shows an empty-state message with a shortcut back into edit mode.
   - `MetricsGrid.tsx` and `WeeklyOverview.tsx` were removed; the two cards that were previously inline JSX ("Net Calories", "Trend") were extracted into standalone components (`net-calories-card.tsx`, `trend-card.tsx`) so every widget is independently addressable.
   - `ChartsSection` and `RecentEntries` (charts, calendars, daily register, recent entries lists) are unchanged and not customizable in this version.
+
+### Changed
+
+- **Streaming/Suspense on data-heavy pages**: `dashboard`, `food`, `weight`, `exercise`, `settings`, `food/all`, `weight/all`, `exercise/all`, and `register/all` no longer block their entire render on `prisma` queries. Each page's static shell (sidebar, header, input forms that need no data) now renders immediately; the data-dependent sections (history lists, charts, the widget grid) are pulled into small async Server Components wrapped in `<Suspense>`, each with a matching-size skeleton fallback (`components/skeletons.tsx`, `components/ui/skeleton.tsx`) so there's no layout shift when real content streams in.
+  - No new database queries were added — existing data-fetching functions were moved from the top-level page into Suspense-wrapped child components, not rewritten.
+  - On `/dashboard`, the widget grid/recent-entries/calendars (from `getDashboardData()`) and the weight progress chart (from `getWeightData()`) stream independently via two separate, nested Suspense boundaries, since they were already two separate parallel queries — whichever resolves first appears first.
+  - On the four paginated `/all` tables, the Suspense boundary is keyed by page number, so changing pages shows the skeleton again rather than leaving the previous page's rows on screen during the fetch.
+  - `report`, `lab`, `agent`, `onboarding`, `login`, and the landing page (`/`) were left unchanged — they're already client-rendered with no blocking server fetch, so there was nothing to stream.

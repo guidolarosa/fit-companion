@@ -1,16 +1,17 @@
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
 import { FoodForm } from "@/components/food-form"
-import { FoodAgent } from "@/components/food-agent"
 import { HealthyProductsList } from "@/components/healthy-products-list"
 import { FoodEntryList } from "@/components/food-entry-list"
 import { PageHeader } from "@/components/page-header"
 import { UtensilsCrossed } from "lucide-react"
 import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
+import { EntryListSkeleton } from "@/components/skeletons"
 
 async function getFoodEntries(userId: string) {
   const [foods, totalCount] = await Promise.all([
@@ -26,14 +27,24 @@ async function getFoodEntries(userId: string) {
   return { foods, totalCount }
 }
 
+async function FoodHistorySection({ userId }: { userId: string }) {
+  const { foods, totalCount } = await getFoodEntries(userId)
+  const t = await getTranslations("food")
+
+  if (foods.length === 0) {
+    return <p className="text-xs text-zinc-600 italic">{t("historyEmpty")}</p>
+  }
+
+  return <FoodEntryList entries={foods} showViewAll={totalCount > 5} />
+}
+
 export default async function FoodPage() {
   const user = await getCurrentUser()
-  
+
   if (!user) {
     redirect("/login")
   }
 
-  const { foods, totalCount } = await getFoodEntries(user.id)
   const t = await getTranslations("food")
 
   return (
@@ -77,11 +88,9 @@ export default async function FoodPage() {
                 <CardDescription className="text-[11px] text-zinc-600">{t("historyDescription")}</CardDescription>
               </CardHeader>
               <CardContent className="overflow-hidden">
-                {foods.length === 0 ? (
-                  <p className="text-xs text-zinc-600 italic">{t("historyEmpty")}</p>
-                ) : (
-                  <FoodEntryList entries={foods} showViewAll={totalCount > 5} />
-                )}
+                <Suspense fallback={<EntryListSkeleton rows={5} />}>
+                  <FoodHistorySection userId={user.id} />
+                </Suspense>
               </CardContent>
             </Card>
           </div>

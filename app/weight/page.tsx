@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { Sidebar } from "@/components/sidebar";
 import { MobileSidebar } from "@/components/mobile-sidebar";
@@ -16,6 +17,7 @@ import { WeightCalendar } from "@/components/weight-calendar";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser } from "@/lib/get-session";
 import { redirect } from "next/navigation";
+import { WeightSectionSkeleton } from "@/components/skeletons";
 
 async function getWeightData(userId: string) {
   const weights = await prisma.weightEntry.findMany({
@@ -25,6 +27,63 @@ async function getWeightData(userId: string) {
   return weights;
 }
 
+async function WeightHistorySection({ userId }: { userId: string }) {
+  const weights = await getWeightData(userId);
+  const t = await getTranslations("weight");
+
+  const weightDays = weights.map((w) => ({
+    date: w.date,
+    weight: w.weight,
+  }));
+
+  return (
+    <div className="grid gap-6 lg:grid-cols-1">
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Second row: Weight Progress Chart */}
+        {weights.length > 0 && (
+          <WeightChart
+            weights={weights}
+            title={t("progressTitle")}
+            description={t("progressDescription")}
+            cardClassName="glass-card"
+          />
+        )}
+
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
+              {t("historyTitle")}
+            </CardTitle>
+            <CardDescription className="text-[11px] text-zinc-600">
+              {t("historyDescription")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <WeightCalendar weightDays={weightDays} />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Third row: Weight Entry List */}
+      {weights.length > 0 && (
+        <Card className="glass-card">
+          <CardHeader>
+            <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
+              {t("recentEntriesTitle")}
+            </CardTitle>
+            <CardDescription className="text-[11px] text-zinc-600">
+              {t("recentEntriesDescription")}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="overflow-hidden">
+            <WeightEntryList entries={weights} limit={7} showAllHref="/weight/all" />
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
 export default async function WeightPage() {
   const user = await getCurrentUser();
 
@@ -32,14 +91,7 @@ export default async function WeightPage() {
     redirect("/login");
   }
 
-  const weights = await getWeightData(user.id);
   const t = await getTranslations("weight");
-
-  // Prepare weight days for calendar
-  const weightDays = weights.map((w) => ({
-    date: w.date,
-    weight: w.weight,
-  }));
 
   return (
     <div className="flex h-screen">
@@ -66,48 +118,9 @@ export default async function WeightPage() {
               </Card>
             </div>
 
-            <div className="grid gap-6 lg:grid-cols-2">
-              {/* Second row: Weight Progress Chart */}
-              {weights.length > 0 && (
-                <WeightChart
-                  weights={weights}
-                  title={t("progressTitle")}
-                  description={t("progressDescription")}
-                  cardClassName="glass-card"
-                />
-              )}
-
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                    {t("historyTitle")}
-                  </CardTitle>
-                  <CardDescription className="text-[11px] text-zinc-600">
-                    {t("historyDescription")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <WeightCalendar weightDays={weightDays} />
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Third row: Weight Entry List */}
-            {weights.length > 0 && (
-              <Card className="glass-card">
-                <CardHeader>
-                  <CardTitle className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
-                    {t("recentEntriesTitle")}
-                  </CardTitle>
-                  <CardDescription className="text-[11px] text-zinc-600">
-                    {t("recentEntriesDescription")}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="overflow-hidden">
-                  <WeightEntryList entries={weights} limit={7} showAllHref="/weight/all" />
-                </CardContent>
-              </Card>
-            )}
+            <Suspense fallback={<WeightSectionSkeleton />}>
+              <WeightHistorySection userId={user.id} />
+            </Suspense>
           </div>
         </div>
       </main>

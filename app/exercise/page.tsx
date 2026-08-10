@@ -1,15 +1,16 @@
+import { Suspense } from "react"
 import { getTranslations } from "next-intl/server"
 import { Sidebar } from "@/components/sidebar"
 import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { prisma } from "@/lib/prisma"
 import { ExerciseForm } from "@/components/exercise-form"
-import { ExerciseAgent } from "@/components/exercise-agent"
 import { ExerciseEntryList } from "@/components/exercise-entry-list"
 import { PageHeader } from "@/components/page-header"
 import { Flame } from "lucide-react"
 import { getCurrentUser } from "@/lib/get-session"
 import { redirect } from "next/navigation"
+import { EntryListSkeleton } from "@/components/skeletons"
 
 async function getExercises(userId: string) {
   const [exercises, totalCount] = await Promise.all([
@@ -25,14 +26,24 @@ async function getExercises(userId: string) {
   return { exercises, totalCount }
 }
 
+async function ExerciseHistorySection({ userId }: { userId: string }) {
+  const { exercises, totalCount } = await getExercises(userId)
+  const t = await getTranslations("exercise")
+
+  if (exercises.length === 0) {
+    return <p className="text-xs text-zinc-600 italic">{t("historyEmpty")}</p>
+  }
+
+  return <ExerciseEntryList entries={exercises} showViewAll={totalCount > 10} />
+}
+
 export default async function ExercisePage() {
   const user = await getCurrentUser()
-  
+
   if (!user) {
     redirect("/login")
   }
 
-  const { exercises, totalCount } = await getExercises(user.id)
   const t = await getTranslations("exercise")
 
   return (
@@ -64,11 +75,9 @@ export default async function ExercisePage() {
               <CardDescription className="text-[11px] text-zinc-600">{t("historyDescription")}</CardDescription>
             </CardHeader>
             <CardContent className="overflow-hidden">
-              {exercises.length === 0 ? (
-                <p className="text-xs text-zinc-600 italic">{t("historyEmpty")}</p>
-              ) : (
-                <ExerciseEntryList entries={exercises} showViewAll={totalCount > 10} />
-              )}
+              <Suspense fallback={<EntryListSkeleton rows={5} />}>
+                <ExerciseHistorySection userId={user.id} />
+              </Suspense>
             </CardContent>
           </Card>
         </div>
